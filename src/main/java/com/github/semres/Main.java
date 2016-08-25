@@ -1,0 +1,6 @@
+package com.github.semres;
+
+public class Main {
+    public static void main(String[] args) {
+    }
+}
