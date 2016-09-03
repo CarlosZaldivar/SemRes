@@ -1,8 +1,6 @@
 package com.github.semres;
 
-import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
-import org.apache.log4j.spi.LoggerFactory;
 
 import java.io.IOException;
 

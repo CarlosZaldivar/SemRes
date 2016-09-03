@@ -1,5 +1,6 @@
 package com.github.semres;
 
+import com.github.semres.babelnet.BabelNetManager;
 import it.uniroma1.lcl.babelnet.BabelNetConfiguration;
 import it.uniroma1.lcl.jlt.Configuration;
 
@@ -12,12 +13,8 @@ class SourcesInitializer {
             case "BabelNet": {
                 String basePath = Settings.getBaseDirectory();
                 String confDirectory = (String) parameters.get("directory");
-                Configuration jltConf = Configuration.getInstance();
-                jltConf.setConfigurationFile(new File(basePath + confDirectory + "config/jlt.properties"));
-
-                BabelNetConfiguration babelnetConf = BabelNetConfiguration.getInstance();
-                babelnetConf.setConfigurationFile(new File(basePath + confDirectory + "config/babelnet.properties"));
-                babelnetConf.setBasePath(basePath + confDirectory);
+                BabelNetManager.getInstance().loadConfiguration(basePath + confDirectory);
+                BabelNetManager.getInstance().setLanguage((String) parameters.get("language"));
             }
         }
     }
