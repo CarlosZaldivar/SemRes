@@ -1,4 +1,4 @@
-databases: {}
+databases-directory: databases
 sources:
   BabelNet:
     directory: babelnet-config/

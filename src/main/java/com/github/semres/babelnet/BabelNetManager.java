@@ -1,5 +1,6 @@
 package com.github.semres.babelnet;
 
+import com.github.semres.Source;
 import it.uniroma1.lcl.babelnet.BabelNet;
 import it.uniroma1.lcl.babelnet.BabelNetConfiguration;
 import it.uniroma1.lcl.babelnet.BabelSynset;
@@ -11,7 +12,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class BabelNetManager {
+public class BabelNetManager extends Source {
     public static BabelNetManager getInstance() {
         return instance;
     }
@@ -49,5 +50,15 @@ public class BabelNetManager {
         }
 
         return returnedSynsets;
+    }
+
+    @Override
+    public Class getSerializerClass() {
+        return BabelNetSerializer.class;
+    }
+
+    @Override
+    public Class getSynsetClass() {
+        return BabelNetSynset.class;
     }
 }
