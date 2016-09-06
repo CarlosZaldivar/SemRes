@@ -81,8 +81,6 @@ public class SemRes {
         }
 
         repositoryManager.addRepositoryConfig(new RepositoryConfig(repositoryId, new SailRepositoryConfig(new MemoryStoreConfig())));
-        Repository newRepo = repositoryManager.getRepository(repositoryId);
-        initializeRepository(newRepo);
     }
 
     public static String getBaseDirectory() {
@@ -96,15 +94,6 @@ public class SemRes {
         // Leaves only the directory
         path = path.substring(0, path.lastIndexOf('/') + 1);
         return path;
-    }
-
-    private void initializeRepository(Repository repository) {
-        try (RepositoryConnection connection = repository.getConnection()) {
-            ValueFactory factory = repository.getValueFactory();
-
-            connection.add(SR.SYNSET, RDF.TYPE, RDFS.CLASS);
-            connection.add(SR.EDGE, RDF.TYPE, RDFS.CLASS);
-        }
     }
 
     public Repository getRepository(String repositoryId) {

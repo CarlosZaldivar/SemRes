@@ -27,8 +27,8 @@ public class UserSynsetSerializer extends SynsetSerializer {
         Model model = new LinkedHashModel();
         ValueFactory factory = repository.getValueFactory();
 
-        model.add(getUserSerializerClassIri(), RDF.TYPE, RDFS.CLASS);
-        model.add(getUserSerializerClassIri(), RDFS.SUBCLASSOF, SR.SYNSET);
+        model.add(getUserSynsetClassIri(), RDF.TYPE, RDFS.CLASS);
+        model.add(getUserSynsetClassIri(), RDFS.SUBCLASSOF, SR.SYNSET);
 
         IRI synsetIri = factory.createIRI(baseIri + "synsets/" + synset.getId());
 
@@ -42,14 +42,14 @@ public class UserSynsetSerializer extends SynsetSerializer {
             model.add(factory.createStatement(synsetIri, RDFS.COMMENT, description));
         }
 
-        model.add(synsetIri, RDF.TYPE, getUserSerializerClassIri());
+        model.add(synsetIri, RDF.TYPE, getUserSynsetClassIri());
         model.add(synsetIri, SR.ID, factory.createLiteral(synset.getId()));
 
         return model;
     }
 
-    public IRI getUserSerializerClassIri() {
-        return repository.getValueFactory().createIRI(baseIri + "UserSynset");
+    public IRI getUserSynsetClassIri() {
+        return repository.getValueFactory().createIRI(baseIri + "classes/UserSynset");
     }
 
     @Override

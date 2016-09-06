@@ -28,7 +28,7 @@ public class UserSynsetSerializerTest {
         Model model = synsetSerializer.synsetToRdf(synset);
 
         assertTrue(model.filter(null, SR.ID, factory.createLiteral("123")).size() == 1);
-        assertTrue(model.filter(null, RDF.TYPE, factory.createIRI("http://example.org/UserSynset")).size() == 1);
+        assertTrue(model.filter(null, RDF.TYPE, factory.createIRI("http://example.org/classes/UserSynset")).size() == 1);
         assertTrue(model.filter(null, RDFS.LABEL, null).size() == 0);
         assertTrue(model.filter(null, RDFS.COMMENT, null).size() == 0);
 

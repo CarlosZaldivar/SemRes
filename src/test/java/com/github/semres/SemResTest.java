@@ -27,15 +27,6 @@ public class SemResTest {
 
             semRes.addRepository("new-repo");
             assertTrue(semRes.getRepositoryIDs().size() == 2);
-
-            Repository repository = semRes.getRepository("new-repo");
-            RepositoryConnection conn = repository.getConnection();
-
-            // Check if there are two classes 'synset' and 'synsetEdge' already in the repository.
-            try (RepositoryResult<Statement> statements = conn.getStatements(null, RDF.TYPE, RDFS.CLASS)) {
-                Model model = QueryResults.asModel(statements);
-                assertTrue(model.size() == 2);
-            }
         } finally {
             FileUtils.deleteDirectory(new File("/tmp/semres-tests"));
         }

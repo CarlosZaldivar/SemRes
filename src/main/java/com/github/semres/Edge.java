@@ -1,6 +1,8 @@
 package com.github.semres;
 
 
+import org.apache.commons.lang.Validate;
+
 public abstract class Edge {
     private final Synset pointedSynset;
     private final Synset originSynset;
@@ -8,14 +10,18 @@ public abstract class Edge {
     protected String description;
     protected double weight;
 
-    public Edge(Synset toSynset, Synset originSynset, RelationType relationType, String description, double weight) {
+    public Edge(Synset pointedSynset, Synset originSynset, RelationType relationType, double weight) {
         if (weight < 0) {
             throw new IllegalArgumentException();
         }
-        this.pointedSynset = toSynset;
+
+        Validate.notNull(pointedSynset, "Pointed synset cannot be null");
+        Validate.notNull(originSynset, "Origin synset cannot be null");
+        Validate.notNull(relationType, "Relation type cannot be null");
+
+        this.pointedSynset = pointedSynset;
         this.originSynset = originSynset;
         this.relationType = relationType;
-        this.description = description;
         this.weight = weight;
     }
 
@@ -39,7 +45,7 @@ public abstract class Edge {
         return relationType;
     }
 
-    public enum RelationType {HOLONYM, HYPERNY, HYPONYM, MERONYM, OTHER}
+    public enum RelationType {HOLONYM, HYPERNYM, HYPONYM, MERONYM, OTHER}
 
     public String getId() {
         return originSynset.getId() + "-" + pointedSynset.getId();
