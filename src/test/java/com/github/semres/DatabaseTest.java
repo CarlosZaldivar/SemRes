@@ -1,5 +1,6 @@
 package com.github.semres;
 
+import com.github.semres.user.UserSynsetSerializer;
 import org.eclipse.rdf4j.repository.Repository;
 import org.eclipse.rdf4j.repository.sail.SailRepository;
 import org.eclipse.rdf4j.sail.memory.MemoryStore;

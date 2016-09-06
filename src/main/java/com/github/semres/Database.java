@@ -7,17 +7,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Database {
-    private List<Serializer> serializers;
+    private List<SynsetSerializer> synsetSerializers;
     private Repository repository;
     private String baseIri = "http://example.org/";
 
     public Database(List<Class> serializerClasses, Repository repository) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
-        List<Serializer> serializers = new ArrayList<>();
+        List<SynsetSerializer> synsetSerializers = new ArrayList<>();
         for (Class serializerClass: serializerClasses) {
-            Serializer loadedSerializer = (Serializer) serializerClass.getConstructor(Repository.class, String.class).newInstance(repository, baseIri);
-            serializers.add(loadedSerializer);
+            SynsetSerializer loadedSynsetSerializer = (SynsetSerializer) serializerClass.getConstructor(Repository.class, String.class).newInstance(repository, baseIri);
+            synsetSerializers.add(loadedSynsetSerializer);
         }
-        this.serializers = serializers;
+        this.synsetSerializers = synsetSerializers;
         this.repository = repository;
     }
 }

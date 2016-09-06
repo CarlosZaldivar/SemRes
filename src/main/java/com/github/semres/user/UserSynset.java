@@ -1,4 +1,6 @@
-package com.github.semres;
+package com.github.semres.user;
+
+import com.github.semres.Synset;
 
 public class UserSynset extends Synset {
     public UserSynset(String id) {

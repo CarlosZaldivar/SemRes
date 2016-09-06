@@ -1,5 +1,8 @@
-package com.github.semres;
+package com.github.semres.user;
 
+import com.github.semres.SR;
+import com.github.semres.Synset;
+import com.github.semres.SynsetSerializer;
 import org.eclipse.rdf4j.model.*;
 import org.eclipse.rdf4j.model.impl.LinkedHashModel;
 import org.eclipse.rdf4j.model.vocabulary.RDF;
@@ -8,7 +11,7 @@ import org.eclipse.rdf4j.query.QueryResults;
 import org.eclipse.rdf4j.repository.Repository;
 import org.eclipse.rdf4j.repository.RepositoryConnection;
 
-public class UserSynsetSerializer extends Serializer {
+public class UserSynsetSerializer extends SynsetSerializer {
 
     public UserSynsetSerializer(Repository repository, String baseIri) {
         super(repository, baseIri);
@@ -50,7 +53,7 @@ public class UserSynsetSerializer extends Serializer {
     }
 
     @Override
-    public Synset rdfToSynset(String synsetId) {
+    public UserSynset rdfToSynset(String synsetId) {
         ValueFactory factory = repository.getValueFactory();
         String id;
         String representation = null;

@@ -3,7 +3,7 @@ package com.github.semres;
 import java.util.HashMap;
 import java.util.Map;
 
-abstract public class Synset {
+public abstract class Synset {
     private final String id;
     protected Map<String, Edge> edges = new HashMap<>();
     protected String representation;

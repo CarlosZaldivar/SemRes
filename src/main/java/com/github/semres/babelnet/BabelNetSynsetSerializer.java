@@ -1,12 +1,12 @@
 package com.github.semres.babelnet;
 
-import com.github.semres.Serializer;
+import com.github.semres.SynsetSerializer;
 import com.github.semres.Synset;
 import org.eclipse.rdf4j.model.*;
 import org.eclipse.rdf4j.repository.Repository;
 
-public class BabelNetSerializer extends Serializer {
-    public BabelNetSerializer(Repository repository, String baseIri) {
+public class BabelNetSynsetSerializer extends SynsetSerializer {
+    public BabelNetSynsetSerializer(Repository repository, String baseIri) {
         super(repository, baseIri);
     }
 

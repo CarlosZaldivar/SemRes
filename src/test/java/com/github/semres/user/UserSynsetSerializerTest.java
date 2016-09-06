@@ -1,5 +1,7 @@
-package com.github.semres;
+package com.github.semres.user;
 
+import com.github.semres.SR;
+import com.github.semres.SynsetSerializer;
 import org.eclipse.rdf4j.model.Model;
 import org.eclipse.rdf4j.model.ValueFactory;
 import org.eclipse.rdf4j.model.vocabulary.RDF;
@@ -19,11 +21,11 @@ public class UserSynsetSerializerTest {
         Repository repo = new SailRepository(new MemoryStore());
         repo.initialize();
         ValueFactory factory = repo.getValueFactory();
-        Serializer serializer = new UserSynsetSerializer(repo, "http://example.org/");
+        SynsetSerializer synsetSerializer = new UserSynsetSerializer(repo, "http://example.org/");
 
         // Testing basic synset
         UserSynset synset = new UserSynset("123");
-        Model model = serializer.synsetToRdf(synset);
+        Model model = synsetSerializer.synsetToRdf(synset);
 
         assertTrue(model.filter(null, SR.ID, factory.createLiteral("123")).size() == 1);
         assertTrue(model.filter(null, RDF.TYPE, factory.createIRI("http://example.org/UserSynset")).size() == 1);
@@ -33,7 +35,7 @@ public class UserSynsetSerializerTest {
         synset.setRepresentation("Car");
         synset.setDescription("Type of vehicle.");
 
-        model = serializer.synsetToRdf(synset);
+        model = synsetSerializer.synsetToRdf(synset);
 
         assertTrue(model.filter(null, RDFS.LABEL, factory.createLiteral("Car")).size() == 1);
         assertTrue(model.filter(null, RDFS.COMMENT, factory.createLiteral("Type of vehicle.")).size() == 1);
@@ -43,19 +45,19 @@ public class UserSynsetSerializerTest {
     public void rdfToSynset() throws Exception {
         Repository repo = new SailRepository(new MemoryStore());
         repo.initialize();
-        Serializer serializer = new UserSynsetSerializer(repo, "http://example.org/");
+        UserSynsetSerializer synsetSerializer = new UserSynsetSerializer(repo, "http://example.org/");
 
         UserSynset synset = new UserSynset("123");
         synset.setRepresentation("Car");
         synset.setDescription("Type of vehicle.");
 
-        Model model = serializer.synsetToRdf(synset);
+        Model model = synsetSerializer.synsetToRdf(synset);
 
         try (RepositoryConnection connection = repo.getConnection()) {
             connection.add(model);
         }
 
-        synset = (UserSynset) serializer.rdfToSynset("123");
+        synset = synsetSerializer.rdfToSynset("123");
         assertTrue(synset.getId().equals("123"));
         assertTrue(synset.getRepresentation().equals("Car"));
         assertTrue(synset.getDescription().equals("Type of vehicle."));

@@ -1,7 +1,7 @@
 package com.github.semres;
 
 
-abstract public class Edge {
+public abstract class Edge {
     private final Synset pointedSynset;
     private final Synset originSynset;
     protected RelationType relationType;

@@ -1,4 +1,7 @@
-package com.github.semres;
+package com.github.semres.user;
+
+import com.github.semres.Edge;
+import com.github.semres.Synset;
 
 public class UserEdge extends Edge {
     public UserEdge(Synset pointedSynset, Synset originSynset, RelationType relationType, String description, double weight) {

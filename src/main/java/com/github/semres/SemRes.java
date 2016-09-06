@@ -35,7 +35,7 @@ public class SemRes {
     private LocalRepositoryManager repositoryManager;
 
     public void addSerializerClass(Class serializer) {
-        if (!Serializer.class.isAssignableFrom(serializer)) {
+        if (!SynsetSerializer.class.isAssignableFrom(serializer)) {
             throw new IllegalArgumentException();
         }
         serializerClasses.add(serializer);
