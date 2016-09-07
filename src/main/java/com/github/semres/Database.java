@@ -20,4 +20,16 @@ public class Database {
         this.synsetSerializers = synsetSerializers;
         this.repository = repository;
     }
+
+    public void addSynset(Synset synset) {
+
+    }
+
+    public Synset getSynset(String id) {
+        return null;
+    }
+
+    private String getSynsetClass(String synsetId) {
+        return null;
+    }
 }
