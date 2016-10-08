@@ -1,11 +1,8 @@
 package com.github.semres;
 
 import com.esotericsoftware.yamlbeans.YamlException;
+import com.github.semres.gui.Main;
 import org.apache.log4j.Logger;
-import org.eclipse.rdf4j.model.ValueFactory;
-import org.eclipse.rdf4j.model.vocabulary.RDF;
-import org.eclipse.rdf4j.model.vocabulary.RDFS;
-import org.eclipse.rdf4j.repository.RepositoryConnection;
 import org.eclipse.rdf4j.repository.config.RepositoryConfig;
 import org.eclipse.rdf4j.repository.manager.LocalRepositoryManager;
 import org.eclipse.rdf4j.repository.Repository;
@@ -21,6 +18,8 @@ import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import javafx.application.Application;
+
 
 public class SemRes {
 
@@ -33,6 +32,7 @@ public class SemRes {
     private List<Class> serializerClasses = new ArrayList<>();
     private Settings settings;
     private LocalRepositoryManager repositoryManager;
+    private static SemRes semRes;
 
     public void addSerializerClass(Class serializer) {
         if (!SynsetSerializer.class.isAssignableFrom(serializer)) {
@@ -55,10 +55,15 @@ public class SemRes {
 
     public static void main(String[] args) {
         try {
-            SemRes semRes = new SemRes();
+            semRes = new SemRes();
         } catch (IOException | NullPointerException e) {
             logger.error("Could not load settings from conf.yaml", e);
         }
+        Application.launch(Main.class, args);
+    }
+
+    public static SemRes getInstance() {
+        return semRes;
     }
 
     public Set<String> getRepositoryIDs() {
