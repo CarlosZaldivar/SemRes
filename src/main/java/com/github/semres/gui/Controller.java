@@ -1,4 +1,4 @@
 package com.github.semres.gui;
 
-public class Controller {
+public abstract class Controller {
 }
