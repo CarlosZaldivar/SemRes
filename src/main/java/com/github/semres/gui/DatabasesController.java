@@ -20,9 +20,11 @@ import java.util.Set;
 
 public class DatabasesController extends Controller implements Initializable {
     @FXML
-    private ListView databases;
+    private ListView listView;
     @FXML
     private Button addButton;
+    @FXML
+    private Button deleteButton;
 
     private ObservableList observableList = FXCollections.observableArrayList();
     private Set<String> databasesNames;
@@ -30,9 +32,10 @@ public class DatabasesController extends Controller implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         databasesNames = SemRes.getInstance().getRepositoryIDs();
+        databasesNames.remove("SYSTEM");
 
         observableList.setAll(databasesNames);
-        databases.setItems(observableList);
+        listView.setItems(observableList);
     }
 
     public void openNewDatabaseDialog() throws IOException {
@@ -53,5 +56,13 @@ public class DatabasesController extends Controller implements Initializable {
     public void addDatabase(String name) {
         SemRes.getInstance().addRepository(name);
         observableList.add(name);
+    }
+
+    public void deleteDatabase() {
+        String name = (String)listView.getSelectionModel().getSelectedItem();
+        if (name != null) {
+            SemRes.getInstance().deleteRepository(name);
+            observableList.remove(name);
+        }
     }
 }

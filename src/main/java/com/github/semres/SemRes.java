@@ -88,6 +88,18 @@ public class SemRes {
         repositoryManager.addRepositoryConfig(new RepositoryConfig(repositoryId, new SailRepositoryConfig(new MemoryStoreConfig())));
     }
 
+    public void deleteRepository(String repositoryId) {
+        if (repositoryId == null) {
+            throw new IllegalArgumentException();
+        }
+
+        if (!repositoryManager.getRepositoryIDs().contains(repositoryId)) {
+            throw new IllegalArgumentException();
+        }
+
+        repositoryManager.removeRepository(repositoryId);
+    }
+
     public static String getBaseDirectory() {
         String path = null;
         try {
