@@ -1,5 +1,6 @@
 package com.github.semres.gui;
 
+import com.github.semres.Board;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Worker.State;
@@ -24,21 +25,36 @@ public class MainController extends Controller implements Initializable {
     private MenuBar menuBar;
 
     @FXML
-    private WebView board;
+    private WebView boardView;
+
+    public Board getBoard() {
+        return board;
+    }
+
+    private Board board;
+
+    public void setBoard(Board board) {
+        this.board = board;
+    }
 
     public void openDatabasesWindow() throws IOException {
-        Parent root = FXMLLoader.load(getClass().getResource("/fxml/databases-list.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/databases-list.fxml"));
+        Parent root = loader.load();
         Stage databasesStage = new Stage();
         databasesStage.setTitle("Databases");
         databasesStage.setScene(new Scene(root, 300, 275));
         databasesStage.initOwner(menuBar.getScene().getWindow());
         databasesStage.initModality(Modality.WINDOW_MODAL);
+
+        DatabasesController childController = loader.getController();
+        childController.setParent(this);
+
         databasesStage.show();
     }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        WebEngine engine = board.getEngine();
+        WebEngine engine = boardView.getEngine();
         // Add "javaApp" object to javascript window.
         engine.getLoadWorker().stateProperty().addListener(
                 new ChangeListener<State>() {
@@ -63,8 +79,8 @@ public class MainController extends Controller implements Initializable {
             addSynsetStage.initOwner(menuBar.getScene().getWindow());
             addSynsetStage.initModality(Modality.WINDOW_MODAL);
 
-//            AddingDatabaseController childController = loader.getController();
-//            childController.setParent(MainController.this);
+            AddingSynsetController childController = loader.getController();
+            childController.setParent(MainController.this);
 
             addSynsetStage.show();
         }

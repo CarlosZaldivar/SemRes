@@ -5,6 +5,7 @@ import org.junit.runners.Suite;
 
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
+        BoardTest.class,
         DatabaseTest.class,
         SemResTest.class,
         com.github.semres.user.TestSuite.class

@@ -21,8 +21,11 @@ public class UserEdgeSerializerTest {
         ValueFactory factory = repo.getValueFactory();
         EdgeSerializer edgeSerializer = new UserEdgeSerializer(repo, "http://example.org/");
 
-        Synset pointedSynset = new UserSynset("123");
-        Synset originSynset = new UserSynset("124");
+        Synset pointedSynset = new UserSynset("Foo1");
+        Synset originSynset = new UserSynset("Foo2");
+
+        pointedSynset.setId("123");
+        originSynset.setId("124");
 
         UserEdge edge = new UserEdge(pointedSynset, originSynset, Edge.RelationType.HOLONYM, 0.4);
         Model model = edgeSerializer.edgeToRdf(edge);
@@ -45,8 +48,11 @@ public class UserEdgeSerializerTest {
         repo.initialize();
         UserEdgeSerializer edgeSerializer = new UserEdgeSerializer(repo, "http://example.org/");
 
-        UserSynset pointedSynset = new UserSynset("123");
-        UserSynset originSynset = new UserSynset("124");
+        UserSynset pointedSynset = new UserSynset("Foo1");
+        UserSynset originSynset = new UserSynset("Foo2");
+
+        pointedSynset.setId("123");
+        originSynset.setId("124");
 
         UserEdge edge = new UserEdge(pointedSynset, originSynset, Edge.RelationType.HOLONYM, 0.5);
 

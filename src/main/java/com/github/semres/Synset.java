@@ -4,12 +4,16 @@ import java.util.HashMap;
 import java.util.Map;
 
 public abstract class Synset {
-    private final String id;
+    private String id;
     protected Map<String, Edge> edges = new HashMap<>();
     protected String representation;
     protected String description;
 
-    public Synset(String id) {
+    public Synset(String representation) {
+        this.representation = representation;
+    }
+
+    public void setId(String id) {
         this.id = id;
     }
 

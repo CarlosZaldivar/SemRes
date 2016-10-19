@@ -77,14 +77,11 @@ public class UserSynsetSerializer extends SynsetSerializer {
             }
         }
 
-        UserSynset synset = new UserSynset(id);
+        UserSynset synset = new UserSynset(representation);
+        synset.setId(id);
 
         if (description != null) {
             synset.setDescription(description);
-        }
-
-        if (representation != null) {
-            synset.setRepresentation(representation);
         }
 
         return synset;

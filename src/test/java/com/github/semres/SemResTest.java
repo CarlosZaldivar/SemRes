@@ -1,14 +1,6 @@
 package com.github.semres;
 
 import org.apache.commons.io.FileUtils;
-import org.eclipse.rdf4j.model.Model;
-import org.eclipse.rdf4j.model.Statement;
-import org.eclipse.rdf4j.model.vocabulary.RDF;
-import org.eclipse.rdf4j.model.vocabulary.RDFS;
-import org.eclipse.rdf4j.query.QueryResults;
-import org.eclipse.rdf4j.repository.Repository;
-import org.eclipse.rdf4j.repository.RepositoryConnection;
-import org.eclipse.rdf4j.repository.RepositoryResult;
 import org.junit.Test;
 
 import java.io.File;

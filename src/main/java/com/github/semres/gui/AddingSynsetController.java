@@ -1,5 +1,6 @@
 package com.github.semres.gui;
 
+import com.github.semres.user.UserSynset;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
@@ -18,7 +19,9 @@ public class AddingSynsetController extends ChildController {
         String description = descriptionTA.getText();
 
         if (representation != null && !representation.isEmpty()) {
-
+            UserSynset newSynset = new UserSynset(representation);
+            newSynset.setDescription(description);
+            ((MainController) parent).getBoard().addSynset(newSynset);
         }
     }
 }

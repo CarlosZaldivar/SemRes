@@ -30,7 +30,7 @@
       </MenuBar>
       <AnchorPane layoutY="29.0" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="29.0">
          <children>
-            <WebView fx:id="board" layoutX="21.0" layoutY="9.0" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+            <WebView fx:id="boardView" layoutX="21.0" layoutY="9.0" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
          </children>
       </AnchorPane>
    </children>
