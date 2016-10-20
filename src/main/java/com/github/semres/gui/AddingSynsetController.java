@@ -5,6 +5,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.stage.Stage;
 
 public class AddingSynsetController extends ChildController {
     @FXML
@@ -21,7 +22,9 @@ public class AddingSynsetController extends ChildController {
         if (representation != null && !representation.isEmpty()) {
             UserSynset newSynset = new UserSynset(representation);
             newSynset.setDescription(description);
-            ((MainController) parent).getBoard().addSynset(newSynset);
+            ((MainController) parent).addSynset(newSynset);
+            Stage stage = (Stage) addButton.getScene().getWindow();
+            stage.close();
         }
     }
 }

@@ -1,6 +1,9 @@
 package com.github.semres.gui;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.semres.Board;
+import com.github.semres.Synset;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Worker.State;
@@ -32,9 +35,28 @@ public class MainController extends Controller implements Initializable {
     }
 
     private Board board;
+    private WebEngine engine;
+
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
+        engine = boardView.getEngine();
+        // Add "javaApp" object to javascript window.
+        engine.getLoadWorker().stateProperty().addListener(
+            new ChangeListener<State>() {
+                public void changed(ObservableValue ov, State oldState, State newState) {
+                    if (newState == State.SUCCEEDED) {
+                        JSObject window = (JSObject) engine.executeScript("window");
+                        window.setMember("javaApp", new JavaApp());
+                    }
+                }
+            }
+        );
+    }
 
     public void setBoard(Board board) {
         this.board = board;
+        // Reload html
+        engine.load(getClass().getResource("/html/board.html").toExternalForm());
     }
 
     public void openDatabasesWindow() throws IOException {
@@ -52,25 +74,21 @@ public class MainController extends Controller implements Initializable {
         databasesStage.show();
     }
 
-    @Override
-    public void initialize(URL location, ResourceBundle resources) {
-        WebEngine engine = boardView.getEngine();
-        // Add "javaApp" object to javascript window.
-        engine.getLoadWorker().stateProperty().addListener(
-                new ChangeListener<State>() {
-                    public void changed(ObservableValue ov, State oldState, State newState) {
-                        if (newState == State.SUCCEEDED) {
-                            JSObject window = (JSObject) engine.executeScript("window");
-                            window.setMember("javaApp", new JavaApp());
-                        }
-                    }
-                });
-        engine.load(getClass().getResource("/html/board.html").toExternalForm());
+    public void addSynset(Synset synset) {
+        board.addSynset(synset);
+        ObjectMapper mapper = new ObjectMapper();
+        String jsonSynset = null;
+        try {
+            jsonSynset = mapper.writeValueAsString(synset);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+        engine.executeScript("addSynset(" + jsonSynset + ");");
+
     }
 
     public class JavaApp {
         public void openNewSynsetWindow() throws IOException {
-            System.out.println("openNewSynsetWindow");
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/add-synset.fxml"));
             Parent root = loader.load();
             Stage addSynsetStage = new Stage();
