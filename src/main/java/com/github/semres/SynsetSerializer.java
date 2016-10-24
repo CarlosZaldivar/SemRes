@@ -1,5 +1,6 @@
 package com.github.semres;
 
+import org.eclipse.rdf4j.model.IRI;
 import org.eclipse.rdf4j.model.Model;
 import org.eclipse.rdf4j.repository.Repository;
 
@@ -14,4 +15,6 @@ public abstract class SynsetSerializer {
 
     public abstract Model synsetToRdf(Synset synset);
     public abstract Synset rdfToSynset(String synsetId);
+    public abstract String getSynsetClass();
+    public abstract IRI getUserSynsetClassIri();
 }
