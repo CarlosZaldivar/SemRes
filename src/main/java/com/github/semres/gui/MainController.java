@@ -4,9 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.semres.Board;
 import com.github.semres.Synset;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
-import javafx.concurrent.Worker.State;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -14,13 +12,16 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.MenuBar;
 import javafx.scene.web.WebEngine;
+import javafx.scene.web.WebEvent;
 import javafx.scene.web.WebView;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import netscape.javascript.JSObject;
+
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
+
+import static es.uvigo.ei.sing.javafx.webview.Java2JavascriptUtils.connectBackendObject;
 
 public class MainController extends Controller implements Initializable {
 
@@ -40,17 +41,8 @@ public class MainController extends Controller implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         engine = boardView.getEngine();
-        // Add "javaApp" object to javascript window.
-        engine.getLoadWorker().stateProperty().addListener(
-            new ChangeListener<State>() {
-                public void changed(ObservableValue ov, State oldState, State newState) {
-                    if (newState == State.SUCCEEDED) {
-                        JSObject window = (JSObject) engine.executeScript("window");
-                        window.setMember("javaApp", new JavaApp());
-                    }
-                }
-            }
-        );
+
+        connectBackendObject(engine, "javaApp", new JavaApp());
     }
 
     public void setBoard(Board board) {
@@ -84,7 +76,6 @@ public class MainController extends Controller implements Initializable {
             e.printStackTrace();
         }
         engine.executeScript("addSynset(" + jsonSynset + ");");
-
     }
 
     public class JavaApp {

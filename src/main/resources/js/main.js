@@ -1,3 +1,6 @@
+// Connect java object
+alert("__CONNECT__BACKEND__javaApp");
+
 var cy = cytoscape({
     container: document.getElementById('cy'),
     style: [
