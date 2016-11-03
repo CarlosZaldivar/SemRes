@@ -118,4 +118,8 @@ public class SemRes {
     public Repository getRepository(String repositoryId) {
         return repositoryManager.getRepository(repositoryId);
     }
+
+    public void save() {
+        repositoryManager.shutDown();
+    }
 }

@@ -1,5 +1,6 @@
 package com.github.semres.gui;
 
+import com.github.semres.SemRes;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -13,5 +14,10 @@ public class Main extends Application {
         primaryStage.setTitle("SemRes");
         primaryStage.setScene(new Scene(root, 600, 550));
         primaryStage.show();
+    }
+
+    @Override
+    public void stop() {
+        SemRes.getInstance().save();
     }
 }
