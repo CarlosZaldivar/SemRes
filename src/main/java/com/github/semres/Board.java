@@ -6,6 +6,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Board {
+    public Map<String, Synset> getSynsets() {
+        return synsets;
+    }
+
     private Map<String, Synset> synsets = new HashMap<>();
     private Map<String, Boolean> synsetsLoadedState = new HashMap<>();
     private Map<String, Edge> edges = new HashMap<>();
@@ -16,6 +20,9 @@ public class Board {
 
     public Board(Database attachedDatabase) {
         this.attachedDatabase = attachedDatabase;
+        for (Synset synset : this.attachedDatabase.getSynsets()) {
+            synsets.put(synset.getId(), synset);
+        }
     }
 
     public void addSynset(Synset newSynset) {
@@ -24,6 +31,13 @@ public class Board {
         }
         synsets.put(newSynset.getId(), newSynset);
         newSynsets.put(newSynset.getId(), newSynset);
+    }
+
+    public void save() {
+        for (Synset synset : newSynsets.values()) {
+            attachedDatabase.addSynset(synset);
+        }
+        newSynsets.clear();
     }
 
     /**

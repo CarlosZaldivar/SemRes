@@ -4,15 +4,17 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.semres.Board;
 import com.github.semres.Synset;
-import javafx.event.EventHandler;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.concurrent.Worker;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.MenuBar;
+import javafx.scene.control.MenuItem;
 import javafx.scene.web.WebEngine;
-import javafx.scene.web.WebEvent;
 import javafx.scene.web.WebView;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -31,6 +33,9 @@ public class MainController extends Controller implements Initializable {
     @FXML
     private WebView boardView;
 
+    @FXML
+    private MenuItem saveMenuItem;
+
     public Board getBoard() {
         return board;
     }
@@ -47,8 +52,33 @@ public class MainController extends Controller implements Initializable {
 
     public void setBoard(Board board) {
         this.board = board;
+
+        engine.getLoadWorker().stateProperty().addListener(
+                new ChangeListener<Worker.State>() {
+                    public void changed(ObservableValue ov, Worker.State oldState, Worker.State newState) {
+                        if (newState == Worker.State.SUCCEEDED) {
+                            for (Synset synset : board.getSynsets().values()) {
+                                ObjectMapper mapper = new ObjectMapper();
+                                String jsonSynset = null;
+                                try {
+                                    jsonSynset = mapper.writeValueAsString(synset);
+                                } catch (JsonProcessingException e) {
+                                    e.printStackTrace();
+                                }
+                                engine.executeScript("addSynset(" + jsonSynset + ");");
+                            }
+                        }
+                    }
+                }
+        );
         // Reload html
         engine.load(getClass().getResource("/html/board.html").toExternalForm());
+        // Enable 'save' option.
+        saveMenuItem.setDisable(false);
+    }
+
+    public void save() {
+        board.save();
     }
 
     public void openDatabasesWindow() throws IOException {

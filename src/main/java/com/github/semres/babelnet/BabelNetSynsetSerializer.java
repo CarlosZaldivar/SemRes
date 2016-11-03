@@ -26,7 +26,7 @@ public class BabelNetSynsetSerializer extends SynsetSerializer {
     }
 
     @Override
-    public IRI getUserSynsetClassIri() {
-        return null;
+    public IRI getSynsetClassIri() {
+        return repository.getValueFactory().createIRI(baseIri + "classes/BabelNetSynset");
     }
 }

@@ -91,7 +91,7 @@ public class Database {
         try {
             serializer = synsetSerializers
                     .stream()
-                    .filter(x -> x.getUserSynsetClassIri().stringValue().equals(type))
+                    .filter(x -> x.getSynsetClassIri().stringValue().equals(type))
                     .findFirst().get();
         } catch (NoSuchElementException e) {
             throw new IllegalArgumentException();

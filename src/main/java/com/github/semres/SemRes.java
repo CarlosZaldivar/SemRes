@@ -2,6 +2,7 @@ package com.github.semres;
 
 import com.esotericsoftware.yamlbeans.YamlException;
 import com.github.semres.gui.Main;
+import com.github.semres.user.UserSynsetSerializer;
 import org.apache.log4j.Logger;
 import org.eclipse.rdf4j.repository.config.RepositoryConfig;
 import org.eclipse.rdf4j.repository.manager.LocalRepositoryManager;
@@ -49,6 +50,7 @@ public class SemRes {
         for (Source source: settings.getSources()) {
             serializerClasses.add(source.getSerializerClass());
         }
+        serializerClasses.add(UserSynsetSerializer.class);
         repositoryManager = new LocalRepositoryManager(new File(settings.getDatabasesDirectory()));
         repositoryManager.initialize();
     }
@@ -85,7 +87,7 @@ public class SemRes {
             throw new IllegalArgumentException();
         }
 
-        repositoryManager.addRepositoryConfig(new RepositoryConfig(repositoryId, new SailRepositoryConfig(new MemoryStoreConfig())));
+        repositoryManager.addRepositoryConfig(new RepositoryConfig(repositoryId, new SailRepositoryConfig(new MemoryStoreConfig(true))));
     }
 
     public void deleteRepository(String repositoryId) {
