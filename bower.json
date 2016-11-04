@@ -1,0 +1,22 @@
+{
+  "name": "semres",
+  "homepage": "https://github.com/CarlosZaldivar/SemRes",
+  "authors": [
+    "Carlos Zaldivar Batista <carlos.zaldivar.batista@gmail.com>"
+  ],
+  "description": "",
+  "main": "",
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "firebug-lite": "^1.5.1",
+    "cytoscape": "^2.7.10"
+  }
+}
