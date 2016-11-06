@@ -17,6 +17,10 @@
   ],
   "dependencies": {
     "firebug-lite": "^1.5.1",
-    "cytoscape": "^2.7.10"
+    "cytoscape": "^2.7.10",
+    "cytoscape-context-menus": "^2.0.3",
+    "jquery": "^3.1.1",
+    "cytoscape-edgehandles": "^2.6.1",
+    "es6-shim": "^0.35.1"
   }
 }

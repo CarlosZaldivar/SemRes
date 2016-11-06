@@ -9,11 +9,100 @@ var cy = cytoscape({
             style: {
                 'label': 'data(representation)'
             }
+        },
+        {
+            selector: 'edge',
+            css: {
+                'curve-style': 'bezier',
+                'target-arrow-shape': 'triangle'
+            }
+        },
+
+        {
+            selector: '.edgehandles-hover',
+            css: {
+                'background-color': 'red'
+            }
+        },
+
+        {
+            selector: '.edgehandles-source',
+            css: {
+                'border-width': 2,
+                'border-color': 'red'
+            }
+        },
+
+        {
+            selector: '.edgehandles-target',
+            css: {
+                'border-width': 2,
+                'border-color': 'red'
+            }
+        },
+
+        {
+            selector: '.edgehandles-preview, .edgehandles-ghost-edge',
+            css: {
+                'line-color': 'red',
+                'target-arrow-color': 'red',
+                'source-arrow-color': 'red'
+            }
         }
     ]
 });
 
-function startSynsetAddition(e) {
+cy.contextMenus({
+    menuItems: [
+        {
+            id: 'remove',
+            title: 'Remove',
+            selector: 'node, edge',
+            onClickFunction: function (event) {
+                event.cyTarget.remove();
+            }
+        },
+        {
+            id: 'hide',
+            title: 'Hide',
+            selector: '*',
+            onClickFunction: function (event) {
+                event.cyTarget.hide();
+            },
+            disabled: false
+        },
+        {
+            id: 'add-node',
+            title: 'Add node',
+            coreAsWell: true,
+            onClickFunction: startSynsetAddition
+        },
+        {
+            id: 'add-edge',
+            title: 'Add edge',
+            selector: 'node',
+            onClickFunction: startEdgeAddition
+        },
+        {
+            id: 'select-all-nodes',
+            title: 'Select all nodes',
+            coreAsWell: true,
+            onClickFunction: function() {
+                cy.elements().unselect();
+                cy.nodes().select();
+            }
+        }
+    ]
+});
+
+cy.edgehandles({});
+cy.edgehandles('disable');
+
+function startEdgeAddition(event) {
+    cy.edgehandles('start', event.cyTarget.id());
+}
+
+function startSynsetAddition() {
     try {
         javaApp.openNewSynsetWindow();
     }
