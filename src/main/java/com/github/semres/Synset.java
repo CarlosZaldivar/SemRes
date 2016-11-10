@@ -36,4 +36,12 @@ public abstract class Synset {
     public void setEdges(Map<String, Edge> newEdges) {
         edges = (newEdges == null) ? new HashMap<>() : new HashMap<>(newEdges);
     }
+
+    public void addEdge(Edge edge) {
+        edges.put(edge.getId(), edge);
+    }
+
+    public void removeEdge(String id) {
+        edges.remove(id);
+    }
 }

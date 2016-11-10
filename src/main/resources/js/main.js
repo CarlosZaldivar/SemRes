@@ -12,6 +12,9 @@ var cy = cytoscape({
         },
         {
             selector: 'edge',
+            style: {
+                'label': 'label'
+            },
             css: {
                 'curve-style': 'bezier',
                 'target-arrow-shape': 'triangle'
@@ -95,7 +98,9 @@ cy.contextMenus({
     ]
 });
 
-cy.edgehandles({});
+cy.edgehandles({
+    complete: setEdgeDetails
+});
 cy.edgehandles('disable');
 
 function startEdgeAddition(event) {
@@ -109,6 +114,10 @@ function startSynsetAddition() {
     catch(err) {
         console.log(err);
     }
+}
+
+function setEdgeDetails(sourceNode, targetNodes, addedEntities) {
+    javaApp.openNewEdgeWindow(sourceNode.data().id, targetNodes.data().id);
 }
 
 function addSynset(synset) {

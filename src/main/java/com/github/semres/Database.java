@@ -13,16 +13,25 @@ import java.util.NoSuchElementException;
 
 public class Database {
     private List<SynsetSerializer> synsetSerializers;
+    private List<EdgeSerializer> edgeSerializers;
     private Repository repository;
     private String baseIri = "http://example.org/";
 
-    public Database(List<Class> serializerClasses, Repository repository) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
+    public Database(List<Class> synsetSerializerClasses, List<Class> edgeSerializerClasses, Repository repository) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
         List<SynsetSerializer> synsetSerializers = new ArrayList<>();
-        for (Class serializerClass: serializerClasses) {
+        for (Class serializerClass: synsetSerializerClasses) {
             SynsetSerializer loadedSynsetSerializer = (SynsetSerializer) serializerClass.getConstructor(Repository.class, String.class).newInstance(repository, baseIri);
             synsetSerializers.add(loadedSynsetSerializer);
         }
         this.synsetSerializers = synsetSerializers;
+
+        List<EdgeSerializer> edgeSerializers = new ArrayList<>();
+        for (Class serializerClass: edgeSerializerClasses) {
+            EdgeSerializer loadedEdgeSerializer = (EdgeSerializer) serializerClass.getConstructor(Repository.class, String.class).newInstance(repository, baseIri);
+            edgeSerializers.add(loadedEdgeSerializer);
+        }
+        this.edgeSerializers = edgeSerializers;
+
         this.repository = repository;
         this.repository.initialize();
     }
@@ -30,6 +39,12 @@ public class Database {
     public void addSynset(Synset synset) {
         try (RepositoryConnection conn = repository.getConnection()) {
             conn.add(getSerializerForSynset(synset).synsetToRdf(synset));
+        }
+    }
+
+    public void addEdge(Edge edge) {
+        try (RepositoryConnection conn = repository.getConnection()) {
+            conn.add(getSerializerForEdge(edge).edgeToRdf(edge));
         }
     }
 
@@ -44,7 +59,6 @@ public class Database {
             // Find subjects of type that is a subclass of SR.SYNSET
             String queryString = String.format("SELECT ?s ?type WHERE { ?s <%s> ?type . ?type <%s> <%s> }", RDF.TYPE, RDFS.SUBCLASSOF, SR.SYNSET);
             TupleQuery tupleQuery = conn.prepareTupleQuery(QueryLanguage.SPARQL, queryString);
-
 
             try (TupleQueryResult result = tupleQuery.evaluate()) {
                 while (result.hasNext()) {
@@ -81,7 +95,7 @@ public class Database {
                     .filter(x -> x.getSynsetClass().equals(synset.getClass().getCanonicalName()))
                     .findFirst().get();
         } catch (NoSuchElementException e) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException(e);
         }
         return serializer;
     }
@@ -95,6 +109,19 @@ public class Database {
                     .findFirst().get();
         } catch (NoSuchElementException e) {
             throw new IllegalArgumentException();
+        }
+        return serializer;
+    }
+
+    private EdgeSerializer getSerializerForEdge(Edge edge) {
+        EdgeSerializer serializer;
+        try {
+            serializer = edgeSerializers
+                    .stream()
+                    .filter(x -> x.getEdgeClass().equals(edge.getClass().getCanonicalName()))
+                    .findFirst().get();
+        } catch (NoSuchElementException e) {
+            throw new IllegalArgumentException(e);
         }
         return serializer;
     }

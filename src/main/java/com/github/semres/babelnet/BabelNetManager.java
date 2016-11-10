@@ -53,8 +53,13 @@ public class BabelNetManager extends Source {
     }
 
     @Override
-    public Class getSerializerClass() {
+    public Class getSynsetSerializerClass() {
         return BabelNetSynsetSerializer.class;
+    }
+
+    @Override
+    public Class getEdgeSerializerClass() {
+        return null;
     }
 
     @Override

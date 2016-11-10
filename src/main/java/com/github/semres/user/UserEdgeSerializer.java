@@ -68,6 +68,11 @@ public class UserEdgeSerializer extends EdgeSerializer {
     }
 
     @Override
+    public String getEdgeClass() {
+        return "com.github.semres.user.UserEdge";
+    }
+
+    @Override
     public UserEdge rdfToEdge(String edgeId, Synset pointedSynset, Synset originSynset) {
         ValueFactory factory = repository.getValueFactory();
         String description = null;

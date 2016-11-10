@@ -2,6 +2,7 @@ package com.github.semres;
 
 import com.esotericsoftware.yamlbeans.YamlException;
 import com.github.semres.gui.Main;
+import com.github.semres.user.UserEdgeSerializer;
 import com.github.semres.user.UserSynsetSerializer;
 import org.apache.log4j.Logger;
 import org.eclipse.rdf4j.repository.config.RepositoryConfig;
@@ -26,20 +27,18 @@ public class SemRes {
 
     final static Logger logger = Logger.getLogger(SemRes.class);
 
-    public List<Class> getSerializerClasses() {
-        return new ArrayList<>(serializerClasses);
-    }
+    private List<Class> synsetSerializerClasses = new ArrayList<>();
+    private List<Class> edgeSerializerClasses = new ArrayList<>();
 
-    private List<Class> serializerClasses = new ArrayList<>();
     private Settings settings;
+
     private LocalRepositoryManager repositoryManager;
     private static SemRes semRes;
-
     public void addSerializerClass(Class serializer) {
         if (!SynsetSerializer.class.isAssignableFrom(serializer)) {
             throw new IllegalArgumentException();
         }
-        serializerClasses.add(serializer);
+        synsetSerializerClasses.add(serializer);
     }
 
     public SemRes() throws FileNotFoundException, YamlException {
@@ -48,11 +47,17 @@ public class SemRes {
 
     public SemRes(Settings settings) {
         for (Source source: settings.getSources()) {
-            serializerClasses.add(source.getSerializerClass());
+            synsetSerializerClasses.add(source.getSynsetSerializerClass());
+//            edgeSerializerClasses.add(source.getEdgeSerializerClass());
         }
-        serializerClasses.add(UserSynsetSerializer.class);
+        synsetSerializerClasses.add(UserSynsetSerializer.class);
+        edgeSerializerClasses.add(UserEdgeSerializer.class);
         repositoryManager = new LocalRepositoryManager(new File(settings.getDatabasesDirectory()));
         repositoryManager.initialize();
+    }
+
+    public List<Class> getSynsetSerializerClasses() {
+        return new ArrayList<>(synsetSerializerClasses);
     }
 
     public static void main(String[] args) {
@@ -74,7 +79,7 @@ public class SemRes {
 
     public Board getBoard(String repositoryId) throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
         Repository repository = repositoryManager.getRepository(repositoryId);
-        Database database = new Database(serializerClasses, repository);
+        Database database = new Database(synsetSerializerClasses, edgeSerializerClasses, repository);
         return new Board(database);
     }
 

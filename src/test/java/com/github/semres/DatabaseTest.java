@@ -20,7 +20,7 @@ public class DatabaseTest {
         List<Class> serializerClasses = new ArrayList<>();
         serializerClasses.add(UserSynsetSerializer.class);
 
-        Database database = new Database(serializerClasses, repo);
+        Database database = new Database(serializerClasses, new ArrayList<>(), repo);
     }
 
     @Test
@@ -29,7 +29,7 @@ public class DatabaseTest {
         List<Class> serializerClasses = new ArrayList<>();
         serializerClasses.add(UserSynsetSerializer.class);
 
-        Database database = new Database(serializerClasses, repo);
+        Database database = new Database(serializerClasses, new ArrayList<>(), repo);
 
         UserSynset synset1 = new UserSynset("Foo1");
         synset1.setId("123");

@@ -13,6 +13,7 @@ public class Board {
     private Map<String, Synset> synsets = new HashMap<>();
     private Map<String, Boolean> synsetsLoadedState = new HashMap<>();
     private Map<String, Edge> edges = new HashMap<>();
+    private Map<String, Edge> newEdges = new HashMap<>();
 
     private Map<String, Synset> newSynsets = new HashMap<>();
 
@@ -33,11 +34,25 @@ public class Board {
         newSynsets.put(newSynset.getId(), newSynset);
     }
 
+    public void addEdge(Edge newEdge) {
+        edges.put(newEdge.getId(), newEdge);
+        newEdges.put(newEdge.getId(), newEdge);
+
+        synsets.get(newEdge.getOriginSynset().getId()).addEdge(newEdge);
+    }
+
+    public Synset getSynset(String id) {
+        return synsets.get(id);
+    }
+
     public void save() {
         for (Synset synset : newSynsets.values()) {
             attachedDatabase.addSynset(synset);
         }
         newSynsets.clear();
+        for (Edge edge : newEdges.values()) {
+            attachedDatabase.addEdge(edge);
+        }
     }
 
     /**

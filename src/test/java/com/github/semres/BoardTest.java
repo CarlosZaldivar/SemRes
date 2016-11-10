@@ -20,7 +20,7 @@ public class BoardTest {
         List<Class> serializerClasses = new ArrayList<>();
         serializerClasses.add(UserSynsetSerializer.class);
 
-        Database database = new Database(serializerClasses, repo);
+        Database database = new Database(serializerClasses, new ArrayList<>(), repo);
         Board board = new Board(database);
 
         Synset synset = new UserSynset("Foo");
