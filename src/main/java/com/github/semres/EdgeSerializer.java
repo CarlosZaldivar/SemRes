@@ -15,7 +15,9 @@ public abstract class EdgeSerializer {
 
     abstract public Model edgeToRdf(Edge edge);
     abstract public Edge rdfToEdge(String edgeId, Synset pointedSynset, Synset originSynset);
+    abstract public Edge rdfToEdge(IRI edge, Synset pointedSynset, Synset originSynset);
     abstract public String getEdgeClass();
+    abstract public IRI getEdgeClassIri();
 
     protected Edge.RelationType relationIriToEnum(IRI relationIri) {
         if (relationIri.stringValue().equals(SR.HOLONYM.stringValue())) {

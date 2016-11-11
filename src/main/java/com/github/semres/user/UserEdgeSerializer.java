@@ -28,8 +28,8 @@ public class UserEdgeSerializer extends EdgeSerializer {
         Model model = new LinkedHashModel();
         ValueFactory factory = repository.getValueFactory();
 
-        model.add(getUserEdgeClassIri(), RDF.TYPE, RDFS.CLASS);
-        model.add(getUserEdgeClassIri(), RDFS.SUBCLASSOF, SR.EDGE);
+        model.add(getEdgeClassIri(), RDF.TYPE, RDFS.CLASS);
+        model.add(getEdgeClassIri(), RDFS.SUBCLASSOF, SR.EDGE);
 
         IRI edgeIri = factory.createIRI(baseIri + "edges/" + edge.getId());
 
@@ -38,7 +38,7 @@ public class UserEdgeSerializer extends EdgeSerializer {
             model.add(factory.createStatement(edgeIri, RDFS.COMMENT, description));
         }
 
-        model.add(edgeIri, RDF.TYPE, getUserEdgeClassIri());
+        model.add(edgeIri, RDF.TYPE, getEdgeClassIri());
         model.add(edgeIri, SR.ID, factory.createLiteral(edge.getId()));
 
         switch (edge.getRelationType()) {
@@ -56,15 +56,10 @@ public class UserEdgeSerializer extends EdgeSerializer {
                 break;
         }
 
-        model.add(edgeIri, SR.POINTED_SYSNET, factory.createIRI(baseIri + "synsets/" + edge.getPointedSynset().getId()));
-        model.add(edgeIri, SR.ORIGIN_SYNSET, factory.createIRI(baseIri + "synsets/" + edge.getOriginSynset().getId()));
+        model.add(factory.createIRI(baseIri + "synsets/" + edge.getOriginSynset().getId()), edgeIri, factory.createIRI(baseIri + "synsets/" + edge.getPointedSynset().getId()));
         model.add(edgeIri, SR.WEIGHT, factory.createLiteral(edge.getWeight()));
 
         return model;
-    }
-
-    public IRI getUserEdgeClassIri() {
-        return repository.getValueFactory().createIRI(baseIri + "classes/UserEdge");
     }
 
     @Override
@@ -73,13 +68,18 @@ public class UserEdgeSerializer extends EdgeSerializer {
     }
 
     @Override
-    public UserEdge rdfToEdge(String edgeId, Synset pointedSynset, Synset originSynset) {
+    public IRI getEdgeClassIri() {
+        return repository.getValueFactory().createIRI(baseIri + "classes/UserEdge");
+    }
+
+    @Override
+    public UserEdge rdfToEdge(IRI edgeIri, Synset pointedSynset, Synset originSynset) {
         ValueFactory factory = repository.getValueFactory();
         String description = null;
         Edge.RelationType relationType = null;
         double weight = -1;
 
-        String queryString = String.format("SELECT * WHERE { <%s> ?p ?o }", baseIri + "edges/" + edgeId);
+        String queryString = String.format("SELECT * WHERE { <%s> ?p ?o }", edgeIri.stringValue());
         List<BindingSet> results = Repositories.tupleQuery(repository, queryString, r -> QueryResults.asList(r));
 
         for (BindingSet result: results) {
@@ -93,6 +93,10 @@ public class UserEdgeSerializer extends EdgeSerializer {
             }
         }
 
+        if (relationType == null) {
+            relationType = Edge.RelationType.OTHER;
+        }
+
         UserEdge edge = new UserEdge(pointedSynset, originSynset, relationType, weight);
 
         if (description != null) {
@@ -100,5 +104,11 @@ public class UserEdgeSerializer extends EdgeSerializer {
         }
 
         return edge;
+    }
+
+    @Override
+    public UserEdge rdfToEdge(String edgeId, Synset pointedSynset, Synset originSynset) {
+        ValueFactory factory = repository.getValueFactory();
+        return rdfToEdge(factory.createIRI(baseIri + "edges/" + edgeId), pointedSynset, originSynset);
     }
 }

@@ -1,5 +1,7 @@
 package com.github.semres;
 
+import org.eclipse.rdf4j.model.IRI;
+import org.eclipse.rdf4j.model.ValueFactory;
 import org.eclipse.rdf4j.model.vocabulary.RDF;
 import org.eclipse.rdf4j.model.vocabulary.RDFS;
 import org.eclipse.rdf4j.query.*;
@@ -52,29 +54,60 @@ public class Database {
         return getSerializerForSynset(type).rdfToSynset(id);
     }
 
+    private Edge getEdge(IRI edgeIri, String type, Synset originSynset, Synset pointedSynset) {
+        return getSerializerForEdge(type).rdfToEdge(edgeIri, pointedSynset, originSynset);
+    }
+
     public List<Synset> getSynsets() {
-        List<Synset> synsets = new ArrayList<>();
+        String queryString = String.format("SELECT ?type ?id WHERE { ?s <%s> ?type . ?type <%s> <%s> . ?s <%s> ?id }", RDF.TYPE, RDFS.SUBCLASSOF, SR.SYNSET, SR.ID);
+        return getSynsets(queryString);
+    }
+
+    public List<Synset> searchSynsets(String searchPhrase) {
+        ValueFactory factory = repository.getValueFactory();
+        String queryString = String.format("SELECT ?type ?id WHERE { ?s <%s> ?type . ?type <%s> <%s> . ?s <%s> ?id . ?s <%s> %s }",
+                RDF.TYPE, RDFS.SUBCLASSOF, SR.SYNSET, SR.ID, RDFS.LABEL, factory.createLiteral(searchPhrase));
+
+        return getSynsets(queryString);
+    }
+
+    public void loadEdges(Synset originSynset) {
+        ValueFactory factory = repository.getValueFactory();
+        String queryString = String.format("SELECT ?edgeType ?edge ?pointedSynsetId ?pointedSynsetType" +
+                " WHERE { ?originSynset <%s> %s . ?originSynset ?edge ?pointedSynset . ?edge <%s> ?edgeType . ?edgeType <%s> <%s> ." +
+                         "?pointedSynset <%s> ?pointedSynsetType . ?pointedSynset <%s> ?pointedSynsetId }",
+                SR.ID, factory.createLiteral(originSynset.getId()), RDF.TYPE, RDFS.SUBCLASSOF, SR.EDGE, RDF.TYPE, SR.ID);
 
         try (RepositoryConnection conn = repository.getConnection()) {
-            // Find subjects of type that is a subclass of SR.SYNSET
-            String queryString = String.format("SELECT ?s ?type WHERE { ?s <%s> ?type . ?type <%s> <%s> }", RDF.TYPE, RDFS.SUBCLASSOF, SR.SYNSET);
             TupleQuery tupleQuery = conn.prepareTupleQuery(QueryLanguage.SPARQL, queryString);
 
             try (TupleQueryResult result = tupleQuery.evaluate()) {
                 while (result.hasNext()) {
                     BindingSet bindingSet = result.next();
-                    String subject = bindingSet.getValue("s").stringValue();
 
-                    // Get type.
+                    String edgeType = bindingSet.getValue("edgeType").stringValue();
+                    IRI edgeIri = factory.createIRI(bindingSet.getValue("edge").stringValue());
+                    String pointedSynsetId = bindingSet.getValue("pointedSynsetId").stringValue();
+                    String pointedSynsetType = bindingSet.getValue("pointedSynsetType").stringValue();
+
+                    Synset pointedSynset = getSynset(pointedSynsetId, pointedSynsetType);
+                    originSynset.addEdge(getEdge(edgeIri, edgeType, originSynset, pointedSynset));
+                }
+            }
+        }
+    }
+
+    private List<Synset> getSynsets(String queryString) {
+        List<Synset> synsets = new ArrayList<>();
+        try (RepositoryConnection conn = repository.getConnection()) {
+            TupleQuery tupleQuery = conn.prepareTupleQuery(QueryLanguage.SPARQL, queryString);
+
+            try (TupleQueryResult result = tupleQuery.evaluate()) {
+                while (result.hasNext()) {
+                    BindingSet bindingSet = result.next();
+
                     String type = bindingSet.getValue("type").stringValue();
-
-                    // Find id.
-                    String id;
-                    queryString = String.format("SELECT ?o WHERE { <%s> <%s> ?o }", subject, SR.ID);
-                    tupleQuery = conn.prepareTupleQuery(QueryLanguage.SPARQL, queryString);
-                    try (TupleQueryResult ids = tupleQuery.evaluate()) {
-                        id = QueryResults.asList(ids).get(0).getValue("o").stringValue();
-                    }
+                    String id = bindingSet.getValue("id").stringValue();
 
                     synsets.add(getSynset(id, type));
                 }
@@ -122,6 +155,19 @@ public class Database {
                     .findFirst().get();
         } catch (NoSuchElementException e) {
             throw new IllegalArgumentException(e);
+        }
+        return serializer;
+    }
+
+    private EdgeSerializer getSerializerForEdge(String type) {
+        EdgeSerializer serializer;
+        try {
+            serializer = edgeSerializers
+                    .stream()
+                    .filter(x -> x.getEdgeClassIri().stringValue().equals(type))
+                    .findFirst().get();
+        } catch (NoSuchElementException e) {
+            throw new IllegalArgumentException();
         }
         return serializer;
     }
