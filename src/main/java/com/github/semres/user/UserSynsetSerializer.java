@@ -7,7 +7,7 @@ import org.eclipse.rdf4j.model.*;
 import org.eclipse.rdf4j.model.impl.LinkedHashModel;
 import org.eclipse.rdf4j.model.vocabulary.RDF;
 import org.eclipse.rdf4j.model.vocabulary.RDFS;
-import org.eclipse.rdf4j.query.QueryResults;
+import org.eclipse.rdf4j.query.*;
 import org.eclipse.rdf4j.repository.Repository;
 import org.eclipse.rdf4j.repository.RepositoryConnection;
 
@@ -54,38 +54,43 @@ public class UserSynsetSerializer extends SynsetSerializer {
     }
 
     @Override
+    public UserSynset rdfToSynset(IRI synsetIri) {
+        UserSynset synset = null;
+        String id;
+        String representation;
+        String description ;
+
+        String queryString = String.format("SELECT ?id ?representation ?description " +
+                        "WHERE { <%s> <%s> ?id . <%s> <%s> ?representation . OPTIONAL { <%s> <%s> ?description }}",
+                        synsetIri.stringValue(), SR.ID, synsetIri.stringValue(), RDFS.LABEL, synsetIri.stringValue(), RDFS.COMMENT);
+
+        try (RepositoryConnection conn = repository.getConnection()) {
+            TupleQuery tupleQuery = conn.prepareTupleQuery(QueryLanguage.SPARQL, queryString);
+
+            try (TupleQueryResult result = tupleQuery.evaluate()) {
+                if (result.hasNext()) {
+                    BindingSet bindingSet = result.next();
+
+                    id = bindingSet.getValue("id").stringValue();
+                    representation = bindingSet.getValue("representation").stringValue();
+
+                    synset = new UserSynset(representation);
+                    synset.setId(id);
+
+                    if (bindingSet.getValue("description") != null) {
+                        description = bindingSet.getValue("description").stringValue();
+                        synset.setDescription(description);
+                    }
+                }
+            }
+        }
+        return synset;
+    }
+
+    @Override
     public UserSynset rdfToSynset(String synsetId) {
         ValueFactory factory = repository.getValueFactory();
-        String id;
-        String representation = null;
-        String description = null;
-        try (RepositoryConnection connection = repository.getConnection()) {
-            Model model = QueryResults.asModel(connection.getStatements(factory.createIRI(baseIri + "synsets/" + synsetId), null, null));
-            if (model.size() == 0) {
-                throw new IllegalArgumentException();
-            }
-
-            id = model.filter(null, SR.ID, null).objects().iterator().next().stringValue();
-
-            for (Value repr: model.filter(null, RDFS.LABEL, null).objects()) {
-                representation = repr.stringValue();
-                break;
-            }
-
-            for (Value desc: model.filter(null, RDFS.COMMENT, null).objects()) {
-                description = desc.stringValue();
-                break;
-            }
-        }
-
-        UserSynset synset = new UserSynset(representation);
-        synset.setId(id);
-
-        if (description != null) {
-            synset.setDescription(description);
-        }
-
-        return synset;
+        return rdfToSynset(factory.createIRI(baseIri + "synsets/" + synsetId));
     }
 
     @Override

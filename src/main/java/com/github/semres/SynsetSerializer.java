@@ -15,6 +15,7 @@ public abstract class SynsetSerializer {
 
     public abstract Model synsetToRdf(Synset synset);
     public abstract Synset rdfToSynset(String synsetId);
+    public abstract Synset rdfToSynset(IRI synsetIri);
     public abstract String getSynsetClass();
     public abstract IRI getSynsetClassIri();
 }

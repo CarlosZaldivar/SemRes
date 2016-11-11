@@ -21,6 +21,11 @@ public class BabelNetSynsetSerializer extends SynsetSerializer {
     }
 
     @Override
+    public Synset rdfToSynset(IRI synsetIri) {
+        return null;
+    }
+
+    @Override
     public String getSynsetClass() {
         return "com.github.semres.babelnet.BabelNetSynset";
     }
