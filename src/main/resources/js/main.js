@@ -134,3 +134,10 @@ function addSynset(synset) {
     });
     cy.layout({name: 'grid'});
 }
+
+function search() {
+    var searchPhrase = $("#searchField").val();
+    if (searchPhrase) {
+        javaApp.search(searchPhrase);
+    }
+}

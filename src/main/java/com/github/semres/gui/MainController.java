@@ -5,9 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.semres.Board;
 import com.github.semres.Edge;
 import com.github.semres.Synset;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
-import javafx.concurrent.Worker;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -19,10 +16,10 @@ import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import jdk.nashorn.api.scripting.JSObject;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.List;
 import java.util.ResourceBundle;
 
 import static es.uvigo.ei.sing.javafx.webview.Java2JavascriptUtils.connectBackendObject;
@@ -55,24 +52,6 @@ public class MainController extends Controller implements Initializable {
     public void setBoard(Board board) {
         this.board = board;
 
-        engine.getLoadWorker().stateProperty().addListener(
-                new ChangeListener<Worker.State>() {
-                    public void changed(ObservableValue ov, Worker.State oldState, Worker.State newState) {
-                        if (newState == Worker.State.SUCCEEDED) {
-                            for (Synset synset : board.getSynsets().values()) {
-                                ObjectMapper mapper = new ObjectMapper();
-                                String jsonSynset = null;
-                                try {
-                                    jsonSynset = mapper.writeValueAsString(synset);
-                                } catch (JsonProcessingException e) {
-                                    e.printStackTrace();
-                                }
-                                engine.executeScript("addSynset(" + jsonSynset + ");");
-                            }
-                        }
-                    }
-                }
-        );
         // Reload html
         engine.load(getClass().getResource("/html/board.html").toExternalForm());
         // Enable 'save' option.
@@ -89,14 +68,7 @@ public class MainController extends Controller implements Initializable {
 
     public void addSynset(Synset synset) {
         board.addSynset(synset);
-        ObjectMapper mapper = new ObjectMapper();
-        String jsonSynset = null;
-        try {
-            jsonSynset = mapper.writeValueAsString(synset);
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-        }
-        engine.executeScript("addSynset(" + jsonSynset + ");");
+        engine.executeScript("addSynset(" + synsetToJson(synset) + ");");
     }
 
     public void addEdge(Edge edge) {
@@ -111,11 +83,15 @@ public class MainController extends Controller implements Initializable {
         public void openNewEdgeWindow(String originSynsetId, String destinationSynsetId) throws IOException {
             AddingEdgeController childController = (AddingEdgeController) openNewWindow("/fxml/add-edge.fxml", "Edge details", 500, 350);
 
-            System.out.println(originSynsetId);
-            System.out.println(destinationSynsetId);
-
             childController.setOriginSynset(board.getSynset(originSynsetId));
             childController.setDestinationSynset(board.getSynset(destinationSynsetId));
+        }
+
+        public void search(String searchPhrase) {
+            List<Synset> synsetsFound = board.loadSynsets(searchPhrase);
+            for (Synset synset : synsetsFound) {
+                engine.executeScript("addSynset(" + synsetToJson(synset) + ");");
+            }
         }
     }
 
@@ -132,5 +108,16 @@ public class MainController extends Controller implements Initializable {
         childController.setParent(MainController.this);
         newStage.show();
         return childController;
+    }
+
+    private String synsetToJson(Synset synset) {
+        ObjectMapper mapper = new ObjectMapper();
+        String jsonSynset = null;
+        try {
+            jsonSynset = mapper.writeValueAsString(synset);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+        return jsonSynset;
     }
 }

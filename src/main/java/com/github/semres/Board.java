@@ -2,7 +2,9 @@ package com.github.semres;
 
 import java.math.BigInteger;
 import java.security.SecureRandom;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class Board {
@@ -21,9 +23,18 @@ public class Board {
 
     public Board(Database attachedDatabase) {
         this.attachedDatabase = attachedDatabase;
-        for (Synset synset : this.attachedDatabase.getSynsets()) {
-            synsets.put(synset.getId(), synset);
+    }
+
+    public List<Synset> loadSynsets(String searchPhrase) {
+        List<Synset> synsetsFound = attachedDatabase.searchSynsets(searchPhrase);
+        List<Synset> newSynsets = new ArrayList<>();
+        for (Synset synset : synsetsFound) {
+            if (synsets.get(synset.getId()) == null) {
+                newSynsets.add(synset);
+                synsets.put(synset.getId(), synset);
+            }
         }
+        return newSynsets;
     }
 
     public void addSynset(Synset newSynset) {
