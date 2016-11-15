@@ -87,6 +87,12 @@ cy.contextMenus({
             onClickFunction: startEdgeAddition
         },
         {
+            id: 'expand',
+            title: 'Expand/Collapse',
+            selector: 'node',
+            onClickFunction: expandOrCollapse
+        },
+        {
             id: 'select-all-nodes',
             title: 'Select all nodes',
             coreAsWell: true,
@@ -121,6 +127,7 @@ function setEdgeDetails(sourceNode, targetNodes, addedEntities) {
 }
 
 function addSynset(synset) {
+    synset.expanded = false;
     cy.add({
         data: synset,
         style: [{
@@ -135,9 +142,36 @@ function addSynset(synset) {
     cy.layout({name: 'grid'});
 }
 
+function addEdge(edge) {
+    var target = cy.getElementById(edge.targetSynset.id);
+    if (!target.data()) {
+        addSynset(edge.targetSynset);
+    }
+
+    edge.target = edge.targetSynset.id;
+    edge.source = edge.sourceSynset.id;
+
+    delete edge.sourceSynset;
+    delete edge.targetSynset;
+
+    cy.add({
+        group: "edges",
+        data: edge
+    });
+
+    cy.getElementById(edge.source).data().expanded = true;
+}
+
 function search() {
     var searchPhrase = $("#searchField").val();
     if (searchPhrase) {
         javaApp.search(searchPhrase);
+    }
+}
+
+function expandOrCollapse(event) {
+    var synset = event.cyTarget.data();
+    if (!synset.expanded) {
+        javaApp.loadEdges(synset.id);
     }
 }

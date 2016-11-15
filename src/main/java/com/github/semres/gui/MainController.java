@@ -19,7 +19,9 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.ResourceBundle;
 
 import static es.uvigo.ei.sing.javafx.webview.Java2JavascriptUtils.connectBackendObject;
@@ -75,6 +77,59 @@ public class MainController extends Controller implements Initializable {
         board.addEdge(edge);
     }
 
+    private Controller openNewWindow(String fxmlPath, String title, int width, int height) throws IOException {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
+        Parent root = loader.load();
+        Stage newStage = new Stage();
+        newStage.setTitle(title);
+        newStage.setScene(new Scene(root, width, height));
+        newStage.initOwner(menuBar.getScene().getWindow());
+        newStage.initModality(Modality.WINDOW_MODAL);
+
+        ChildController childController = loader.getController();
+        childController.setParent(MainController.this);
+        newStage.show();
+        return childController;
+    }
+
+    private Map<String, Object> synsetToMap(Synset synset) {
+        Map<String, Object> synsetMap = new HashMap<>();
+        synsetMap.put("id", synset.getId());
+        synsetMap.put("description", synset.getDescription());
+        synsetMap.put("representation", synset.getRepresentation());
+        return synsetMap;
+    }
+
+    private String synsetToJson(Synset synset) {
+        ObjectMapper mapper = new ObjectMapper();
+        String jsonSynset = null;
+        try {
+            jsonSynset = mapper.writeValueAsString(synsetToMap(synset));
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+        return jsonSynset;
+    }
+
+    private String edgeToJson(Edge edge) {
+        Map<String, Object> edgeMap = new HashMap<>();
+        edgeMap.put("id", edge.getId());
+        edgeMap.put("description", edge.getDescription());
+        edgeMap.put("weight", edge.getWeight());
+        edgeMap.put("targetSynset", synsetToMap(edge.getPointedSynset()));
+        edgeMap.put("sourceSynset", synsetToMap(edge.getOriginSynset()));
+
+
+        String jsonEdge = null;
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            jsonEdge = mapper.writeValueAsString(edgeMap);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+        return jsonEdge;
+    }
+
     public class JavaApp {
         public void openNewSynsetWindow() throws IOException {
             openNewWindow("/fxml/add-synset.fxml", "Add synset", 500, 350);
@@ -93,31 +148,12 @@ public class MainController extends Controller implements Initializable {
                 engine.executeScript("addSynset(" + synsetToJson(synset) + ");");
             }
         }
-    }
 
-    private Controller openNewWindow(String fxmlPath, String title, int width, int height) throws IOException {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
-        Parent root = loader.load();
-        Stage newStage = new Stage();
-        newStage.setTitle(title);
-        newStage.setScene(new Scene(root, width, height));
-        newStage.initOwner(menuBar.getScene().getWindow());
-        newStage.initModality(Modality.WINDOW_MODAL);
-
-        ChildController childController = loader.getController();
-        childController.setParent(MainController.this);
-        newStage.show();
-        return childController;
-    }
-
-    private String synsetToJson(Synset synset) {
-        ObjectMapper mapper = new ObjectMapper();
-        String jsonSynset = null;
-        try {
-            jsonSynset = mapper.writeValueAsString(synset);
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
+        public void loadEdges(String synsetId) {
+            board.loadEdges(synsetId);
+            for (Edge edge : board.getSynset(synsetId).getEdges().values()) {
+                engine.executeScript("addEdge(" + edgeToJson(edge) + ");");
+            }
         }
-        return jsonSynset;
     }
 }

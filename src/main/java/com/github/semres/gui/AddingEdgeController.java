@@ -9,6 +9,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextFormatter;
+import javafx.stage.Stage;
 import javafx.util.converter.NumberStringConverter;
 
 import java.net.URL;
@@ -46,7 +47,10 @@ public class AddingEdgeController extends ChildController implements Initializab
             Edge.RelationType relationType = Edge.RelationType.valueOf(relationTypeCB.getSelectionModel().getSelectedItem().toString());
             UserEdge newEdge = new UserEdge(destinationSynset, originSynset, relationType, weight);
 
-            System.out.println(weight);
+            ((MainController) parent).addEdge(newEdge);
+
+            Stage stage = (Stage) addButton.getScene().getWindow();
+            stage.close();
         }
     }
 }

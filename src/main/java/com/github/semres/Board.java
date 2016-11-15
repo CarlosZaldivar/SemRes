@@ -37,6 +37,16 @@ public class Board {
         return newSynsets;
     }
 
+    public void loadEdges(String synsetId) {
+        Synset synset = synsets.get(synsetId);
+        if (synset != null) {
+            attachedDatabase.loadEdges(synset);
+            for (Edge edge : synset.getEdges().values()) {
+                edges.put(edge.getId(), edge);
+            }
+        }
+    }
+
     public void addSynset(Synset newSynset) {
         if (newSynset.getId() == null) {
             newSynset.setId(getNewSynsetId());
