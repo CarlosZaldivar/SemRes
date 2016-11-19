@@ -60,6 +60,23 @@ public class DatabaseTest {
     }
 
     @Test
+    public void removeSynset() throws Exception {
+        Repository repo = new SailRepository(new MemoryStore());
+        List<Class> synsetSerializerClasses = new ArrayList<>();
+        synsetSerializerClasses.add(UserSynsetSerializer.class);
+
+        Database database = new Database(synsetSerializerClasses, new ArrayList<>(), repo);
+
+        UserSynset synset = new UserSynset("Foo");
+        synset.setId("123");
+
+        database.addSynset(synset);
+        assertTrue(database.getSynsets().size() == 1);
+        database.removeSynset(synset);
+        assertTrue(database.getSynsets().size() == 0);
+    }
+
+    @Test
     public void searchSynsets() throws Exception {
         Repository repo = new SailRepository(new MemoryStore());
         List<Class> serializerClasses = new ArrayList<>();

@@ -1,6 +1,7 @@
 package com.github.semres;
 
 import org.eclipse.rdf4j.model.IRI;
+import org.eclipse.rdf4j.model.Statement;
 import org.eclipse.rdf4j.model.ValueFactory;
 import org.eclipse.rdf4j.model.vocabulary.RDF;
 import org.eclipse.rdf4j.model.vocabulary.RDFS;
@@ -47,6 +48,18 @@ public class Database {
     public void addEdge(Edge edge) {
         try (RepositoryConnection conn = repository.getConnection()) {
             conn.add(getSerializerForEdge(edge).edgeToRdf(edge));
+        }
+    }
+
+    public void removeSynset(Synset synset) {
+        try (RepositoryConnection conn = repository.getConnection()) {
+            ValueFactory factory = conn.getValueFactory();
+            String queryString = String.format("CONSTRUCT { ?s ?p ?o } WHERE {?s <%s> %s . ?s ?p ?o }", SR.ID, factory.createLiteral(synset.getId()));
+            GraphQueryResult results = conn.prepareGraphQuery(queryString).evaluate();
+            while (results.hasNext()) {
+                Statement statement = results.next();
+                conn.remove(statement);
+            }
         }
     }
 
