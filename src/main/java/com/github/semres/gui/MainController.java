@@ -116,6 +116,7 @@ public class MainController extends Controller implements Initializable {
         edgeMap.put("id", edge.getId());
         edgeMap.put("description", edge.getDescription());
         edgeMap.put("weight", edge.getWeight());
+        edgeMap.put("relationType", edge.getRelationType().toString().toLowerCase());
         edgeMap.put("targetSynset", synsetToMap(edge.getPointedSynset()));
         edgeMap.put("sourceSynset", synsetToMap(edge.getOriginSynset()));
 

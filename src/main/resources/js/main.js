@@ -13,11 +13,10 @@ var cy = cytoscape({
         {
             selector: 'edge',
             style: {
-                'label': 'label'
-            },
-            css: {
+                'label': 'data(relationType)',
                 'curve-style': 'bezier',
-                'target-arrow-shape': 'triangle'
+                'target-arrow-shape': 'triangle',
+                'font-size': '10'
             }
         },
 
@@ -61,9 +60,7 @@ cy.contextMenus({
             id: 'remove',
             title: 'Remove',
             selector: 'node, edge',
-            onClickFunction: function (event) {
-                event.cyTarget.remove();
-            }
+            onClickFunction: removeElement
         },
         {
             id: 'hide',
@@ -174,4 +171,8 @@ function expandOrCollapse(event) {
     if (!synset.expanded) {
         javaApp.loadEdges(synset.id);
     }
+}
+
+function removeElement(event) {
+
 }
