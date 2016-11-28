@@ -5,7 +5,8 @@ import java.util.Map;
 
 public abstract class Synset {
     private String id;
-    protected Map<String, Edge> edges = new HashMap<>();
+    protected Map<String, Edge> outgoingEdges = new HashMap<>();
+    protected Map<String, Edge> pointingEdges = new HashMap<>();
     protected String representation;
     protected String description;
 
@@ -29,19 +30,41 @@ public abstract class Synset {
         return id;
     }
 
-    public Map<String, Edge> getEdges() {
-        return new HashMap<>(edges);
+    public Map<String, Edge> getOutgoingEdges() {
+        return new HashMap<>(outgoingEdges);
     }
 
-    public void setEdges(Map<String, Edge> newEdges) {
-        edges = (newEdges == null) ? new HashMap<>() : new HashMap<>(newEdges);
+    public void setOutgoingEdges(Map<String, Edge> newEdges) {
+        outgoingEdges = (newEdges == null) ? new HashMap<>() : new HashMap<>(newEdges);
     }
 
-    public void addEdge(Edge edge) {
-        edges.put(edge.getId(), edge);
+    public Map<String, Edge> getPointingEdges() {
+        return new HashMap<>(pointingEdges);
     }
 
-    public void removeEdge(String id) {
-        edges.remove(id);
+    public void setPointingEdges(Map<String, Edge> newEdges) {
+        pointingEdges = (newEdges == null) ? new HashMap<>() : new HashMap<>(newEdges);
+    }
+
+    public void addOutgoingEdge(Edge edge) {
+        outgoingEdges.put(edge.getId(), edge);
+    }
+
+    public void addPointingEdge(Edge edge) { pointingEdges.put(edge.getId(), edge); }
+
+    public void removeOutgoingEdge(Edge edge) {
+        removeOutgoingEdge(edge.getId());
+    }
+
+    public void removePointingEdge(Edge edge) {
+        removePointingEdge(edge.getId());
+    }
+
+    public void removeOutgoingEdge(String id) {
+        outgoingEdges.remove(id);
+    }
+
+    public void removePointingEdge(String id) {
+        pointingEdges.remove(id);
     }
 }

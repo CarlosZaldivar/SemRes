@@ -4,7 +4,7 @@ package com.github.semres;
 import org.apache.commons.lang.Validate;
 
 public abstract class Edge {
-    private final Synset pointedSynset;
+    private Synset pointedSynset;
     private final Synset originSynset;
     protected RelationType relationType;
     protected String description;
@@ -27,6 +27,11 @@ public abstract class Edge {
 
     public Synset getPointedSynset() {
         return pointedSynset;
+    }
+
+
+    public void setPointedSynset(Synset pointedSynset) {
+        this.pointedSynset = pointedSynset;
     }
 
     public double getWeight() {

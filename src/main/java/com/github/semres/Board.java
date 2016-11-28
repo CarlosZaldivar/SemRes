@@ -15,9 +15,11 @@ public class Board {
     private Map<String, Synset> synsets = new HashMap<>();
     private Map<String, Boolean> synsetsLoadedState = new HashMap<>();
     private Map<String, Edge> edges = new HashMap<>();
-    private Map<String, Edge> newEdges = new HashMap<>();
 
     private Map<String, Synset> newSynsets = new HashMap<>();
+    private Map<String, Edge> newEdges = new HashMap<>();
+    private Map<String, Synset> removedSynsets = new HashMap<>();
+    private Map<String, Edge> removedEdges = new HashMap<>();
 
     private Database attachedDatabase;
 
@@ -42,8 +44,14 @@ public class Board {
         if (synset != null) {
             List<Edge> edges = attachedDatabase.getOutgoingEdges(synset);
             for (Edge edge : edges) {
+                if (synsets.containsKey(edge.getPointedSynset().getId())) {
+                    edge.setPointedSynset(synsets.get(edge.getPointedSynset().getId()));
+                } else {
+                    synsets.put(edge.getPointedSynset().getId(), edge.getPointedSynset());
+                }
                 this.edges.put(edge.getId(), edge);
-                synset.addEdge(edge);
+                synset.addOutgoingEdge(edge);
+                edge.getPointedSynset().addPointingEdge(edge);
             }
         }
     }
@@ -60,11 +68,31 @@ public class Board {
         edges.put(newEdge.getId(), newEdge);
         newEdges.put(newEdge.getId(), newEdge);
 
-        synsets.get(newEdge.getOriginSynset().getId()).addEdge(newEdge);
+        synsets.get(newEdge.getOriginSynset().getId()).addOutgoingEdge(newEdge);
     }
 
     public Synset getSynset(String id) {
         return synsets.get(id);
+    }
+
+    public void removeElement(String id) {
+        if (synsets.containsKey(id)) {
+            Synset removedSynset = synsets.get(id);
+            for (Edge edge : removedSynset.getOutgoingEdges().values()) {
+                edges.remove(edge.getId());
+            }
+            for (Edge edge : removedSynset.getPointingEdges().values()) {
+                edges.remove(edge.getId());
+            }
+            synsets.remove(id);
+            removedSynsets.put(id, removedSynset);
+        } else if (edges.containsKey(id)) {
+            Edge removedEdge = edges.get(id);
+            removedEdge.getPointedSynset().removePointingEdge(removedEdge);
+            removedEdge.getOriginSynset().removeOutgoingEdge(removedEdge);
+            edges.remove(id);
+            removedEdges.put(id, removedEdge);
+        }
     }
 
     public void save() {
@@ -75,6 +103,15 @@ public class Board {
         for (Edge edge : newEdges.values()) {
             attachedDatabase.addEdge(edge);
         }
+        newEdges.clear();
+        for (Edge edge : removedEdges.values()) {
+            attachedDatabase.removeEdge(edge);
+        }
+        removedEdges.clear();
+        for (Synset synset : removedSynsets.values()) {
+            attachedDatabase.removeSynset(synset);
+        }
+        removedSynsets.clear();
     }
 
     /**

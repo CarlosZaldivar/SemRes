@@ -31,7 +31,7 @@ public class UserEdgeSerializer extends EdgeSerializer {
         model.add(getEdgeClassIri(), RDF.TYPE, RDFS.CLASS);
         model.add(getEdgeClassIri(), RDFS.SUBCLASSOF, SR.EDGE);
 
-        IRI edgeIri = factory.createIRI(baseIri + "edges/" + edge.getId());
+        IRI edgeIri = factory.createIRI(baseIri + "outgoingEdges/" + edge.getId());
 
         if (edge.getDescription() != null) {
             Literal description = factory.createLiteral(edge.getDescription());
@@ -109,6 +109,6 @@ public class UserEdgeSerializer extends EdgeSerializer {
     @Override
     public UserEdge rdfToEdge(String edgeId, Synset pointedSynset, Synset originSynset) {
         ValueFactory factory = repository.getValueFactory();
-        return rdfToEdge(factory.createIRI(baseIri + "edges/" + edgeId), pointedSynset, originSynset);
+        return rdfToEdge(factory.createIRI(baseIri + "outgoingEdges/" + edgeId), pointedSynset, originSynset);
     }
 }

@@ -206,9 +206,9 @@ public class Database {
     }
 
     /**
-     * Get IRI's of all edges that are connected with given synset, both starting and ending on it.
+     * Get IRI's of all outgoingEdges that are connected with given synset, both starting and ending on it.
      * @param synset
-     * @return List of all synset's edges IRI's
+     * @return List of all synset's outgoingEdges IRI's
      */
     private List<IRI> getEdgesIris(Synset synset) {
         List<IRI> iris = new ArrayList<>();

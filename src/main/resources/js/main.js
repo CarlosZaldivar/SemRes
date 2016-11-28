@@ -155,8 +155,6 @@ function addEdge(edge) {
         group: "edges",
         data: edge
     });
-
-    cy.getElementById(edge.source).data().expanded = true;
 }
 
 function search() {
@@ -170,9 +168,11 @@ function expandOrCollapse(event) {
     var synset = event.cyTarget.data();
     if (!synset.expanded) {
         javaApp.loadEdges(synset.id);
+        synset.expanded = true;
     }
 }
 
 function removeElement(event) {
-
+    javaApp.removeElement(event.cyTarget.id());
+    cy.remove(event.cyTarget);
 }

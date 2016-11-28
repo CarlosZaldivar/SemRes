@@ -152,9 +152,13 @@ public class MainController extends Controller implements Initializable {
 
         public void loadEdges(String synsetId) {
             board.loadEdges(synsetId);
-            for (Edge edge : board.getSynset(synsetId).getEdges().values()) {
+            for (Edge edge : board.getSynset(synsetId).getOutgoingEdges().values()) {
                 engine.executeScript("addEdge(" + edgeToJson(edge) + ");");
             }
+        }
+
+        public void removeElement(String id) {
+            board.removeElement(id);
         }
     }
 }

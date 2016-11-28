@@ -70,7 +70,7 @@ public class BabelNetSynset extends Synset {
             Edge newEdge =
                     new BabelNetEdge(referencedSynset, this, Edge.RelationType.HOLONYM, babelPointer.getName(), edge.getWeight());
             if (!removedEdges.containsKey(newEdge.getId())) {
-                edges.put(newEdge.getId(), newEdge);
+                outgoingEdges.put(newEdge.getId(), newEdge);
             }
         }
     }
