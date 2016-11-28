@@ -40,9 +40,10 @@ public class Board {
     public void loadEdges(String synsetId) {
         Synset synset = synsets.get(synsetId);
         if (synset != null) {
-            attachedDatabase.loadEdges(synset);
-            for (Edge edge : synset.getEdges().values()) {
-                edges.put(edge.getId(), edge);
+            List<Edge> edges = attachedDatabase.getOutgoingEdges(synset);
+            for (Edge edge : edges) {
+                this.edges.put(edge.getId(), edge);
+                synset.addEdge(edge);
             }
         }
     }

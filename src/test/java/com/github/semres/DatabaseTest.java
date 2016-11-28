@@ -10,6 +10,7 @@ import org.eclipse.rdf4j.sail.memory.MemoryStore;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import static org.junit.Assert.*;
@@ -77,6 +78,63 @@ public class DatabaseTest {
     }
 
     @Test
+    public void removeSynsetWithEdges() throws Exception {
+        Repository repo = new SailRepository(new MemoryStore());
+        List<Class> synsetSerializerClasses = new ArrayList<>();
+        synsetSerializerClasses.add(UserSynsetSerializer.class);
+        List<Class> edgeSerializerClasses = new ArrayList<>();
+        edgeSerializerClasses.add(UserEdgeSerializer.class);
+
+        Database database = new Database(synsetSerializerClasses, edgeSerializerClasses, repo);
+
+        UserSynset firstSynset = new UserSynset("Foo");
+        firstSynset.setId("123");
+        UserSynset middleSynset = new UserSynset("Bar");
+        middleSynset.setId("124");
+        UserSynset lastSynset = new UserSynset("Car");
+        lastSynset.setId("125");
+
+        Edge firstEdge = new UserEdge(middleSynset, firstSynset, Edge.RelationType.HOLONYM, 1);
+        Edge secondEdge = new UserEdge(lastSynset, middleSynset, Edge.RelationType.HOLONYM, 1);
+
+        database.addSynset(firstSynset);
+        database.addSynset(middleSynset);
+        database.addSynset(lastSynset);
+        database.addEdge(firstEdge);
+        database.addEdge(secondEdge);
+        assertTrue(database.getOutgoingEdges(firstSynset).size() == 1 && database.getPointingEdges(lastSynset).size() == 1);
+
+        database.removeSynset(middleSynset);
+
+        assertTrue(database.getOutgoingEdges(firstSynset).size() == 0 && database.getPointingEdges(lastSynset).size() == 0);
+    }
+
+    @Test
+    public void removeEdge() throws Exception {
+        Repository repo = new SailRepository(new MemoryStore());
+        List<Class> synsetSerializerClasses = new ArrayList<>();
+        synsetSerializerClasses.add(UserSynsetSerializer.class);
+        List<Class> edgeSerializerClasses = new ArrayList<>();
+        edgeSerializerClasses.add(UserEdgeSerializer.class);
+
+        Database database = new Database(synsetSerializerClasses, edgeSerializerClasses, repo);
+
+        UserSynset originSynset = new UserSynset("Foo");
+        originSynset.setId("123");
+        UserSynset pointedSynset = new UserSynset("Bar");
+        pointedSynset.setId("124");
+        Edge edge = new UserEdge(pointedSynset, originSynset, Edge.RelationType.HOLONYM, 1);
+
+        database.addSynset(originSynset);
+        database.addSynset(pointedSynset);
+        database.addEdge(edge);
+        assertTrue(database.getOutgoingEdges(originSynset).size() == 1);
+
+        database.removeEdge(edge);
+        assertTrue(database.getOutgoingEdges(originSynset).size() == 0);
+    }
+
+    @Test
     public void searchSynsets() throws Exception {
         Repository repo = new SailRepository(new MemoryStore());
         List<Class> serializerClasses = new ArrayList<>();
@@ -115,7 +173,7 @@ public class DatabaseTest {
     }
 
     @Test
-    public void loadEdges() throws Exception {
+    public void getOutgoingEdges() throws Exception {
         Repository repo = new SailRepository(new MemoryStore());
         List<Class> synsetSerializers = new ArrayList<>();
         synsetSerializers.add(UserSynsetSerializer.class);
@@ -135,9 +193,7 @@ public class DatabaseTest {
 
         Synset loadedSynset = database.searchSynsets("Foo1").get(0);
 
-        database.loadEdges(loadedSynset);
-
-        Edge edge = new ArrayList<>(loadedSynset.getEdges().values()).get(0);
+        Edge edge = new ArrayList<>(database.getOutgoingEdges(loadedSynset)).get(0);
 
         assertTrue(edge.getId().equals("123-124"));
         assertTrue(edge.getPointedSynset().getId().equals(pointedSynset.getId()));

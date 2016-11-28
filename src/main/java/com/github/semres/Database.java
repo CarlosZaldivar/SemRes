@@ -53,12 +53,57 @@ public class Database {
 
     public void removeSynset(Synset synset) {
         try (RepositoryConnection conn = repository.getConnection()) {
+
             ValueFactory factory = conn.getValueFactory();
-            String queryString = String.format("CONSTRUCT { ?s ?p ?o } WHERE {?s <%s> %s . ?s ?p ?o }", SR.ID, factory.createLiteral(synset.getId()));
-            GraphQueryResult results = conn.prepareGraphQuery(queryString).evaluate();
-            while (results.hasNext()) {
-                Statement statement = results.next();
+            String queryString;
+
+            // Remove edges
+            List<IRI> edgesIris = getEdgesIris(synset);
+            for (IRI edgeIri : edgesIris) {
+                queryString = String.format("CONSTRUCT { ?originSynset <%s> ?pointedSynset }" +
+                        "WHERE { ?originSynset <%s> ?pointedSynset }", edgeIri, edgeIri);
+                GraphQueryResult result = conn.prepareGraphQuery(queryString).evaluate();
+                Statement edgeStatement = result.next();
+
+                queryString = String.format("CONSTRUCT { <%s> ?p ?o } WHERE { <%s> ?p ?o }", edgeIri, edgeIri);
+                result = conn.prepareGraphQuery(queryString).evaluate();
+
+                while (result.hasNext()) {
+                    Statement statement = result.next();
+                    conn.remove(statement);
+                }
+                conn.remove(edgeStatement);
+            }
+
+            // Remove synset
+            queryString = String.format("CONSTRUCT { ?s ?p ?o } WHERE { ?s <%s> %s . ?s ?p ?o }", SR.ID, factory.createLiteral(synset.getId()));
+            GraphQueryResult result = conn.prepareGraphQuery(queryString).evaluate();
+            while (result.hasNext()) {
+                Statement statement = result.next();
                 conn.remove(statement);
+            }
+        }
+    }
+
+    public void removeEdge(Edge edge) {
+        try (RepositoryConnection conn = repository.getConnection()) {
+            ValueFactory factory = conn.getValueFactory();
+            String queryString = String.format("CONSTRUCT { ?originSynset ?edge ?pointedSynset }" +
+                            "WHERE { ?originSynset <%s> %s . ?pointedSynset <%s> %s . ?originSynset ?edge ?pointedSynset }",
+                    SR.ID, factory.createLiteral(edge.getOriginSynset().getId()), SR.ID, factory.createLiteral(edge.getPointedSynset().getId()));
+            GraphQueryResult result = conn.prepareGraphQuery(queryString).evaluate();
+            if (result.hasNext()) {
+                Statement edgeStatement = result.next();
+                IRI edgeIri = edgeStatement.getPredicate();
+                conn.remove(edgeStatement);
+
+                queryString = String.format("CONSTRUCT { <%s> ?p ?o } WHERE { <%s> ?p ?o }", edgeIri, edgeIri);
+                result = conn.prepareGraphQuery(queryString).evaluate();
+
+                while (result.hasNext()) {
+                    Statement statement = result.next();
+                    conn.remove(statement);
+                }
             }
         }
     }
@@ -104,7 +149,8 @@ public class Database {
         return synsets;
     }
 
-    public void loadEdges(Synset originSynset) {
+    public List<Edge> getOutgoingEdges(Synset originSynset) {
+        List<Edge> edges = new ArrayList<>();
         ValueFactory factory = repository.getValueFactory();
         String queryString = String.format("SELECT ?edgeType ?edge ?pointedSynset ?pointedSynsetType" +
                 " WHERE { ?originSynset <%s> %s . ?originSynset ?edge ?pointedSynset . ?edge <%s> ?edgeType . ?edgeType <%s> <%s> ." +
@@ -124,14 +170,65 @@ public class Database {
                     String pointedSynsetType = bindingSet.getValue("pointedSynsetType").stringValue();
 
                     Synset pointedSynset = getSynset(pointedSynsetIri, pointedSynsetType);
-                    originSynset.addEdge(getEdge(edgeIri, edgeType, originSynset, pointedSynset));
+                    edges.add(getEdge(edgeIri, edgeType, originSynset, pointedSynset));
                 }
             }
         }
+        return edges;
     }
 
-    private String getSynsetClass(String synsetId) {
-        return null;
+    public List<Edge> getPointingEdges(Synset pointedSynset) {
+        List<Edge> edges = new ArrayList<>();
+        ValueFactory factory = repository.getValueFactory();
+        String queryString = String.format("SELECT ?edgeType ?edge ?originSynset ?originSynsetType" +
+                        " WHERE { ?pointedSynset <%s> %s . ?originSynset ?edge ?pointedSynset . ?edge <%s> ?edgeType . ?edgeType <%s> <%s> ." +
+                        "?originSynset <%s> ?originSynsetType }",
+                SR.ID, factory.createLiteral(pointedSynset.getId()), RDF.TYPE, RDFS.SUBCLASSOF, SR.EDGE, RDF.TYPE);
+
+        try (RepositoryConnection conn = repository.getConnection()) {
+            TupleQuery tupleQuery = conn.prepareTupleQuery(QueryLanguage.SPARQL, queryString);
+
+            try (TupleQueryResult result = tupleQuery.evaluate()) {
+                while (result.hasNext()) {
+                    BindingSet bindingSet = result.next();
+
+                    String edgeType = bindingSet.getValue("edgeType").stringValue();
+                    IRI edgeIri = factory.createIRI(bindingSet.getValue("edge").stringValue());
+                    IRI originSynsetIri = factory.createIRI(bindingSet.getValue("originSynset").stringValue());
+                    String originSynsetType = bindingSet.getValue("originSynsetType").stringValue();
+
+                    Synset originSynset = getSynset(originSynsetIri, originSynsetType);
+                    edges.add(getEdge(edgeIri, edgeType, originSynset, pointedSynset));
+                }
+            }
+        }
+        return edges;
+    }
+
+    /**
+     * Get IRI's of all edges that are connected with given synset, both starting and ending on it.
+     * @param synset
+     * @return List of all synset's edges IRI's
+     */
+    private List<IRI> getEdgesIris(Synset synset) {
+        List<IRI> iris = new ArrayList<>();
+        ValueFactory factory = repository.getValueFactory();
+        String queryString = String.format("SELECT ?edge" +
+                        " WHERE { ?synset <%s> %s . { ?s ?edge ?synset } UNION { ?synset ?edge ?o } . ?edge <%s> ?edgeType . ?edgeType <%s> <%s> }",
+                SR.ID, factory.createLiteral(synset.getId()), RDF.TYPE, RDFS.SUBCLASSOF, SR.EDGE);
+        try (RepositoryConnection conn = repository.getConnection()) {
+            TupleQuery tupleQuery = conn.prepareTupleQuery(QueryLanguage.SPARQL, queryString);
+
+            try (TupleQueryResult result = tupleQuery.evaluate()) {
+                while (result.hasNext()) {
+                    BindingSet bindingSet = result.next();
+
+                    String edge = bindingSet.getValue("edge").stringValue();
+                    iris.add(factory.createIRI(edge));
+                }
+            }
+        }
+        return iris;
     }
 
     private SynsetSerializer getSerializerForSynset(Synset synset) {
