@@ -63,15 +63,6 @@ cy.contextMenus({
             onClickFunction: removeElement
         },
         {
-            id: 'hide',
-            title: 'Hide',
-            selector: '*',
-            onClickFunction: function (event) {
-                event.cyTarget.hide();
-            },
-            disabled: false
-        },
-        {
             id: 'add-node',
             title: 'Add node',
             coreAsWell: true,
@@ -80,14 +71,20 @@ cy.contextMenus({
         {
             id: 'add-edge',
             title: 'Add edge',
-            selector: 'node',
+            selector: 'node[expanded="true"]',
             onClickFunction: startEdgeAddition
         },
         {
             id: 'expand',
-            title: 'Expand/Collapse',
-            selector: 'node',
-            onClickFunction: expandOrCollapse
+            title: 'Expand',
+            selector: 'node[expanded="false"]',
+            onClickFunction: expand
+        },
+        {
+            id: 'collapse',
+            title: 'Collapse',
+            selector: 'node[expanded="true"]',
+            onClickFunction: function (event) { collapse(event.cyTarget); }
         },
         {
             id: 'select-all-nodes',
@@ -102,7 +99,8 @@ cy.contextMenus({
 });
 
 cy.edgehandles({
-    complete: setEdgeDetails
+    complete: setEdgeDetails,
+    edgeType: function(sourceNode, targetNode) {return sourceNode.edgesTo(targetNode).empty() ? 'flat' : null; }
 });
 cy.edgehandles('disable');
 
@@ -119,21 +117,18 @@ function startSynsetAddition() {
     }
 }
 
-function setEdgeDetails(sourceNode, targetNodes, addedEntities) {
-    javaApp.openNewEdgeWindow(sourceNode.data().id, targetNodes.data().id);
+function setEdgeDetails(sourceNode, targetNode, addedEntities) {
+    if (addedEntities.length === 1) {
+        javaApp.openNewEdgeWindow(sourceNode.data().id, targetNode.data().id);
+    }
 }
 
 function addSynset(synset) {
-    synset.expanded = false;
+    synset.expanded = "false";
     cy.add({
         data: synset,
         style: [{
-            selector: 'node',
-            style: {
-                shape: 'hexagon',
-                // 'background-color': 'red',
-                label: 'data(id)'
-            }
+            selector: 'node'
         }]
     });
     cy.layout({name: 'grid'});
@@ -164,11 +159,43 @@ function search() {
     }
 }
 
-function expandOrCollapse(event) {
+function expand(event) {
     var synset = event.cyTarget.data();
-    if (!synset.expanded) {
+    if (synset.expanded === "false") {
         javaApp.loadEdges(synset.id);
-        synset.expanded = true;
+        synset.expanded = "true";
+    }
+}
+
+function collapse(cyTarget) {
+    var synset = cyTarget.data();
+    if (synset.expanded === "true") {
+        cyTarget.connectedEdges().forEach(function (edge) {
+            if (edge.source().data().id === cyTarget.data().id) {
+                var target = edge.target();
+
+                var targetConnectedEdges = target.connectedEdges();
+                var shouldBeRemoved = true;
+
+                for (var i = 0; i < targetConnectedEdges.length; ++i) {
+                    var edgeSource = targetConnectedEdges[i].source();
+                    if (edgeSource.data().id !== target.data().id && edgeSource.data().id !== synset.id) {
+                        shouldBeRemoved = false;
+                        break;
+                    }
+                }
+
+                if (shouldBeRemoved) {
+                    if (target.data().expanded === "true") {
+                        collapse(target);
+                    }
+                    cy.remove(target);
+                } else {
+                    cy.remove(edge);
+                }
+            }
+        });
+        synset.expanded = "false";
     }
 }
 

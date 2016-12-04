@@ -42,6 +42,10 @@ public class Board {
     public void loadEdges(String synsetId) {
         Synset synset = synsets.get(synsetId);
         if (synset != null) {
+            if (synset.getOutgoingEdges().size() > 0) {
+                return;
+            }
+
             List<Edge> edges = attachedDatabase.getOutgoingEdges(synset);
             for (Edge edge : edges) {
                 if (synsets.containsKey(edge.getPointedSynset().getId())) {
