@@ -31,7 +31,7 @@ public class Board {
         List<Synset> synsetsFound = attachedDatabase.searchSynsets(searchPhrase);
         List<Synset> newSynsets = new ArrayList<>();
         for (Synset synset : synsetsFound) {
-            if (synsets.get(synset.getId()) == null) {
+            if (synsets.get(synset.getId()) == null && removedSynsets.get(synset.getId()) == null) {
                 newSynsets.add(synset);
                 synsets.put(synset.getId(), synset);
             }
@@ -41,22 +41,25 @@ public class Board {
 
     public void loadEdges(String synsetId) {
         Synset synset = synsets.get(synsetId);
-        if (synset != null) {
-            if (synset.getOutgoingEdges().size() > 0) {
-                return;
+
+        if (synset == null || !synset.getOutgoingEdges().isEmpty()) {
+            return;
+        }
+
+        List<Edge> edges = attachedDatabase.getOutgoingEdges(synset);
+        for (Edge edge : edges) {
+            if (removedEdges.get(edge.getId()) != null) {
+                continue;
             }
 
-            List<Edge> edges = attachedDatabase.getOutgoingEdges(synset);
-            for (Edge edge : edges) {
-                if (synsets.containsKey(edge.getPointedSynset().getId())) {
-                    edge.setPointedSynset(synsets.get(edge.getPointedSynset().getId()));
-                } else {
-                    synsets.put(edge.getPointedSynset().getId(), edge.getPointedSynset());
-                }
-                this.edges.put(edge.getId(), edge);
-                synset.addOutgoingEdge(edge);
-                edge.getPointedSynset().addPointingEdge(edge);
+            if (synsets.containsKey(edge.getPointedSynset().getId())) {
+                edge.setPointedSynset(synsets.get(edge.getPointedSynset().getId()));
+            } else {
+                synsets.put(edge.getPointedSynset().getId(), edge.getPointedSynset());
             }
+            this.edges.put(edge.getId(), edge);
+            synset.addOutgoingEdge(edge);
+            edge.getPointedSynset().addPointingEdge(edge);
         }
     }
 
