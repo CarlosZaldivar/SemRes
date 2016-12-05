@@ -84,7 +84,7 @@ cy.contextMenus({
             id: 'collapse',
             title: 'Collapse',
             selector: 'node[expanded="true"]',
-            onClickFunction: function (event) { collapse(event.cyTarget); }
+            onClickFunction: function (event) { collapse(event.cyTarget, []); }
         },
         {
             id: 'select-all-nodes',
@@ -174,12 +174,16 @@ function expand(event) {
     }
 }
 
-function collapse(cyTarget) {
+function collapse(cyTarget, synsetsToCollapse) {
     var synset = cyTarget.data();
     if (synset.expanded === "true") {
         cyTarget.connectedEdges().forEach(function (edge) {
             if (edge.source().data().id === cyTarget.data().id) {
                 var target = edge.target();
+
+                if (synsetsToCollapse.indexOf(target.data().id) > -1) {
+                    return;
+                }
 
                 var targetConnectedEdges = target.connectedEdges();
                 var shouldBeRemoved = true;
@@ -194,7 +198,9 @@ function collapse(cyTarget) {
 
                 if (shouldBeRemoved) {
                     if (target.data().expanded === "true") {
-                        collapse(target);
+                        var newSynsetsToCollapse = synsetsToCollapse.slice();
+                        newSynsetsToCollapse.push(synset.id);
+                        collapse(target, newSynsetsToCollapse);
                     }
                     cy.remove(target);
                 } else {
