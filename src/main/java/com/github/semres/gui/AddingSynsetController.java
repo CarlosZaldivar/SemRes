@@ -1,13 +1,19 @@
 package com.github.semres.gui;
 
 import com.github.semres.user.UserSynset;
+import javafx.beans.binding.Bindings;
+import javafx.beans.binding.BooleanBinding;
 import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
-public class AddingSynsetController extends ChildController {
+import java.net.URL;
+import java.util.ResourceBundle;
+
+public class AddingSynsetController extends ChildController implements Initializable {
     @FXML
     TextField representationTF;
     @FXML
@@ -26,5 +32,11 @@ public class AddingSynsetController extends ChildController {
             Stage stage = (Stage) addButton.getScene().getWindow();
             stage.close();
         }
+    }
+
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
+        BooleanBinding representationValid = Bindings.createBooleanBinding(() -> representationTF.getText().length() > 0, representationTF.textProperty());
+        addButton.disableProperty().bind(representationValid.not());
     }
 }
