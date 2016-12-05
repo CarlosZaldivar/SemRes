@@ -79,6 +79,17 @@ public class Board {
         return synsets.get(id);
     }
 
+    public List<Synset> searchLoadedSynsets(String searchPhrase) {
+        List<Synset> synsetsFound = new ArrayList<>();
+
+        for (Synset synset : synsets.values()) {
+            if (synset.getRepresentation().equals(searchPhrase)) {
+                synsetsFound.add(synset);
+            }
+        }
+        return synsetsFound;
+    }
+
     public void removeElement(String id) {
         if (synsets.containsKey(id)) {
             Synset removedSynset = synsets.get(id);

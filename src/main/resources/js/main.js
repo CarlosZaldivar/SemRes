@@ -124,6 +124,9 @@ function setEdgeDetails(sourceNode, targetNode, addedEntities) {
 }
 
 function addSynset(synset) {
+    if (cy.elements('#' + synset.id).length === 1) {
+        return;
+    }
     synset.expanded = "false";
     cy.add({
         data: synset,
@@ -135,6 +138,10 @@ function addSynset(synset) {
 }
 
 function addEdge(edge) {
+    if (cy.elements('#' + edge.id).length === 1) {
+        return;
+    }
+
     var target = cy.getElementById(edge.targetSynset.id);
     if (!target.data()) {
         addSynset(edge.targetSynset);

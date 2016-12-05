@@ -144,7 +144,12 @@ public class MainController extends Controller implements Initializable {
         }
 
         public void search(String searchPhrase) {
-            List<Synset> synsetsFound = board.loadSynsets(searchPhrase);
+            List<Synset> synsetsFound = board.searchLoadedSynsets(searchPhrase);
+
+            if (synsetsFound.isEmpty()) {
+                synsetsFound = board.loadSynsets(searchPhrase);
+            }
+
             for (Synset synset : synsetsFound) {
                 engine.executeScript("addSynset(" + synsetToJson(synset) + ");");
             }
