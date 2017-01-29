@@ -10,6 +10,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.web.WebEngine;
@@ -35,6 +36,10 @@ public class MainController extends Controller implements Initializable {
     private WebView boardView;
 
     @FXML
+    private Menu viewMenu;
+    @FXML
+    private Menu babelNetMenu;
+    @FXML
     private MenuItem saveMenuItem;
 
     public Board getBoard() {
@@ -58,6 +63,8 @@ public class MainController extends Controller implements Initializable {
         engine.load(getClass().getResource("/html/board.html").toExternalForm());
         // Enable 'save' option.
         saveMenuItem.setDisable(false);
+        viewMenu.setDisable(false);
+        babelNetMenu.setDisable(false);
     }
 
     public void save() {
@@ -70,11 +77,27 @@ public class MainController extends Controller implements Initializable {
 
     public void addSynset(Synset synset) {
         board.addSynset(synset);
+        addSynsetToView(synset);
+    }
+
+    public void addSynsetToView(Synset synset) {
         engine.executeScript("addSynset(" + synsetToJson(synset) + ");");
+    }
+
+    public List<Synset> loadSynsets(String searchPhrase) {
+        return board.loadSynsets(searchPhrase);
+    }
+
+    public List<Synset> searchLoadedSynsets(String searchPhrase) {
+        return board.searchLoadedSynsets(searchPhrase);
     }
 
     public void addEdge(Edge edge) {
         board.addEdge(edge);
+    }
+
+    public void openLoadSynsetWindow() throws IOException {
+        openNewWindow("/fxml/load-synset.fxml", "Load synset", 500, 350);
     }
 
     private Controller openNewWindow(String fxmlPath, String title, int width, int height) throws IOException {
@@ -141,18 +164,6 @@ public class MainController extends Controller implements Initializable {
 
             childController.setOriginSynset(board.getSynset(originSynsetId));
             childController.setDestinationSynset(board.getSynset(destinationSynsetId));
-        }
-
-        public void search(String searchPhrase) {
-            List<Synset> synsetsFound = board.searchLoadedSynsets(searchPhrase);
-
-            if (synsetsFound.isEmpty()) {
-                synsetsFound = board.loadSynsets(searchPhrase);
-            }
-
-            for (Synset synset : synsetsFound) {
-                engine.executeScript("addSynset(" + synsetToJson(synset) + ");");
-            }
         }
 
         public void loadEdges(String synsetId) {

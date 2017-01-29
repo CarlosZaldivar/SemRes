@@ -53,6 +53,11 @@
             <artifactId>junit</artifactId>
             <version>4.12</version>
         </dependency>
+        <dependency>
+            <groupId>com.guigarage</groupId>
+            <artifactId>controls</artifactId>
+            <version>0.7</version>
+        </dependency>
     </dependencies>
     <build>
         <plugins>
@@ -73,11 +78,15 @@
                     <descriptorRefs>
                         <descriptorRef>jar-with-dependencies</descriptorRef>
                     </descriptorRefs>
+                    <outputDirectory>
+                        ${project.basedir}/dist
+                    </outputDirectory>
                     <archive>
                         <manifest>
                             <mainClass>com.github.semres.SemRes</mainClass>
                         </manifest>
                     </archive>
+                    <appendAssemblyId>false</appendAssemblyId>
                 </configuration>
                 <executions>
                     <execution>
@@ -100,11 +109,16 @@
                             <goal>copy-resources</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${basedir}/target/</outputDirectory>
+                            <outputDirectory>${basedir}/dist/</outputDirectory>
                             <resources>
                                 <resource>
                                     <directory>src/main/resources/</directory>
-                                    <filtering>true</filtering>
+                                    <includes>
+                                        <include>babelnet-config/**</include>
+                                        <include>img/**</include>
+                                        <include>conf.yaml</include>
+                                        <include>log4j.properties</include>
+                                    </includes>
                                 </resource>
                             </resources>
                         </configuration>
@@ -148,6 +162,24 @@
                         </configuration>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-clean-plugin</artifactId>
+                <version>3.0.0</version>
+                <configuration>
+                    <filesets>
+                        <fileset>
+                            <directory>dist</directory>
+                        </fileset>
+                        <fileset>
+                            <directory>node</directory>
+                        </fileset>
+                        <fileset>
+                            <directory>node_modules</directory>
+                        </fileset>
+                    </filesets>
+                </configuration>
             </plugin>
         </plugins>
     </build>

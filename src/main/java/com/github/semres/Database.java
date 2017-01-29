@@ -123,9 +123,10 @@ public class Database {
 
     public List<Synset> searchSynsets(String searchPhrase) {
         ValueFactory factory = repository.getValueFactory();
-        String queryString = String.format("SELECT ?type ?synset WHERE { ?synset <%s> ?type . ?type <%s> <%s> . ?synset <%s> %s }",
-                RDF.TYPE, RDFS.SUBCLASSOF, SR.SYNSET, RDFS.LABEL, factory.createLiteral(searchPhrase));
-
+        String queryString = String.format("SELECT ?type ?synset WHERE { ?synset <%s> ?type . ?type <%s> <%s> . ?synset <%s> ?label ." +
+                        " filter contains(lcase(str(?label)), lcase(str(\"%s\"))) }",
+                RDF.TYPE, RDFS.SUBCLASSOF, SR.SYNSET, RDFS.LABEL, searchPhrase);
+        System.out.println(queryString);
         return getSynsets(queryString);
     }
 
