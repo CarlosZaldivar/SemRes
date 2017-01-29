@@ -178,6 +178,12 @@
                         <fileset>
                             <directory>node_modules</directory>
                         </fileset>
+                        <fileset>
+                            <directory>etc</directory>
+                        </fileset>
+                        <fileset>
+                            <directory>src/main/resources/bower_components</directory>
+                        </fileset>
                     </filesets>
                 </configuration>
             </plugin>
