@@ -12,35 +12,38 @@ import java.util.List;
 import java.util.Map;
 
 public class BabelNetSynset extends Synset {
-    private final BabelSynset babelSynset;
+    private BabelSynset babelSynset;
     private Map<String, Edge> removedEdges = new HashMap<>();
     private Date lastUpdateDate;
 
-    public BabelNetSynset(BabelSynset synset) {
-        super(synset.getId().toString());
+    public BabelNetSynset(BabelSynset synset) throws IOException {
+        super(synset.getMainSense(BabelNetManager.getInstance().getJltLanguage()).getSenseString());
 
-        BabelSense sense = synset.getMainSense(BabelNetManager.getInstance().getJltLanguage());
-        String representation = null;
-        if (sense != null) {
-            representation = sense.getSenseString();
-        }
+        setId(synset.getId().getID());
 
         String description;
         try {
-            description = synset.getMainGloss(BabelNetManager.getInstance().getJltLanguage()).toString();
-        } catch (IOException e) {
+            description = synset.getMainGloss(BabelNetManager.getInstance().getJltLanguage()).getGloss();
+        } catch (IOException | NullPointerException e) {
             description = null;
         }
-        this.representation = representation;
         this.description = description;
         babelSynset = synset;
+    }
+
+    public BabelNetSynset(String representation) {
+        super(representation);
     }
 
     public Date getLastUpdateDate() {
         return lastUpdateDate;
     }
 
-    public void update() throws IOException {
+    public void update() throws IOException, InvalidBabelSynsetIDException {
+        if (babelSynset == null) {
+            babelSynset = BabelNetManager.getInstance().getBabelSynset(getId());
+        }
+
         BabelSense sense = babelSynset.getMainSense(BabelNetManager.getInstance().getJltLanguage());
         String representation = null;
         if (sense != null) {
@@ -73,5 +76,9 @@ public class BabelNetSynset extends Synset {
                 outgoingEdges.put(newEdge.getId(), newEdge);
             }
         }
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 }

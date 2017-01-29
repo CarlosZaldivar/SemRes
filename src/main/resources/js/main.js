@@ -127,6 +127,9 @@ function addSynset(synset) {
     if (cy.elements('#' + synset.id).length === 1) {
         return;
     }
+
+    synset.id = synset.id.replace("_", ":");
+
     synset.expanded = "false";
     cy.add({
         data: synset,
@@ -157,13 +160,6 @@ function addEdge(edge) {
         group: "edges",
         data: edge
     });
-}
-
-function search() {
-    var searchPhrase = $("#searchField").val();
-    if (searchPhrase) {
-        javaApp.search(searchPhrase);
-    }
 }
 
 function expand(event) {

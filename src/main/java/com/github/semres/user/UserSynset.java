@@ -3,8 +3,8 @@ package com.github.semres.user;
 import com.github.semres.Synset;
 
 public class UserSynset extends Synset {
-    public UserSynset(String id) {
-        super(id);
+    public UserSynset(String representation) {
+        super(representation);
     }
 
     public void setRepresentation(String representation) {

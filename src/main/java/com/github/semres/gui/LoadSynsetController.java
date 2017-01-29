@@ -35,7 +35,7 @@ public class LoadSynsetController extends ChildController implements Initializab
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        synsetsListView.setCellFactory(v -> new SynsetCell<>(this));
+        synsetsListView.setCellFactory(v -> new LoadedSynsetCell<>(this));
         synsetsListView.setItems(synsetsObservableList);
     }
 
@@ -67,10 +67,10 @@ public class LoadSynsetController extends ChildController implements Initializab
     }
 }
 
-class SynsetCell<T extends Media> extends SimpleMediaListCell<T> {
+class LoadedSynsetCell<T extends Media> extends SimpleMediaListCell<T> {
     LoadSynsetController controller;
 
-    SynsetCell(LoadSynsetController controller) {
+    LoadedSynsetCell(LoadSynsetController controller) {
         this.controller = controller;
         addEventHandler(MouseEvent.MOUSE_CLICKED, controller::addSynsetToView);
     }

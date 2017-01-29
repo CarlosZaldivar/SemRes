@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.RowConstraints?>
+
+<?import java.net.URL?>
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0"
+            prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.102" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.github.semres.gui.SearchBabelNetController">
+    <stylesheets>
+        <URL value="@../css/listview.css"/>
+    </stylesheets>
+    <BorderPane prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
+                AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+        <top>
+            <GridPane minHeight="50.0" BorderPane.alignment="CENTER">
+                <columnConstraints>
+                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="80.0" prefWidth="100.0"/>
+                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="20.0" prefWidth="100.0"/>
+                </columnConstraints>
+                <rowConstraints>
+                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                </rowConstraints>
+                <AnchorPane prefHeight="200.0" prefWidth="200.0">
+                    <TextField fx:id="searchBox" AnchorPane.bottomAnchor="14.0" AnchorPane.leftAnchor="14.0"
+                               AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="14.0"/>
+                </AnchorPane>
+                <AnchorPane prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1">
+                    <Button mnemonicParsing="false" onAction="#search" text="Search"
+                            AnchorPane.bottomAnchor="14.0" AnchorPane.leftAnchor="14.0"
+                            AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="14.0"/>
+                </AnchorPane>
+            </GridPane>
+        </top>
+        <center>
+            <ListView fx:id="synsetsListView" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER"/>
+        </center>
+    </BorderPane>
+</AnchorPane>

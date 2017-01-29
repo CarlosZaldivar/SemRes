@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.semres.Board;
 import com.github.semres.Edge;
 import com.github.semres.Synset;
+import com.github.semres.babelnet.BabelNetManager;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -48,11 +49,12 @@ public class MainController extends Controller implements Initializable {
 
     private Board board;
     private WebEngine engine;
+    private BabelNetManager babelNetManager;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        babelNetManager = new BabelNetManager();
         engine = boardView.getEngine();
-
         connectBackendObject(engine, "javaApp", new JavaApp());
     }
 
@@ -88,6 +90,10 @@ public class MainController extends Controller implements Initializable {
         return board.loadSynsets(searchPhrase);
     }
 
+    public List<Synset> searchBabelNet(String searchPhrase) throws IOException {
+        return (List) babelNetManager.getSynsets(searchPhrase);
+    }
+
     public List<Synset> searchLoadedSynsets(String searchPhrase) {
         return board.searchLoadedSynsets(searchPhrase);
     }
@@ -98,6 +104,10 @@ public class MainController extends Controller implements Initializable {
 
     public void openLoadSynsetWindow() throws IOException {
         openNewWindow("/fxml/load-synset.fxml", "Load synset", 500, 350);
+    }
+
+    public void openSearchBabelNetWindow() throws IOException {
+        openNewWindow("/fxml/search-babelnet.fxml", "Search BabelNet", 500, 350);
     }
 
     private Controller openNewWindow(String fxmlPath, String title, int width, int height) throws IOException {
@@ -117,7 +127,9 @@ public class MainController extends Controller implements Initializable {
 
     private Map<String, Object> synsetToMap(Synset synset) {
         Map<String, Object> synsetMap = new HashMap<>();
-        synsetMap.put("id", synset.getId());
+
+        // Temporary measure to avoid errors when trying to send json with colon.
+        synsetMap.put("id", synset.getId().replace(':', '_'));
         synsetMap.put("description", synset.getDescription());
         synsetMap.put("representation", synset.getRepresentation());
         return synsetMap;

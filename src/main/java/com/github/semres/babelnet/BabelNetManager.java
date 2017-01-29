@@ -1,9 +1,7 @@
 package com.github.semres.babelnet;
 
 import com.github.semres.Source;
-import it.uniroma1.lcl.babelnet.BabelNet;
-import it.uniroma1.lcl.babelnet.BabelNetConfiguration;
-import it.uniroma1.lcl.babelnet.BabelSynset;
+import it.uniroma1.lcl.babelnet.*;
 import it.uniroma1.lcl.jlt.Configuration;
 import it.uniroma1.lcl.jlt.util.Language;
 
@@ -39,6 +37,10 @@ public class BabelNetManager extends Source {
 
     public void setLanguage(String languageCode) {
         language = Language.valueOf(languageCode);
+    }
+
+    public BabelSynset getBabelSynset(String id) throws InvalidBabelSynsetIDException, IOException {
+        return BabelNet.getInstance().getSynset(new BabelSynsetID(id));
     }
 
     public List<BabelNetSynset> getSynsets(String word) throws IOException {
