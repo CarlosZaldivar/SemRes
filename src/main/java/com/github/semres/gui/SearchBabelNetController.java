@@ -7,9 +7,9 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.ListView;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.Region;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -49,11 +49,20 @@ public class SearchBabelNetController extends ChildController implements Initial
             return;
         }
 
-        List<Synset> synsetsFound = null;
+        List<Synset> synsetsFound;
         try {
             synsetsFound = ((MainController) parent).searchBabelNet(searchPhrase);
         } catch (IOException e) {
-            System.out.println("BabelNet connection error.");
+            Alert alert = new Alert(Alert.AlertType.ERROR, "There was a problem connecting to BabelNet.");
+            alert.showAndWait();
+            return;
+        } catch (RuntimeException e) {
+            Alert alert = new Alert(Alert.AlertType.ERROR, e.getMessage());
+
+            // Resize dialog so that the whole text would fit.
+            alert.getDialogPane().getChildren().stream().filter(node -> node instanceof Label).forEach(node -> ((Label)node).setMinHeight(Region.USE_PREF_SIZE));
+            alert.showAndWait();
+            return;
         }
 
         for (Synset synset : synsetsFound) {
