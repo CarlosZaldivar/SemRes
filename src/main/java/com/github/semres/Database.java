@@ -51,60 +51,34 @@ public class Database {
         }
     }
 
+    public void editSynset(Synset edited, Synset original) {
+        if (!edited.getId().equals(original.getId())) {
+            throw new IllegalArgumentException("Original and edited synsets have different IDs.");
+        }
+
+        try (RepositoryConnection conn = repository.getConnection()) {
+            conn.remove(getSerializerForSynset(original).synsetToRdf(original));
+            conn.add(getSerializerForSynset(edited).synsetToRdf(edited));
+        }
+    }
+
     public void removeSynset(Synset synset) {
         try (RepositoryConnection conn = repository.getConnection()) {
+            // Remove edges. It could be optimized by checking if the edges are not already loaded.
+            List<Edge> outgoingEdges = getOutgoingEdges(synset);
+            List<Edge> pointingEdges = getPointingEdges(synset);
 
-            ValueFactory factory = conn.getValueFactory();
-            String queryString;
-
-            // Remove edges
-            List<IRI> edgesIris = getEdgesIris(synset);
-            for (IRI edgeIri : edgesIris) {
-                queryString = String.format("CONSTRUCT { ?originSynset <%s> ?pointedSynset }" +
-                        "WHERE { ?originSynset <%s> ?pointedSynset }", edgeIri, edgeIri);
-                GraphQueryResult result = conn.prepareGraphQuery(queryString).evaluate();
-                Statement edgeStatement = result.next();
-
-                queryString = String.format("CONSTRUCT { <%s> ?p ?o } WHERE { <%s> ?p ?o }", edgeIri, edgeIri);
-                result = conn.prepareGraphQuery(queryString).evaluate();
-
-                while (result.hasNext()) {
-                    Statement statement = result.next();
-                    conn.remove(statement);
-                }
-                conn.remove(edgeStatement);
-            }
+            outgoingEdges.forEach(this::removeEdge);
+            pointingEdges.forEach(this::removeEdge);
 
             // Remove synset
-            queryString = String.format("CONSTRUCT { ?s ?p ?o } WHERE { ?s <%s> %s . ?s ?p ?o }", SR.ID, factory.createLiteral(synset.getId()));
-            GraphQueryResult result = conn.prepareGraphQuery(queryString).evaluate();
-            while (result.hasNext()) {
-                Statement statement = result.next();
-                conn.remove(statement);
-            }
+            conn.remove(getSerializerForSynset(synset).synsetToRdf(synset));
         }
     }
 
     public void removeEdge(Edge edge) {
         try (RepositoryConnection conn = repository.getConnection()) {
-            ValueFactory factory = conn.getValueFactory();
-            String queryString = String.format("CONSTRUCT { ?originSynset ?edge ?pointedSynset }" +
-                            "WHERE { ?originSynset <%s> %s . ?pointedSynset <%s> %s . ?originSynset ?edge ?pointedSynset }",
-                    SR.ID, factory.createLiteral(edge.getOriginSynset().getId()), SR.ID, factory.createLiteral(edge.getPointedSynset().getId()));
-            GraphQueryResult result = conn.prepareGraphQuery(queryString).evaluate();
-            if (result.hasNext()) {
-                Statement edgeStatement = result.next();
-                IRI edgeIri = edgeStatement.getPredicate();
-                conn.remove(edgeStatement);
-
-                queryString = String.format("CONSTRUCT { <%s> ?p ?o } WHERE { <%s> ?p ?o }", edgeIri, edgeIri);
-                result = conn.prepareGraphQuery(queryString).evaluate();
-
-                while (result.hasNext()) {
-                    Statement statement = result.next();
-                    conn.remove(statement);
-                }
-            }
+            conn.remove(getSerializerForEdge(edge).edgeToRdf(edge));
         }
     }
 
@@ -202,32 +176,6 @@ public class Database {
             }
         }
         return edges;
-    }
-
-    /**
-     * Get IRI's of all outgoingEdges that are connected with given synset, both starting and ending on it.
-     * @param synset
-     * @return List of all synset's outgoingEdges IRI's
-     */
-    private List<IRI> getEdgesIris(Synset synset) {
-        List<IRI> iris = new ArrayList<>();
-        ValueFactory factory = repository.getValueFactory();
-        String queryString = String.format("SELECT ?edge" +
-                        " WHERE { ?synset <%s> %s . { ?s ?edge ?synset } UNION { ?synset ?edge ?o } . ?edge <%s> ?edgeType . ?edgeType <%s> <%s> }",
-                SR.ID, factory.createLiteral(synset.getId()), RDF.TYPE, RDFS.SUBCLASSOF, SR.EDGE);
-        try (RepositoryConnection conn = repository.getConnection()) {
-            TupleQuery tupleQuery = conn.prepareTupleQuery(QueryLanguage.SPARQL, queryString);
-
-            try (TupleQueryResult result = tupleQuery.evaluate()) {
-                while (result.hasNext()) {
-                    BindingSet bindingSet = result.next();
-
-                    String edge = bindingSet.getValue("edge").stringValue();
-                    iris.add(factory.createIRI(edge));
-                }
-            }
-        }
-        return iris;
     }
 
     private SynsetSerializer getSerializerForSynset(Synset synset) {

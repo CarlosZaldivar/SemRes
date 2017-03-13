@@ -1,6 +1,8 @@
 package com.github.semres;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public abstract class Synset {
@@ -38,12 +40,24 @@ public abstract class Synset {
         outgoingEdges = (newEdges == null) ? new HashMap<>() : new HashMap<>(newEdges);
     }
 
+    public void setOutgoingEdges(List<Edge> newEdges) {
+        for (Edge edge : new ArrayList<>(newEdges)) {
+            outgoingEdges.put(edge.getId(), edge);
+        }
+    }
+
     public Map<String, Edge> getPointingEdges() {
         return new HashMap<>(pointingEdges);
     }
 
     public void setPointingEdges(Map<String, Edge> newEdges) {
         pointingEdges = (newEdges == null) ? new HashMap<>() : new HashMap<>(newEdges);
+    }
+
+    public void setPointingEdges(List<Edge> newEdges) {
+        for (Edge edge : new ArrayList<>(newEdges)) {
+            pointingEdges.put(edge.getId(), edge);
+        }
     }
 
     public void addOutgoingEdge(Edge edge) {

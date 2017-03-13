@@ -6,14 +6,16 @@ import it.uniroma1.lcl.babelnet.*;
 import it.uniroma1.lcl.babelnet.data.BabelPointer;
 
 import java.io.IOException;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class BabelNetSynset extends Synset {
     private BabelSynset babelSynset;
-    private Map<String, Edge> removedEdges = new HashMap<>();
+
+    public Set<BabelSynsetID> getRemovedRelations() {
+        return removedRelations;
+    }
+
+    private Set<BabelSynsetID> removedRelations = new HashSet<>();
     private Date lastUpdateDate;
 
     public BabelNetSynset(BabelSynset synset) throws IOException {
@@ -31,8 +33,21 @@ public class BabelNetSynset extends Synset {
         babelSynset = synset;
     }
 
+    @Override
+    public void removeOutgoingEdge(String id) {
+        if (outgoingEdges.get(id) instanceof BabelNetEdge) {
+            removedRelations.add(((BabelNetSynset) outgoingEdges.get(id).getPointedSynset()).getBabelSynsetID());
+        }
+        super.removeOutgoingEdge(id);
+    }
+
     public BabelNetSynset(String representation) {
         super(representation);
+    }
+
+    public BabelNetSynset(String representation, Set<BabelSynsetID> removedRelations) {
+        super(representation);
+        this.removedRelations = removedRelations;
     }
 
     public Date getLastUpdateDate() {
@@ -67,18 +82,30 @@ public class BabelNetSynset extends Synset {
     }
 
     private void addEdge(BabelSynsetIDRelation edge) throws IOException {
+        if (removedRelations.contains(edge.getBabelSynsetIDTarget())) { return; }
+
         if (edge.getWeight() > 0) {
             BabelNetSynset referencedSynset = new BabelNetSynset(BabelNet.getInstance().getSynset(edge.getBabelSynsetIDTarget()));
             BabelPointer babelPointer = edge.getPointer();
             Edge newEdge =
                     new BabelNetEdge(referencedSynset, this, Edge.RelationType.HOLONYM, babelPointer.getName(), edge.getWeight());
-            if (!removedEdges.containsKey(newEdge.getId())) {
-                outgoingEdges.put(newEdge.getId(), newEdge);
-            }
+            outgoingEdges.put(newEdge.getId(), newEdge);
         }
     }
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public BabelSynsetID getBabelSynsetID() {
+        if (babelSynset != null) {
+            return babelSynset.getId();
+        } else {
+            try {
+                return new BabelSynsetID(getId());
+            } catch (InvalidBabelSynsetIDException e) {
+                throw new RuntimeException("Invalid BabelNet ID");
+            }
+        }
     }
 }

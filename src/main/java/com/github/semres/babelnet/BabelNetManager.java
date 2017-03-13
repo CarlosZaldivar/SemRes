@@ -40,7 +40,11 @@ public class BabelNetManager extends Source {
     }
 
     public BabelSynset getBabelSynset(String id) throws InvalidBabelSynsetIDException, IOException {
-        return BabelNet.getInstance().getSynset(new BabelSynsetID(id));
+        return getBabelSynset(new BabelSynsetID(id));
+    }
+
+    public BabelSynset getBabelSynset(BabelSynsetID id) throws IOException {
+        return BabelNet.getInstance().getSynset(id);
     }
 
     public List<BabelNetSynset> getSynsets(String word) throws IOException {

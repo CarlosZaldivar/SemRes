@@ -1,5 +1,9 @@
 package com.github.semres;
 
+import com.github.semres.babelnet.BabelNetEdge;
+import com.github.semres.babelnet.BabelNetEdgeSerializer;
+import com.github.semres.babelnet.BabelNetSynset;
+import com.github.semres.babelnet.BabelNetSynsetSerializer;
 import com.github.semres.user.UserEdge;
 import com.github.semres.user.UserEdgeSerializer;
 import com.github.semres.user.UserSynset;
@@ -10,7 +14,6 @@ import org.eclipse.rdf4j.sail.memory.MemoryStore;
 import org.junit.Test;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import static org.junit.Assert.*;
@@ -23,7 +26,7 @@ public class DatabaseTest {
         List<Class> serializerClasses = new ArrayList<>();
         serializerClasses.add(UserSynsetSerializer.class);
 
-        Database database = new Database(serializerClasses, new ArrayList<>(), repo);
+        new Database(serializerClasses, new ArrayList<>(), repo);
     }
 
     @Test
@@ -132,6 +135,65 @@ public class DatabaseTest {
 
         database.removeEdge(edge);
         assertTrue(database.getOutgoingEdges(originSynset).size() == 0);
+    }
+
+    @Test
+    public void editSynset() throws Exception {
+        Repository repo = new SailRepository(new MemoryStore());
+        List<Class> synsetSerializerClasses = new ArrayList<>();
+        synsetSerializerClasses.add(UserSynsetSerializer.class);
+        List<Class> edgeSerializerClasses = new ArrayList<>();
+        edgeSerializerClasses.add(UserEdgeSerializer.class);
+
+        Database database = new Database(synsetSerializerClasses, edgeSerializerClasses, repo);
+
+        UserSynset originalSynset = new UserSynset("Foo");
+        originalSynset.setId("123");
+        originalSynset.setDescription("aaa");
+
+        database.addSynset(originalSynset);
+        UserSynset editedSynset = (UserSynset) database.searchSynsets("Foo").get(0);
+        editedSynset.setRepresentation("Bar");
+        editedSynset.setDescription("bbb");
+
+        database.editSynset(editedSynset, originalSynset);
+
+        Synset savedSynset = database.searchSynsets("Bar").get(0);
+        assertTrue(savedSynset.getDescription().equals("bbb"));
+        assertTrue(database.searchSynsets("Foo").size() == 0);
+    }
+
+    @Test
+    public void removeBabelNetEdge() throws Exception {
+        Repository repo = new SailRepository(new MemoryStore());
+        List<Class> synsetSerializerClasses = new ArrayList<>();
+        synsetSerializerClasses.add(BabelNetSynsetSerializer.class);
+        List<Class> edgeSerializerClasses = new ArrayList<>();
+        edgeSerializerClasses.add(BabelNetEdgeSerializer.class);
+
+        Database database = new Database(synsetSerializerClasses, edgeSerializerClasses, repo);
+
+        BabelNetSynset originSynset = new BabelNetSynset("Foo");
+        originSynset.setId("bn:00024922n");
+        BabelNetSynset pointedSynset = new BabelNetSynset("Bar");
+        pointedSynset.setId("bn:00024923n");
+        Edge edge = new BabelNetEdge(pointedSynset, originSynset, Edge.RelationType.HOLONYM, "", 1);
+
+        database.addSynset(originSynset);
+        database.addSynset(pointedSynset);
+        database.addEdge(edge);
+
+        assertTrue(database.getOutgoingEdges(originSynset).size() == 1);
+        assertTrue(originSynset.getRemovedRelations().size() == 0);
+
+        BabelNetSynset editedSynset = (BabelNetSynset) database.searchSynsets("Foo").get(0);
+        editedSynset.setOutgoingEdges(database.getOutgoingEdges(editedSynset));
+        editedSynset.removeOutgoingEdge(edge.getId());
+        database.removeEdge(edge);
+        database.editSynset(editedSynset, originSynset);
+
+        assertTrue(database.getOutgoingEdges(editedSynset).size() == 0);
+        assertTrue(((BabelNetSynset) database.searchSynsets("Foo").get(0)).getRemovedRelations().size() == 1);
     }
 
     @Test

@@ -16,6 +16,7 @@ public class SR {
     // Properties
     public static final IRI ID;
     public static final IRI RELATION_TYPE;
+    public static final IRI REMOVED_RELATION;
 
     public static final IRI WEIGHT;
 
@@ -24,6 +25,7 @@ public class SR {
         SYNSET = factory.createIRI("http://www.example.org/Synset");
         EDGE = factory.createIRI("http://www.example.org/Edge");
         ID = factory.createIRI("http://www.example.org/Id");
+        REMOVED_RELATION = factory.createIRI("http://www.example.org/RemovedRelation");
         RELATION_TYPE = factory.createIRI("http://www.example.org/RelationType");
         HOLONYM = factory.createIRI("http://www.example.org/Holonym");
         HYPERNYM = factory.createIRI("http://example.org/Hypernym");

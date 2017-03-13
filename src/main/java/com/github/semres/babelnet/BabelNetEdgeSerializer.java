@@ -1,4 +1,4 @@
-package com.github.semres.user;
+package com.github.semres.babelnet;
 
 import com.github.semres.Edge;
 import com.github.semres.EdgeSerializer;
@@ -12,23 +12,23 @@ import org.eclipse.rdf4j.repository.util.Repositories;
 
 import java.util.List;
 
-public class UserEdgeSerializer extends EdgeSerializer {
-    public UserEdgeSerializer(Repository repository, String baseIri) {
+public class BabelNetEdgeSerializer extends EdgeSerializer {
+    public BabelNetEdgeSerializer(Repository repository, String baseIri) {
         super(repository, baseIri);
     }
 
     @Override
     public String getEdgeClass() {
-        return "com.github.semres.user.UserEdge";
+        return "com.github.semres.babelnet.BabelNetEdge";
     }
 
     @Override
     public IRI getEdgeClassIri() {
-        return repository.getValueFactory().createIRI(baseIri + "classes/UserEdge");
+        return repository.getValueFactory().createIRI(baseIri + "classes/BabelNetEdge");
     }
 
     @Override
-    public UserEdge rdfToEdge(IRI edgeIri, Synset pointedSynset, Synset originSynset) {
+    public BabelNetEdge rdfToEdge(IRI edgeIri, Synset pointedSynset, Synset originSynset) {
         ValueFactory factory = repository.getValueFactory();
         String description = null;
         Edge.RelationType relationType = null;
@@ -52,17 +52,19 @@ public class UserEdgeSerializer extends EdgeSerializer {
             relationType = Edge.RelationType.OTHER;
         }
 
-        UserEdge edge = new UserEdge(pointedSynset, originSynset, relationType, weight);
+        BabelNetEdge edge;
 
         if (description != null) {
-            edge.setDescription(description);
+            edge = new BabelNetEdge(pointedSynset, originSynset, relationType, description, weight);
+        } else {
+            edge = new BabelNetEdge(pointedSynset, originSynset, relationType, weight);
         }
 
         return edge;
     }
 
     @Override
-    public UserEdge rdfToEdge(String edgeId, Synset pointedSynset, Synset originSynset) {
+    public BabelNetEdge rdfToEdge(String edgeId, Synset pointedSynset, Synset originSynset) {
         ValueFactory factory = repository.getValueFactory();
         return rdfToEdge(factory.createIRI(baseIri + "outgoingEdges/" + edgeId), pointedSynset, originSynset);
     }

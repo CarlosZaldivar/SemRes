@@ -1,7 +1,12 @@
 package com.github.semres;
 
 import org.eclipse.rdf4j.model.IRI;
+import org.eclipse.rdf4j.model.Literal;
 import org.eclipse.rdf4j.model.Model;
+import org.eclipse.rdf4j.model.ValueFactory;
+import org.eclipse.rdf4j.model.impl.LinkedHashModel;
+import org.eclipse.rdf4j.model.vocabulary.RDF;
+import org.eclipse.rdf4j.model.vocabulary.RDFS;
 import org.eclipse.rdf4j.repository.Repository;
 
 public abstract class EdgeSerializer {
@@ -13,7 +18,44 @@ public abstract class EdgeSerializer {
         this.baseIri = baseIri;
     }
 
-    abstract public Model edgeToRdf(Edge edge);
+    public Model edgeToRdf(Edge edge) {
+        Model model = new LinkedHashModel();
+        ValueFactory factory = repository.getValueFactory();
+
+        model.add(getEdgeClassIri(), RDF.TYPE, RDFS.CLASS);
+        model.add(getEdgeClassIri(), RDFS.SUBCLASSOF, SR.EDGE);
+
+        IRI edgeIri = factory.createIRI(baseIri + "outgoingEdges/" + edge.getId());
+
+        if (edge.getDescription() != null) {
+            Literal description = factory.createLiteral(edge.getDescription());
+            model.add(factory.createStatement(edgeIri, RDFS.COMMENT, description));
+        }
+
+        model.add(edgeIri, RDF.TYPE, getEdgeClassIri());
+        model.add(edgeIri, SR.ID, factory.createLiteral(edge.getId()));
+
+        switch (edge.getRelationType()) {
+            case HOLONYM:
+                model.add(edgeIri, SR.RELATION_TYPE, SR.HOLONYM);
+                break;
+            case HYPERNYM:
+                model.add(edgeIri, SR.RELATION_TYPE, SR.HYPERNYM);
+                break;
+            case HYPONYM:
+                model.add(edgeIri, SR.RELATION_TYPE, SR.HYPONYM);
+                break;
+            case MERONYM:
+                model.add(edgeIri, SR.RELATION_TYPE, SR.MERONYM);
+                break;
+        }
+
+        model.add(factory.createIRI(baseIri + "synsets/" + edge.getOriginSynset().getId()), edgeIri, factory.createIRI(baseIri + "synsets/" + edge.getPointedSynset().getId()));
+        model.add(edgeIri, SR.WEIGHT, factory.createLiteral(edge.getWeight()));
+
+        return model;
+    }
+
     abstract public Edge rdfToEdge(String edgeId, Synset pointedSynset, Synset originSynset);
     abstract public Edge rdfToEdge(IRI edge, Synset pointedSynset, Synset originSynset);
     abstract public String getEdgeClass();
