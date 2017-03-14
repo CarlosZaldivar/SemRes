@@ -35,7 +35,7 @@ public class UserEdgeSerializer extends EdgeSerializer {
         double weight = -1;
 
         String queryString = String.format("SELECT * WHERE { <%s> ?p ?o }", edgeIri.stringValue());
-        List<BindingSet> results = Repositories.tupleQuery(repository, queryString, r -> QueryResults.asList(r));
+        List<BindingSet> results = Repositories.tupleQuery(repository, queryString, (iter) -> QueryResults.asList(iter));
 
         for (BindingSet result: results) {
             if (result.getValue("p").stringValue().equals(SR.RELATION_TYPE.stringValue())) {

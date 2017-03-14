@@ -10,10 +10,10 @@ import org.eclipse.rdf4j.model.vocabulary.RDFS;
 import org.eclipse.rdf4j.repository.Repository;
 
 public abstract class EdgeSerializer {
-    protected Repository repository;
-    protected String baseIri;
+    protected final Repository repository;
+    protected final String baseIri;
 
-    public EdgeSerializer(Repository repository, String baseIri) {
+    protected EdgeSerializer(Repository repository, String baseIri) {
         this.repository = repository;
         this.baseIri = baseIri;
     }

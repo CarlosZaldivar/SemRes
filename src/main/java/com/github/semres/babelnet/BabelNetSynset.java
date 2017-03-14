@@ -18,7 +18,7 @@ public class BabelNetSynset extends Synset {
     private Set<BabelSynsetID> removedRelations = new HashSet<>();
     private Date lastUpdateDate;
 
-    public BabelNetSynset(BabelSynset synset) throws IOException {
+    BabelNetSynset(BabelSynset synset) {
         super(synset.getMainSense(BabelNetManager.getInstance().getJltLanguage()).getSenseString());
 
         setId(synset.getId().getID());
@@ -45,7 +45,7 @@ public class BabelNetSynset extends Synset {
         super(representation);
     }
 
-    public BabelNetSynset(String representation, Set<BabelSynsetID> removedRelations) {
+    BabelNetSynset(String representation, Set<BabelSynsetID> removedRelations) {
         super(representation);
         this.removedRelations = removedRelations;
     }
@@ -97,7 +97,7 @@ public class BabelNetSynset extends Synset {
         this.description = description;
     }
 
-    public BabelSynsetID getBabelSynsetID() {
+    private BabelSynsetID getBabelSynsetID() {
         if (babelSynset != null) {
             return babelSynset.getId();
         } else {

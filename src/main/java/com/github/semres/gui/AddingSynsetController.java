@@ -15,10 +15,13 @@ import java.util.ResourceBundle;
 
 public class AddingSynsetController extends ChildController implements Initializable {
     @FXML
+    private
     TextField representationTF;
     @FXML
+    private
     TextArea descriptionTA;
     @FXML
+    private
     Button addButton;
 
     public void addSynset() {

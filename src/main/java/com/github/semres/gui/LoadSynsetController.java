@@ -25,12 +25,14 @@ import java.util.ResourceBundle;
 
 public class LoadSynsetController extends ChildController implements Initializable {
     @FXML
+    private
     ListView<SynsetMedia> synsetsListView;
 
-    private ObservableList<SynsetMedia> synsetsObservableList = FXCollections.observableArrayList();
+    private final ObservableList<SynsetMedia> synsetsObservableList = FXCollections.observableArrayList();
 
 
     @FXML
+    private
     TextField searchBox;
 
     @Override
@@ -39,7 +41,7 @@ public class LoadSynsetController extends ChildController implements Initializab
         synsetsListView.setItems(synsetsObservableList);
     }
 
-    public void addSynsetToView(MouseEvent click) {
+    void addSynsetToView(MouseEvent click) {
         if (click.getClickCount() == 2 && synsetsListView.getSelectionModel().getSelectedItem() != null) {
             Synset synset = synsetsListView.getSelectionModel().getSelectedItem().getSynset();
             ((MainController) parent).addSynsetToView(synset);
@@ -68,10 +70,8 @@ public class LoadSynsetController extends ChildController implements Initializab
 }
 
 class LoadedSynsetCell<T extends Media> extends SimpleMediaListCell<T> {
-    LoadSynsetController controller;
 
     LoadedSynsetCell(LoadSynsetController controller) {
-        this.controller = controller;
         addEventHandler(MouseEvent.MOUSE_CLICKED, controller::addSynsetToView);
     }
 }
@@ -80,7 +80,7 @@ class SynsetMedia implements Media {
 
     private Synset synset;
 
-    public SynsetMedia(Synset synset) {
+    SynsetMedia(Synset synset) {
         this.synset = synset;
     }
 

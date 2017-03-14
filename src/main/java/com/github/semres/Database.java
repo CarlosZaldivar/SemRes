@@ -1,7 +1,6 @@
 package com.github.semres;
 
 import org.eclipse.rdf4j.model.IRI;
-import org.eclipse.rdf4j.model.Statement;
 import org.eclipse.rdf4j.model.ValueFactory;
 import org.eclipse.rdf4j.model.vocabulary.RDF;
 import org.eclipse.rdf4j.model.vocabulary.RDFS;
@@ -12,25 +11,25 @@ import org.eclipse.rdf4j.repository.RepositoryConnection;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.NoSuchElementException;
 
-public class Database {
+class Database {
     private List<SynsetSerializer> synsetSerializers;
     private List<EdgeSerializer> edgeSerializers;
     private Repository repository;
-    private String baseIri = "http://example.org/";
 
-    public Database(List<Class> synsetSerializerClasses, List<Class> edgeSerializerClasses, Repository repository) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
+    Database(List<Class<? extends SynsetSerializer>> synsetSerializerClasses, List<Class<? extends EdgeSerializer>> edgeSerializerClasses,
+             Repository repository) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
         List<SynsetSerializer> synsetSerializers = new ArrayList<>();
-        for (Class serializerClass: synsetSerializerClasses) {
-            SynsetSerializer loadedSynsetSerializer = (SynsetSerializer) serializerClass.getConstructor(Repository.class, String.class).newInstance(repository, baseIri);
+        String baseIri = "http://example.org/";
+        for (Class<? extends SynsetSerializer> serializerClass: synsetSerializerClasses) {
+            SynsetSerializer loadedSynsetSerializer = serializerClass.getConstructor(Repository.class, String.class).newInstance(repository, baseIri);
             synsetSerializers.add(loadedSynsetSerializer);
         }
         this.synsetSerializers = synsetSerializers;
 
         List<EdgeSerializer> edgeSerializers = new ArrayList<>();
-        for (Class serializerClass: edgeSerializerClasses) {
-            EdgeSerializer loadedEdgeSerializer = (EdgeSerializer) serializerClass.getConstructor(Repository.class, String.class).newInstance(repository, baseIri);
+        for (Class<? extends EdgeSerializer> serializerClass: edgeSerializerClasses) {
+            EdgeSerializer loadedEdgeSerializer = serializerClass.getConstructor(Repository.class, String.class).newInstance(repository, baseIri);
             edgeSerializers.add(loadedEdgeSerializer);
         }
         this.edgeSerializers = edgeSerializers;
@@ -39,19 +38,19 @@ public class Database {
         this.repository.initialize();
     }
 
-    public void addSynset(Synset synset) {
+    void addSynset(Synset synset) {
         try (RepositoryConnection conn = repository.getConnection()) {
             conn.add(getSerializerForSynset(synset).synsetToRdf(synset));
         }
     }
 
-    public void addEdge(Edge edge) {
+    void addEdge(Edge edge) {
         try (RepositoryConnection conn = repository.getConnection()) {
             conn.add(getSerializerForEdge(edge).edgeToRdf(edge));
         }
     }
 
-    public void editSynset(Synset edited, Synset original) {
+    void editSynset(Synset edited, Synset original) {
         if (!edited.getId().equals(original.getId())) {
             throw new IllegalArgumentException("Original and edited synsets have different IDs.");
         }
@@ -62,7 +61,7 @@ public class Database {
         }
     }
 
-    public void removeSynset(Synset synset) {
+    void removeSynset(Synset synset) {
         try (RepositoryConnection conn = repository.getConnection()) {
             // Remove edges. It could be optimized by checking if the edges are not already loaded.
             List<Edge> outgoingEdges = getOutgoingEdges(synset);
@@ -76,7 +75,7 @@ public class Database {
         }
     }
 
-    public void removeEdge(Edge edge) {
+    void removeEdge(Edge edge) {
         try (RepositoryConnection conn = repository.getConnection()) {
             conn.remove(getSerializerForEdge(edge).edgeToRdf(edge));
         }
@@ -90,12 +89,12 @@ public class Database {
         return getSerializerForEdge(type).rdfToEdge(edgeIri, pointedSynset, originSynset);
     }
 
-    public List<Synset> getSynsets() {
+    List<Synset> getSynsets() {
         String queryString = String.format("SELECT ?type ?synset WHERE { ?synset <%s> ?type . ?type <%s> <%s> }", RDF.TYPE, RDFS.SUBCLASSOF, SR.SYNSET);
         return getSynsets(queryString);
     }
 
-    public List<Synset> searchSynsets(String searchPhrase) {
+    List<Synset> searchSynsets(String searchPhrase) {
         String queryString = String.format("SELECT ?type ?synset WHERE { ?synset <%s> ?type . ?type <%s> <%s> . ?synset <%s> ?label ." +
                         " filter contains(lcase(str(?label)), lcase(str(\"%s\"))) }",
                 RDF.TYPE, RDFS.SUBCLASSOF, SR.SYNSET, RDFS.LABEL, searchPhrase);
@@ -122,7 +121,7 @@ public class Database {
         return synsets;
     }
 
-    public List<Edge> getOutgoingEdges(Synset originSynset) {
+    List<Edge> getOutgoingEdges(Synset originSynset) {
         List<Edge> edges = new ArrayList<>();
         ValueFactory factory = repository.getValueFactory();
         String queryString = String.format("SELECT ?edgeType ?edge ?pointedSynset ?pointedSynsetType" +
@@ -150,7 +149,7 @@ public class Database {
         return edges;
     }
 
-    public List<Edge> getPointingEdges(Synset pointedSynset) {
+    List<Edge> getPointingEdges(Synset pointedSynset) {
         List<Edge> edges = new ArrayList<>();
         ValueFactory factory = repository.getValueFactory();
         String queryString = String.format("SELECT ?edgeType ?edge ?originSynset ?originSynsetType" +
@@ -180,53 +179,37 @@ public class Database {
 
     private SynsetSerializer getSerializerForSynset(Synset synset) {
         SynsetSerializer serializer;
-        try {
-            serializer = synsetSerializers
-                    .stream()
-                    .filter(x -> x.getSynsetClass().equals(synset.getClass().getCanonicalName()))
-                    .findFirst().get();
-        } catch (NoSuchElementException e) {
-            throw new IllegalArgumentException(e);
-        }
+        serializer = synsetSerializers
+                .stream()
+                .filter(x -> x.getSynsetClass().equals(synset.getClass().getCanonicalName()))
+                .findFirst().orElseThrow(IllegalArgumentException::new);
         return serializer;
     }
 
     private SynsetSerializer getSerializerForSynset(String type) {
         SynsetSerializer serializer;
-        try {
-            serializer = synsetSerializers
-                    .stream()
-                    .filter(x -> x.getSynsetClassIri().stringValue().equals(type))
-                    .findFirst().get();
-        } catch (NoSuchElementException e) {
-            throw new IllegalArgumentException();
-        }
+        serializer = synsetSerializers
+                .stream()
+                .filter(x -> x.getSynsetClassIri().stringValue().equals(type))
+                .findFirst().orElseThrow(IllegalArgumentException::new);
         return serializer;
     }
 
     private EdgeSerializer getSerializerForEdge(Edge edge) {
         EdgeSerializer serializer;
-        try {
-            serializer = edgeSerializers
-                    .stream()
-                    .filter(x -> x.getEdgeClass().equals(edge.getClass().getCanonicalName()))
-                    .findFirst().get();
-        } catch (NoSuchElementException e) {
-            throw new IllegalArgumentException(e);
-        }
+        serializer = edgeSerializers
+                .stream()
+                .filter(x -> x.getEdgeClass().equals(edge.getClass().getCanonicalName()))
+                .findFirst().orElseThrow(IllegalArgumentException::new);
         return serializer;
     }
 
     private EdgeSerializer getSerializerForEdge(String type) {
         EdgeSerializer serializer;
-        try {
-            serializer = edgeSerializers
-                    .stream()
-                    .filter(x -> x.getEdgeClassIri().stringValue().equals(type))
-                    .findFirst().get();
-        } catch (NoSuchElementException e) {
-            throw new IllegalArgumentException();
-        }
+        serializer = edgeSerializers
+                .stream()
+                .filter(x -> x.getEdgeClassIri().stringValue().equals(type))
+                .findFirst().orElseThrow(IllegalArgumentException::new);
         return serializer;
     }
 }

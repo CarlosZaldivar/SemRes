@@ -23,18 +23,17 @@ import java.util.Set;
 
 public class DatabasesController extends ChildController implements Initializable {
     @FXML
-    private ListView listView;
+    private ListView<String> listView;
     @FXML
     private Button addButton;
     @FXML
     private Button deleteButton;
 
-    private ObservableList observableList = FXCollections.observableArrayList();
-    private Set<String> databasesNames;
+    private final ObservableList<String> observableList = FXCollections.observableArrayList();
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        databasesNames = SemRes.getInstance().getRepositoryIDs();
+        Set<String> databasesNames = SemRes.getInstance().getRepositoryIDs();
         databasesNames.remove("SYSTEM");
 
         observableList.setAll(databasesNames);
@@ -56,13 +55,13 @@ public class DatabasesController extends ChildController implements Initializabl
         databasesStage.show();
     }
 
-    public void addDatabase(String name) {
+    void addDatabase(String name) {
         SemRes.getInstance().addRepository(name);
         observableList.add(name);
     }
 
     public void deleteDatabase() {
-        String name = (String)listView.getSelectionModel().getSelectedItem();
+        String name = listView.getSelectionModel().getSelectedItem();
         if (name != null && !name.equals("SYSTEM")) {
             SemRes.getInstance().deleteRepository(name);
             observableList.remove(name);
@@ -71,7 +70,7 @@ public class DatabasesController extends ChildController implements Initializabl
 
     public void clickedListView(MouseEvent click) throws NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
         if (click.getClickCount() == 2 && listView.getSelectionModel().getSelectedItem() != null) {
-            String repositoryName = (String) listView.getSelectionModel().getSelectedItem();
+            String repositoryName = listView.getSelectionModel().getSelectedItem();
             Board loadedBoard =  SemRes.getInstance().getBoard(repositoryName);
             ((MainController) parent).setBoard(loadedBoard);
             Stage stage = (Stage) listView.getScene().getWindow();

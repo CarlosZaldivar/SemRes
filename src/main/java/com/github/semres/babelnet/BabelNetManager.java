@@ -1,6 +1,9 @@
 package com.github.semres.babelnet;
 
+import com.github.semres.EdgeSerializer;
 import com.github.semres.Source;
+import com.github.semres.Synset;
+import com.github.semres.SynsetSerializer;
 import it.uniroma1.lcl.babelnet.*;
 import it.uniroma1.lcl.jlt.Configuration;
 import it.uniroma1.lcl.jlt.util.Language;
@@ -31,7 +34,7 @@ public class BabelNetManager extends Source {
         return language.toString();
     }
 
-    public Language getJltLanguage() {
+    Language getJltLanguage() {
         return language;
     }
 
@@ -39,11 +42,11 @@ public class BabelNetManager extends Source {
         language = Language.valueOf(languageCode);
     }
 
-    public BabelSynset getBabelSynset(String id) throws InvalidBabelSynsetIDException, IOException {
+    BabelSynset getBabelSynset(String id) throws InvalidBabelSynsetIDException, IOException {
         return getBabelSynset(new BabelSynsetID(id));
     }
 
-    public BabelSynset getBabelSynset(BabelSynsetID id) throws IOException {
+    private BabelSynset getBabelSynset(BabelSynsetID id) throws IOException {
         return BabelNet.getInstance().getSynset(id);
     }
 
@@ -59,17 +62,17 @@ public class BabelNetManager extends Source {
     }
 
     @Override
-    public Class getSynsetSerializerClass() {
+    public Class<? extends SynsetSerializer> getSynsetSerializerClass() {
         return BabelNetSynsetSerializer.class;
     }
 
     @Override
-    public Class getEdgeSerializerClass() {
-        return null;
+    public Class<? extends EdgeSerializer> getEdgeSerializerClass() {
+        return BabelNetEdgeSerializer.class;
     }
 
     @Override
-    public Class getSynsetClass() {
+    public Class<? extends Synset> getSynsetClass() {
         return BabelNetSynset.class;
     }
 }

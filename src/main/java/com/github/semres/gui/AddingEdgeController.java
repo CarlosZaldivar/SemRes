@@ -17,10 +17,13 @@ import java.util.ResourceBundle;
 
 public class AddingEdgeController extends ChildController implements Initializable {
     @FXML
-    ComboBox relationTypeCB;
+    private
+    ComboBox<Edge.RelationType> relationTypeCB;
     @FXML
+    private
     TextField weightTF;
     @FXML
+    private
     Button addButton;
 
     private Synset originSynset;
@@ -30,7 +33,7 @@ public class AddingEdgeController extends ChildController implements Initializab
         this.originSynset = originSynset;
     }
 
-    public void setDestinationSynset(Synset destinationSynset) {
+    void setDestinationSynset(Synset destinationSynset) {
         this.destinationSynset = destinationSynset;
     }
 

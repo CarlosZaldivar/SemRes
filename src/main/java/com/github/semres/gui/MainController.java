@@ -6,6 +6,7 @@ import com.github.semres.Board;
 import com.github.semres.Edge;
 import com.github.semres.Synset;
 import com.github.semres.babelnet.BabelNetManager;
+import com.github.semres.babelnet.BabelNetSynset;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -58,7 +59,7 @@ public class MainController extends Controller implements Initializable {
         connectBackendObject(engine, "javaApp", new JavaApp());
     }
 
-    public void setBoard(Board board) {
+    void setBoard(Board board) {
         this.board = board;
 
         // Reload html
@@ -77,28 +78,33 @@ public class MainController extends Controller implements Initializable {
         openNewWindow("/fxml/databases-list.fxml", "Databases", 300, 275);
     }
 
-    public void addSynset(Synset synset) {
+    void addSynset(Synset synset) {
         board.addSynset(synset);
         addSynsetToView(synset);
     }
 
-    public void addSynsetToView(Synset synset) {
+    private void addEdgeToView(Edge edge) {
+        String script = "addEdge(" + edgeToJson(edge) + ");";
+        engine.executeScript(script);
+    }
+
+    void addSynsetToView(Synset synset) {
         engine.executeScript("addSynset(" + synsetToJson(synset) + ");");
     }
 
-    public List<Synset> loadSynsets(String searchPhrase) {
+    List<Synset> loadSynsets(String searchPhrase) {
         return board.loadSynsets(searchPhrase);
     }
 
-    public List<Synset> searchBabelNet(String searchPhrase) throws IOException {
-        return (List) babelNetManager.getSynsets(searchPhrase);
+    List<? extends Synset> searchBabelNet(String searchPhrase) throws IOException {
+        return babelNetManager.getSynsets(searchPhrase);
     }
 
-    public List<Synset> searchLoadedSynsets(String searchPhrase) {
+    List<Synset> searchLoadedSynsets(String searchPhrase) {
         return board.searchLoadedSynsets(searchPhrase);
     }
 
-    public void addEdge(Edge edge) {
+    void addEdge(Edge edge) {
         board.addEdge(edge);
     }
 
@@ -132,6 +138,7 @@ public class MainController extends Controller implements Initializable {
         synsetMap.put("id", synset.getId().replace(':', '_'));
         synsetMap.put("description", synset.getDescription());
         synsetMap.put("representation", synset.getRepresentation());
+        synsetMap.put("class", synset.getClass().getSimpleName());
         return synsetMap;
     }
 
@@ -148,7 +155,7 @@ public class MainController extends Controller implements Initializable {
 
     private String edgeToJson(Edge edge) {
         Map<String, Object> edgeMap = new HashMap<>();
-        edgeMap.put("id", edge.getId());
+        edgeMap.put("id", edge.getId().replace(':', '_'));
         edgeMap.put("description", edge.getDescription());
         edgeMap.put("weight", edge.getWeight());
         edgeMap.put("relationType", edge.getRelationType().toString().toLowerCase());
@@ -180,9 +187,13 @@ public class MainController extends Controller implements Initializable {
 
         public void loadEdges(String synsetId) {
             board.loadEdges(synsetId);
-            for (Edge edge : board.getSynset(synsetId).getOutgoingEdges().values()) {
-                engine.executeScript("addEdge(" + edgeToJson(edge) + ");");
-            }
+            board.getSynset(synsetId).getOutgoingEdges().values().forEach(MainController.this::addEdgeToView);
+        }
+
+        public void loadEdgesFromBabelNet(String synsetId) {
+            BabelNetSynset synset = (BabelNetSynset) board.getSynset(synsetId);
+//            synset.loadEdges();
+            synset.getOutgoingEdges().values().forEach(MainController.this::addEdgeToView);
         }
 
         public void removeElement(String id) {

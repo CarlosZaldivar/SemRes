@@ -19,12 +19,14 @@ import java.util.ResourceBundle;
 
 public class SearchBabelNetController extends ChildController implements Initializable {
     @FXML
+    private
     ListView<SynsetMedia> synsetsListView;
 
-    private ObservableList<SynsetMedia> synsetsObservableList = FXCollections.observableArrayList();
+    private final ObservableList<SynsetMedia> synsetsObservableList = FXCollections.observableArrayList();
 
 
     @FXML
+    private
     TextField searchBox;
 
     @Override
@@ -33,7 +35,7 @@ public class SearchBabelNetController extends ChildController implements Initial
         synsetsListView.setItems(synsetsObservableList);
     }
 
-    public void addSynset(MouseEvent click) {
+    void addSynset(MouseEvent click) {
         if (click.getClickCount() == 2 && synsetsListView.getSelectionModel().getSelectedItem() != null) {
             Synset synset = synsetsListView.getSelectionModel().getSelectedItem().getSynset();
             ((MainController) parent).addSynset(synset);
@@ -49,7 +51,7 @@ public class SearchBabelNetController extends ChildController implements Initial
             return;
         }
 
-        List<Synset> synsetsFound;
+        List<? extends Synset> synsetsFound;
         try {
             synsetsFound = ((MainController) parent).searchBabelNet(searchPhrase);
         } catch (IOException e) {
@@ -72,10 +74,8 @@ public class SearchBabelNetController extends ChildController implements Initial
 }
 
 class BabelNetSynsetCell<T extends Media> extends SimpleMediaListCell<T> {
-    SearchBabelNetController controller;
 
     BabelNetSynsetCell(SearchBabelNetController controller) {
-        this.controller = controller;
         addEventHandler(MouseEvent.MOUSE_CLICKED, controller::addSynset);
     }
 }

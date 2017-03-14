@@ -23,7 +23,7 @@ public class DatabaseTest {
     @Test
     public void constructor() throws Exception {
         Repository repo = new SailRepository(new MemoryStore());
-        List<Class> serializerClasses = new ArrayList<>();
+        List<Class<? extends SynsetSerializer>> serializerClasses = new ArrayList<>();
         serializerClasses.add(UserSynsetSerializer.class);
 
         new Database(serializerClasses, new ArrayList<>(), repo);
@@ -32,7 +32,7 @@ public class DatabaseTest {
     @Test
     public void getSynsets() throws Exception {
         Repository repo = new SailRepository(new MemoryStore());
-        List<Class> serializerClasses = new ArrayList<>();
+        List<Class<? extends SynsetSerializer>> serializerClasses = new ArrayList<>();
         serializerClasses.add(UserSynsetSerializer.class);
 
         Database database = new Database(serializerClasses, new ArrayList<>(), repo);
@@ -51,14 +51,17 @@ public class DatabaseTest {
         assertTrue(synsets.size() == 2);
 
         for (Synset synset : synsets) {
-            if (synset.getId().equals("123")) {
-                assertTrue(synset.getRepresentation().equals("Foo1"));
-                assertTrue(synset.getDescription().equals("Bar"));
-            } else if (synset.getId().equals("124")) {
-                assertTrue(synset.getRepresentation().equals("Foo2"));
-                assertTrue(synset.getDescription() == null);
-            } else {
-                throw new Exception();
+            switch (synset.getId()) {
+                case "123":
+                    assertTrue(synset.getRepresentation().equals("Foo1"));
+                    assertTrue(synset.getDescription().equals("Bar"));
+                    break;
+                case "124":
+                    assertTrue(synset.getRepresentation().equals("Foo2"));
+                    assertTrue(synset.getDescription() == null);
+                    break;
+                default:
+                    throw new Exception();
             }
         }
     }
@@ -66,7 +69,7 @@ public class DatabaseTest {
     @Test
     public void removeSynset() throws Exception {
         Repository repo = new SailRepository(new MemoryStore());
-        List<Class> synsetSerializerClasses = new ArrayList<>();
+        List<Class<? extends SynsetSerializer>> synsetSerializerClasses = new ArrayList<>();
         synsetSerializerClasses.add(UserSynsetSerializer.class);
 
         Database database = new Database(synsetSerializerClasses, new ArrayList<>(), repo);
@@ -83,9 +86,9 @@ public class DatabaseTest {
     @Test
     public void removeSynsetWithEdges() throws Exception {
         Repository repo = new SailRepository(new MemoryStore());
-        List<Class> synsetSerializerClasses = new ArrayList<>();
+        List<Class<? extends SynsetSerializer>> synsetSerializerClasses = new ArrayList<>();
         synsetSerializerClasses.add(UserSynsetSerializer.class);
-        List<Class> edgeSerializerClasses = new ArrayList<>();
+        List<Class<? extends EdgeSerializer>> edgeSerializerClasses = new ArrayList<>();
         edgeSerializerClasses.add(UserEdgeSerializer.class);
 
         Database database = new Database(synsetSerializerClasses, edgeSerializerClasses, repo);
@@ -115,9 +118,9 @@ public class DatabaseTest {
     @Test
     public void removeEdge() throws Exception {
         Repository repo = new SailRepository(new MemoryStore());
-        List<Class> synsetSerializerClasses = new ArrayList<>();
+        List<Class<? extends SynsetSerializer>> synsetSerializerClasses = new ArrayList<>();
         synsetSerializerClasses.add(UserSynsetSerializer.class);
-        List<Class> edgeSerializerClasses = new ArrayList<>();
+        List<Class<? extends EdgeSerializer>> edgeSerializerClasses = new ArrayList<>();
         edgeSerializerClasses.add(UserEdgeSerializer.class);
 
         Database database = new Database(synsetSerializerClasses, edgeSerializerClasses, repo);
@@ -140,9 +143,9 @@ public class DatabaseTest {
     @Test
     public void editSynset() throws Exception {
         Repository repo = new SailRepository(new MemoryStore());
-        List<Class> synsetSerializerClasses = new ArrayList<>();
+        List<Class<? extends SynsetSerializer>> synsetSerializerClasses = new ArrayList<>();
         synsetSerializerClasses.add(UserSynsetSerializer.class);
-        List<Class> edgeSerializerClasses = new ArrayList<>();
+        List<Class<? extends EdgeSerializer>> edgeSerializerClasses = new ArrayList<>();
         edgeSerializerClasses.add(UserEdgeSerializer.class);
 
         Database database = new Database(synsetSerializerClasses, edgeSerializerClasses, repo);
@@ -166,9 +169,9 @@ public class DatabaseTest {
     @Test
     public void removeBabelNetEdge() throws Exception {
         Repository repo = new SailRepository(new MemoryStore());
-        List<Class> synsetSerializerClasses = new ArrayList<>();
+        List<Class<? extends SynsetSerializer>> synsetSerializerClasses = new ArrayList<>();
         synsetSerializerClasses.add(BabelNetSynsetSerializer.class);
-        List<Class> edgeSerializerClasses = new ArrayList<>();
+        List<Class<? extends EdgeSerializer>> edgeSerializerClasses = new ArrayList<>();
         edgeSerializerClasses.add(BabelNetEdgeSerializer.class);
 
         Database database = new Database(synsetSerializerClasses, edgeSerializerClasses, repo);
@@ -199,7 +202,7 @@ public class DatabaseTest {
     @Test
     public void searchSynsets() throws Exception {
         Repository repo = new SailRepository(new MemoryStore());
-        List<Class> serializerClasses = new ArrayList<>();
+        List<Class<? extends SynsetSerializer>> serializerClasses = new ArrayList<>();
         serializerClasses.add(UserSynsetSerializer.class);
 
         Database database = new Database(serializerClasses, new ArrayList<>(), repo);
@@ -222,14 +225,17 @@ public class DatabaseTest {
         assertTrue(synsets.size() == 2);
 
         for (Synset synset : synsets) {
-            if (synset.getId().equals("123")) {
-                assertTrue(synset.getRepresentation().equals("Foo"));
-                assertTrue(synset.getDescription().equals("Foo1"));
-            } else if (synset.getId().equals("124")) {
-                assertTrue(synset.getRepresentation().equals("Foo"));
-                assertTrue(synset.getDescription().equals("Foo2"));
-            } else {
-                throw new Exception();
+            switch (synset.getId()) {
+                case "123":
+                    assertTrue(synset.getRepresentation().equals("Foo"));
+                    assertTrue(synset.getDescription().equals("Foo1"));
+                    break;
+                case "124":
+                    assertTrue(synset.getRepresentation().equals("Foo"));
+                    assertTrue(synset.getDescription().equals("Foo2"));
+                    break;
+                default:
+                    throw new Exception();
             }
         }
     }
@@ -237,9 +243,9 @@ public class DatabaseTest {
     @Test
     public void getOutgoingEdges() throws Exception {
         Repository repo = new SailRepository(new MemoryStore());
-        List<Class> synsetSerializers = new ArrayList<>();
+        List<Class<? extends SynsetSerializer>> synsetSerializers = new ArrayList<>();
         synsetSerializers.add(UserSynsetSerializer.class);
-        List<Class> edgeSerializers = new ArrayList<>();
+        List<Class<? extends EdgeSerializer>> edgeSerializers = new ArrayList<>();
         edgeSerializers.add(UserEdgeSerializer.class);
 
         Database database = new Database(synsetSerializers, edgeSerializers, repo);

@@ -5,10 +5,10 @@ import org.eclipse.rdf4j.model.Model;
 import org.eclipse.rdf4j.repository.Repository;
 
 public abstract class SynsetSerializer {
-    protected Repository repository;
-    protected String baseIri;
+    protected final Repository repository;
+    protected final String baseIri;
 
-    public SynsetSerializer(Repository repository, String baseIri) {
+    protected SynsetSerializer(Repository repository, String baseIri) {
         this.repository = repository;
         this.baseIri = baseIri;
     }

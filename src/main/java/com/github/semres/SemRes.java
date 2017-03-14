@@ -25,30 +25,24 @@ import javafx.application.Application;
 
 public class SemRes {
 
-    final static Logger logger = Logger.getLogger(SemRes.class);
+    private final static Logger logger = Logger.getLogger(SemRes.class);
 
-    private List<Class> synsetSerializerClasses = new ArrayList<>();
-    private List<Class> edgeSerializerClasses = new ArrayList<>();
+    private final List<Class<? extends SynsetSerializer>> synsetSerializerClasses = new ArrayList<>();
+    private final List<Class<? extends EdgeSerializer>> edgeSerializerClasses = new ArrayList<>();
 
     private Settings settings;
 
-    private LocalRepositoryManager repositoryManager;
+    private final LocalRepositoryManager repositoryManager;
     private static SemRes semRes;
-    public void addSerializerClass(Class serializer) {
-        if (!SynsetSerializer.class.isAssignableFrom(serializer)) {
-            throw new IllegalArgumentException();
-        }
-        synsetSerializerClasses.add(serializer);
-    }
 
-    public SemRes() throws FileNotFoundException, YamlException {
+    private SemRes() throws FileNotFoundException, YamlException {
         this(new Settings());
     }
 
-    public SemRes(Settings settings) {
+    SemRes(Settings settings) {
         for (Source source: settings.getSources()) {
             synsetSerializerClasses.add(source.getSynsetSerializerClass());
-//            edgeSerializerClasses.add(source.getEdgeSerializerClass());
+            edgeSerializerClasses.add(source.getEdgeSerializerClass());
         }
         synsetSerializerClasses.add(UserSynsetSerializer.class);
         edgeSerializerClasses.add(UserEdgeSerializer.class);
@@ -108,7 +102,7 @@ public class SemRes {
     }
 
     public static String getBaseDirectory() {
-        String path = null;
+        String path;
         try {
             path = URLDecoder.decode(Settings.class.getProtectionDomain().getCodeSource().getLocation().getPath(), "UTF-8");
         } catch (UnsupportedEncodingException e) {

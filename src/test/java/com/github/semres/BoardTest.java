@@ -17,7 +17,7 @@ public class BoardTest {
     @Test
     public void addSynset() throws Exception {
         Repository repo = new SailRepository(new MemoryStore());
-        List<Class> serializerClasses = new ArrayList<>();
+        List<Class<? extends SynsetSerializer>> serializerClasses = new ArrayList<>();
         serializerClasses.add(UserSynsetSerializer.class);
 
         Database database = new Database(serializerClasses, new ArrayList<>(), repo);

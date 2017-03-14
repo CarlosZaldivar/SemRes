@@ -21,9 +21,9 @@ import java.util.Set;
  */
 public class Java2JavascriptUtils {
 	
-	private static Map<WebEngine, Map<String, Object>> 
+	private static final Map<WebEngine, Map<String, Object>>
 		backendObjects = new HashMap<>();
-	private static Set<WebEngine> 
+	private static final Set<WebEngine>
 		webEnginesWithAlertChangeListener =	new HashSet<>();
 	
 	private static boolean changing = false;
@@ -85,7 +85,7 @@ public class Java2JavascriptUtils {
 					@Override
 					public void changed(
 							ObservableValue
-							<? extends EventHandler<WebEvent<String>>> arg0,										
+							<? extends EventHandler<WebEvent<String>>> arg0,
 							EventHandler<WebEvent<String>> previous,
 							final EventHandler<WebEvent<String>> newHandler) {
 
@@ -93,7 +93,7 @@ public class Java2JavascriptUtils {
 							changing = true;
 							webEngine.setOnAlert(
 								new AlertEventHandlerWrapper(
-										webEngine, 
+										webEngine,
 										newHandler));
 							changing = false;
 						}
@@ -105,12 +105,7 @@ public class Java2JavascriptUtils {
 
 	private static void registerBackendObject(final WebEngine webEngine,
 			final String varname, final Object backend) {
-		Map<String, Object> webEngineBridges = backendObjects.get(webEngine);
-		if (webEngineBridges == null){
-			webEngineBridges = new HashMap<>();
-			backendObjects.put(webEngine, webEngineBridges);
-			
-		}
+		Map<String, Object> webEngineBridges = backendObjects.computeIfAbsent(webEngine, k -> new HashMap<>());
 		webEngineBridges.put(varname, backend);
 		
 	}
@@ -136,7 +131,7 @@ public class Java2JavascriptUtils {
 		private static final 
 			String CONNECT_BACKEND_MAGIC_WORD = "__CONNECT__BACKEND__";
 		private final EventHandler<WebEvent<String>> wrappedHandler;
-		private WebEngine engine;
+		private final WebEngine engine;
 
 		private AlertEventHandlerWrapper(
 				WebEngine engine, 

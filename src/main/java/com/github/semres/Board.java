@@ -12,18 +12,18 @@ public class Board {
         return synsets;
     }
 
-    private Map<String, Synset> synsets = new HashMap<>();
-    private Map<String, Boolean> synsetsLoadedState = new HashMap<>();
-    private Map<String, Edge> edges = new HashMap<>();
+    private final Map<String, Synset> synsets = new HashMap<>();
+    private final Map<String, Edge> edges = new HashMap<>();
 
-    private Map<String, Synset> newSynsets = new HashMap<>();
-    private Map<String, Edge> newEdges = new HashMap<>();
-    private Map<String, Synset> removedSynsets = new HashMap<>();
-    private Map<String, Edge> removedEdges = new HashMap<>();
+    private final Map<String, Synset> newSynsets = new HashMap<>();
+    private final Map<String, Edge> newEdges = new HashMap<>();
+    private final Map<String, Synset> removedSynsets = new HashMap<>();
+    private final Map<String, Edge> removedEdges = new HashMap<>();
+    private Map<String, SynsetEdit> editedSynsets = new HashMap<>();
 
-    private Database attachedDatabase;
+    private final Database attachedDatabase;
 
-    public Board(Database attachedDatabase) {
+    Board(Database attachedDatabase) {
         this.attachedDatabase = attachedDatabase;
     }
 
@@ -146,5 +146,24 @@ public class Board {
             }
         }
         return id;
+    }
+}
+
+class SynsetEdit {
+    private final Synset original;
+    private final Synset edited;
+
+    public Synset getOriginal() {
+        return original;
+    }
+
+    public Synset getEdited() {
+        return edited;
+    }
+
+    public SynsetEdit(Synset original, Synset edited) {
+
+        this.original = original;
+        this.edited = edited;
     }
 }

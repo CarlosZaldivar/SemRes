@@ -68,7 +68,7 @@ public class BabelNetSynsetSerializer extends SynsetSerializer {
 
     @Override
     public Synset rdfToSynset(IRI synsetIri) {
-        BabelNetSynset synset = null;
+        BabelNetSynset synset;
         String id;
         String representation;
         String description = null;

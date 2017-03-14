@@ -9,11 +9,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class Settings {
+class Settings {
     private String databasesDirectory;
     private List<Source> sources = new ArrayList<>();
 
-    public Settings() throws FileNotFoundException, YamlException {
+    Settings() throws FileNotFoundException, YamlException {
         YamlReader reader = new YamlReader(new FileReader(SemRes.getBaseDirectory() + "conf.yaml"));
 
         Map settingsMap = (Map) reader.read();
@@ -23,12 +23,12 @@ public class Settings {
         this.databasesDirectory = databasesDirectory.startsWith("/") ? databasesDirectory : SemRes.getBaseDirectory() + databasesDirectory;
     }
 
-    public Settings(String databasesDirectory, List<Source> sources) {
+    Settings(String databasesDirectory, List<Source> sources) {
         this.databasesDirectory = databasesDirectory;
         this.sources = sources;
     }
 
-    public String getDatabasesDirectory() {
+    String getDatabasesDirectory() {
         return databasesDirectory;
     }
 
@@ -36,7 +36,7 @@ public class Settings {
         this.databasesDirectory = databasesDirectory;
     }
 
-    public List<Source> getSources() {
+    List<Source> getSources() {
         return new ArrayList<>(sources);
     }
 }

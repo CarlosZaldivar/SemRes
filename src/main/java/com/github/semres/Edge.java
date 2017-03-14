@@ -10,7 +10,7 @@ public abstract class Edge {
     protected String description;
     protected double weight;
 
-    public Edge(Synset pointedSynset, Synset originSynset, RelationType relationType, double weight) {
+    protected Edge(Synset pointedSynset, Synset originSynset, RelationType relationType, double weight) {
         if (weight < 0) {
             throw new IllegalArgumentException();
         }
@@ -30,7 +30,7 @@ public abstract class Edge {
     }
 
 
-    public void setPointedSynset(Synset pointedSynset) {
+    void setPointedSynset(Synset pointedSynset) {
         this.pointedSynset = pointedSynset;
     }
 
