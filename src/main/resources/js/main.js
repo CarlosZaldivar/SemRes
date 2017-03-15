@@ -120,6 +120,7 @@ function startSynsetAddition() {
 function setEdgeDetails(sourceNode, targetNode, addedEntities) {
     if (addedEntities.length === 1) {
         javaApp.openNewEdgeWindow(sourceNode.data().id, targetNode.data().id);
+        cy.remove(addedEntities);
     }
 }
 

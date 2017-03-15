@@ -83,14 +83,17 @@ public class MainController extends Controller implements Initializable {
         addSynsetToView(synset);
     }
 
-    private void addEdgeToView(Edge edge) {
-        String script = "addEdge(" + edgeToJson(edge) + ");";
-        engine.executeScript(script);
-    }
-
     void addSynsetToView(Synset synset) {
         engine.executeScript("addSynset(" + synsetToJson(synset) + ");");
     }
+
+    void addEdge(Edge edge) {
+        board.addEdge(edge);
+        addEdgeToView(edge);
+    }
+
+    private void addEdgeToView(Edge edge) { engine.executeScript("addEdge(" + edgeToJson(edge) + ");"); }
+
 
     List<Synset> loadSynsets(String searchPhrase) {
         return board.loadSynsets(searchPhrase);
@@ -102,10 +105,6 @@ public class MainController extends Controller implements Initializable {
 
     List<Synset> searchLoadedSynsets(String searchPhrase) {
         return board.searchLoadedSynsets(searchPhrase);
-    }
-
-    void addEdge(Edge edge) {
-        board.addEdge(edge);
     }
 
     public void openLoadSynsetWindow() throws IOException {
