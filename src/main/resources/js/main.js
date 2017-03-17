@@ -1,3 +1,5 @@
+"use strict";
+
 // Connect java object
 alert("__CONNECT__BACKEND__javaApp");
 
@@ -145,6 +147,13 @@ function addEdge(edge) {
     if (cy.elements('#' + edge.id).length === 1) {
         return;
     }
+
+    var origin = cy.getElementById(edge.sourceSynset.id);
+    if (!origin.data()) {
+        addSynset(edge.sourceSynset);
+    }
+
+    cy.getElementById(edge.sourceSynset.id).data().expanded = "true";
 
     var target = cy.getElementById(edge.targetSynset.id);
     if (!target.data()) {

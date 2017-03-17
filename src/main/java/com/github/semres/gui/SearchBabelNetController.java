@@ -1,8 +1,11 @@
 package com.github.semres.gui;
 
+import com.github.semres.Edge;
 import com.github.semres.Synset;
+import com.github.semres.babelnet.BabelNetSynset;
 import com.guigarage.controls.Media;
 import com.guigarage.controls.SimpleMediaListCell;
+import it.uniroma1.lcl.babelnet.InvalidBabelSynsetIDException;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -37,8 +40,21 @@ public class SearchBabelNetController extends ChildController implements Initial
 
     void addSynset(MouseEvent click) {
         if (click.getClickCount() == 2 && synsetsListView.getSelectionModel().getSelectedItem() != null) {
-            Synset synset = synsetsListView.getSelectionModel().getSelectedItem().getSynset();
+            BabelNetSynset synset = (BabelNetSynset) synsetsListView.getSelectionModel().getSelectedItem().getSynset();
+            try {
+                synset.loadEdgesFromBabelNet();
+            } catch (IOException | InvalidBabelSynsetIDException e) {
+                Alert alert = new Alert(Alert.AlertType.ERROR, e.getMessage());
+                // Resize dialog so that the whole text would fit.
+                alert.getDialogPane().getChildren().stream().filter(node -> node instanceof Label).forEach(node -> ((Label)node).setMinHeight(Region.USE_PREF_SIZE));
+                alert.showAndWait();
+                return;
+            }
             ((MainController) parent).addSynset(synset);
+            for (Edge edge : synset.getOutgoingEdges().values()) {
+                ((MainController) parent).addEdge(edge);
+            }
+
             Stage stage = (Stage) synsetsListView.getScene().getWindow();
             stage.close();
         }
@@ -60,7 +76,6 @@ public class SearchBabelNetController extends ChildController implements Initial
             return;
         } catch (RuntimeException e) {
             Alert alert = new Alert(Alert.AlertType.ERROR, e.getMessage());
-
             // Resize dialog so that the whole text would fit.
             alert.getDialogPane().getChildren().stream().filter(node -> node instanceof Label).forEach(node -> ((Label)node).setMinHeight(Region.USE_PREF_SIZE));
             alert.showAndWait();

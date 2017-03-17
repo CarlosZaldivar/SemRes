@@ -5,7 +5,7 @@ import org.apache.commons.lang.Validate;
 
 public abstract class Edge {
     private Synset pointedSynset;
-    private final Synset originSynset;
+    private Synset originSynset;
     protected RelationType relationType;
     protected String description;
     protected double weight;
@@ -29,7 +29,6 @@ public abstract class Edge {
         return pointedSynset;
     }
 
-
     void setPointedSynset(Synset pointedSynset) {
         this.pointedSynset = pointedSynset;
     }
@@ -44,6 +43,10 @@ public abstract class Edge {
 
     public Synset getOriginSynset() {
         return originSynset;
+    }
+
+    public void setOriginSynset(Synset originSynset) {
+        this.originSynset = originSynset;
     }
 
     public RelationType getRelationType() {

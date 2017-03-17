@@ -72,10 +72,23 @@ public class Board {
     }
 
     public void addEdge(Edge newEdge) {
+        String originSynsetId = newEdge.getOriginSynset().getId();
+        if (synsets.get(originSynsetId) == null) {
+            addSynset(newEdge.getOriginSynset());
+        } else {
+            newEdge.setOriginSynset(synsets.get(originSynsetId));
+        }
+        String pointedSynsetId = newEdge.getPointedSynset().getId();
+        if (synsets.get(pointedSynsetId) == null) {
+            addSynset(newEdge.getPointedSynset());
+        } else {
+            newEdge.setPointedSynset(synsets.get(pointedSynsetId));
+        }
+
         edges.put(newEdge.getId(), newEdge);
         newEdges.put(newEdge.getId(), newEdge);
 
-        synsets.get(newEdge.getOriginSynset().getId()).addOutgoingEdge(newEdge);
+        synsets.get(originSynsetId).addOutgoingEdge(newEdge);
     }
 
     public Synset getSynset(String id) {
@@ -162,7 +175,6 @@ class SynsetEdit {
     }
 
     public SynsetEdit(Synset original, Synset edited) {
-
         this.original = original;
         this.edited = edited;
     }
