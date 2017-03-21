@@ -107,7 +107,7 @@ cy.edgehandles({
 cy.edgehandles('disable');
 
 function startEdgeAddition(event) {
-    cy.edgehandles('start', event.cyTarget.id());
+    cy.edgehandles('start', escapeColon(event.cyTarget.id()));
 }
 
 function startSynsetAddition() {
@@ -127,11 +127,9 @@ function setEdgeDetails(sourceNode, targetNode, addedEntities) {
 }
 
 function addSynset(synset) {
-    if (cy.elements('#' + synset.id).length === 1) {
+    if (cy.elements('#' + escapeColon(synset.id)).length === 1) {
         return;
     }
-
-    synset.id = synset.id.replace("_", ":");
 
     synset.expanded = "false";
     cy.add({
@@ -144,18 +142,18 @@ function addSynset(synset) {
 }
 
 function addEdge(edge) {
-    if (cy.elements('#' + edge.id).length === 1) {
+    if (cy.elements('#' + escapeColon(edge.id)).length === 1) {
         return;
     }
 
-    var origin = cy.getElementById(edge.sourceSynset.id);
+    var origin = cy.getElementById(escapeColon(edge.sourceSynset.id));
     if (!origin.data()) {
         addSynset(edge.sourceSynset);
     }
 
-    cy.getElementById(edge.sourceSynset.id).data().expanded = "true";
+    // cy.getElementById(escapeColon(edge.sourceSynset.id)).data().expanded = "true";
 
-    var target = cy.getElementById(edge.targetSynset.id);
+    var target = cy.getElementById(escapeColon(edge.targetSynset.id));
     if (!target.data()) {
         addSynset(edge.targetSynset);
     }
@@ -221,4 +219,8 @@ function collapse(cyTarget, synsetsToCollapse) {
 function removeElement(event) {
     javaApp.removeElement(event.cyTarget.id());
     cy.remove(event.cyTarget);
+}
+
+function escapeColon(string) {
+    return string.replaceAll(':', '\\:');
 }

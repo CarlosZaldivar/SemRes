@@ -134,7 +134,7 @@ public class MainController extends Controller implements Initializable {
         Map<String, Object> synsetMap = new HashMap<>();
 
         // Temporary measure to avoid errors when trying to send json with colon.
-        synsetMap.put("id", synset.getId().replace(':', '_'));
+        synsetMap.put("id", synset.getId());
         synsetMap.put("description", synset.getDescription());
         synsetMap.put("representation", synset.getRepresentation());
         synsetMap.put("class", synset.getClass().getSimpleName());
@@ -154,7 +154,7 @@ public class MainController extends Controller implements Initializable {
 
     private String edgeToJson(Edge edge) {
         Map<String, Object> edgeMap = new HashMap<>();
-        edgeMap.put("id", edge.getId().replace(':', '_'));
+        edgeMap.put("id", edge.getId());
         edgeMap.put("description", edge.getDescription());
         edgeMap.put("weight", edge.getWeight());
         edgeMap.put("relationType", edge.getRelationType().toString().toLowerCase());
