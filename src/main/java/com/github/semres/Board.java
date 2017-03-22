@@ -99,7 +99,7 @@ public class Board {
         List<Synset> synsetsFound = new ArrayList<>();
 
         for (Synset synset : synsets.values()) {
-            if (synset.getRepresentation().equals(searchPhrase)) {
+            if (synset.getRepresentation().toLowerCase().contains(searchPhrase.toLowerCase())) {
                 synsetsFound.add(synset);
             }
         }
