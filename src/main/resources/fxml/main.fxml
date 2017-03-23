@@ -14,6 +14,7 @@
             <MenuItem mnemonicParsing="false" onAction="#openDatabasesWindow" text="Databases"/>
             <MenuItem fx:id="saveMenuItem" disable="true" mnemonicParsing="false" onAction="#save"
                       text="Save"/>
+            <MenuItem fx:id="exportMenuItem" disable="true" onAction="#export" text="Export"/>
             <MenuItem mnemonicParsing="false" text="Close"/>
         </Menu>
         <Menu fx:id="viewMenu" disable="true" mnemonicParsing="false" text="View">

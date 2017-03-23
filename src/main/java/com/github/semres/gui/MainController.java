@@ -15,6 +15,8 @@ import javafx.scene.Scene;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
+import javafx.scene.input.Clipboard;
+import javafx.scene.input.ClipboardContent;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import javafx.stage.Modality;
@@ -43,6 +45,8 @@ public class MainController extends Controller implements Initializable {
     private Menu babelNetMenu;
     @FXML
     private MenuItem saveMenuItem;
+    @FXML
+    private MenuItem exportMenuItem;
 
     public Board getBoard() {
         return board;
@@ -64,14 +68,23 @@ public class MainController extends Controller implements Initializable {
 
         // Reload html
         engine.load(getClass().getResource("/html/board.html").toExternalForm());
-        // Enable 'save' option.
+        // Enable some options.
         saveMenuItem.setDisable(false);
+        exportMenuItem.setDisable(false);
         viewMenu.setDisable(false);
         babelNetMenu.setDisable(false);
     }
 
     public void save() {
         board.save();
+    }
+
+    public void export() {
+        // For debuging purposes database triplets are written to clipboard. It can be changed to a file later.
+        Clipboard clipboard = Clipboard.getSystemClipboard();
+        ClipboardContent content = new ClipboardContent();
+        content.putString(board.export());
+        clipboard.setContent(content);
     }
 
     public void openDatabasesWindow() throws IOException {

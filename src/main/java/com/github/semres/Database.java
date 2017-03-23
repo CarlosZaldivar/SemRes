@@ -1,13 +1,17 @@
 package com.github.semres;
 
 import org.eclipse.rdf4j.model.IRI;
+import org.eclipse.rdf4j.model.Model;
 import org.eclipse.rdf4j.model.ValueFactory;
 import org.eclipse.rdf4j.model.vocabulary.RDF;
 import org.eclipse.rdf4j.model.vocabulary.RDFS;
 import org.eclipse.rdf4j.query.*;
 import org.eclipse.rdf4j.repository.Repository;
 import org.eclipse.rdf4j.repository.RepositoryConnection;
+import org.eclipse.rdf4j.rio.RDFFormat;
+import org.eclipse.rdf4j.rio.Rio;
 
+import java.io.StringWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
@@ -99,6 +103,17 @@ class Database {
                         " filter contains(lcase(str(?label)), lcase(str(\"%s\"))) }",
                 RDF.TYPE, RDFS.SUBCLASSOF, SR.SYNSET, RDFS.LABEL, searchPhrase);
         return getSynsets(queryString);
+    }
+
+    String export() {
+        try (RepositoryConnection conn = repository.getConnection()) {
+            GraphQueryResult graphResult = conn.prepareGraphQuery("CONSTRUCT { ?s ?p ?o } WHERE {?s ?p ?o }").evaluate();
+            Model resultModel = QueryResults.asModel(graphResult);
+
+            StringWriter buffer = new StringWriter();
+            Rio.write(resultModel, buffer, RDFFormat.RDFXML);
+            return buffer.toString();
+        }
     }
 
     private List<Synset> getSynsets(String queryString) {

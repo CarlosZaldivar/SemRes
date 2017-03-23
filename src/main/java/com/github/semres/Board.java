@@ -145,6 +145,10 @@ public class Board {
         removedSynsets.clear();
     }
 
+    public String export() {
+        return attachedDatabase.export();
+    }
+
     /**
      * Generate unique synset id.
      * @return Unique synset id.
