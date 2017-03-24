@@ -7,6 +7,7 @@ import it.uniroma1.lcl.babelnet.BabelSynsetID;
 import it.uniroma1.lcl.babelnet.InvalidBabelSynsetIDException;
 import org.eclipse.rdf4j.model.*;
 import org.eclipse.rdf4j.model.impl.LinkedHashModel;
+import org.eclipse.rdf4j.model.impl.SimpleValueFactory;
 import org.eclipse.rdf4j.model.vocabulary.RDF;
 import org.eclipse.rdf4j.model.vocabulary.RDFS;
 import org.eclipse.rdf4j.query.BindingSet;
@@ -32,9 +33,6 @@ public class BabelNetSynsetSerializer extends SynsetSerializer {
 
         Model model = new LinkedHashModel();
         ValueFactory factory = repository.getValueFactory();
-
-        model.add(getSynsetClassIri(), RDF.TYPE, RDFS.CLASS);
-        model.add(getSynsetClassIri(), RDFS.SUBCLASSOF, SR.SYNSET);
 
         IRI synsetIri = factory.createIRI(baseIri + "synsets/" + synset.getId());
 
@@ -135,6 +133,6 @@ public class BabelNetSynsetSerializer extends SynsetSerializer {
 
     @Override
     public IRI getSynsetClassIri() {
-        return repository.getValueFactory().createIRI(baseIri + "classes/BabelNetSynset");
+        return CommonIRI.BABELNET_SYNSET;
     }
 }

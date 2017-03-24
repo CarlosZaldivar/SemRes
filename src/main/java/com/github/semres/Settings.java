@@ -2,6 +2,7 @@ package com.github.semres;
 
 import com.esotericsoftware.yamlbeans.YamlException;
 import com.esotericsoftware.yamlbeans.YamlReader;
+import com.github.semres.user.UserManager;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -18,6 +19,9 @@ class Settings {
 
         Map settingsMap = (Map) reader.read();
         ((Map) settingsMap.get("sources")).forEach((key, value) -> sources.add(SourcesInitializer.initialize((String) key, (Map) value)));
+
+        // Always add custom user synsets and edges.
+        sources.add(new UserManager());
 
         String databasesDirectory = (String) settingsMap.get("databases-directory");
         this.databasesDirectory = databasesDirectory.startsWith("/") ? databasesDirectory : SemRes.getBaseDirectory() + databasesDirectory;

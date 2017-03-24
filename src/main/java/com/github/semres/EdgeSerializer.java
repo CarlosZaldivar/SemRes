@@ -22,9 +22,6 @@ public abstract class EdgeSerializer {
         Model model = new LinkedHashModel();
         ValueFactory factory = repository.getValueFactory();
 
-        model.add(getEdgeClassIri(), RDF.TYPE, RDFS.CLASS);
-        model.add(getEdgeClassIri(), RDFS.SUBCLASSOF, SR.EDGE);
-
         IRI edgeIri = factory.createIRI(baseIri + "outgoingEdges/" + edge.getId());
 
         if (edge.getDescription() != null) {

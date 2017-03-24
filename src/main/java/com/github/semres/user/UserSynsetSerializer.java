@@ -49,11 +49,6 @@ public class UserSynsetSerializer extends SynsetSerializer {
     }
 
     @Override
-    public IRI getSynsetClassIri() {
-        return repository.getValueFactory().createIRI(baseIri + "classes/UserSynset");
-    }
-
-    @Override
     public UserSynset rdfToSynset(IRI synsetIri) {
         UserSynset synset = null;
         String id;
@@ -96,5 +91,10 @@ public class UserSynsetSerializer extends SynsetSerializer {
     @Override
     public String getSynsetClass() {
         return "com.github.semres.user.UserSynset";
+    }
+
+    @Override
+    public IRI getSynsetClassIri() {
+        return CommonIRI.USER_SYNSET;
     }
 }

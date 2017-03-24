@@ -18,16 +18,6 @@ public class BabelNetEdgeSerializer extends EdgeSerializer {
     }
 
     @Override
-    public String getEdgeClass() {
-        return "com.github.semres.babelnet.BabelNetEdge";
-    }
-
-    @Override
-    public IRI getEdgeClassIri() {
-        return repository.getValueFactory().createIRI(baseIri + "classes/BabelNetEdge");
-    }
-
-    @Override
     public BabelNetEdge rdfToEdge(IRI edgeIri, Synset pointedSynset, Synset originSynset) {
         ValueFactory factory = repository.getValueFactory();
         String description = null;
@@ -67,5 +57,15 @@ public class BabelNetEdgeSerializer extends EdgeSerializer {
     public BabelNetEdge rdfToEdge(String edgeId, Synset pointedSynset, Synset originSynset) {
         ValueFactory factory = repository.getValueFactory();
         return rdfToEdge(factory.createIRI(baseIri + "outgoingEdges/" + edgeId), pointedSynset, originSynset);
+    }
+
+    @Override
+    public String getEdgeClass() {
+        return "com.github.semres.babelnet.BabelNetEdge";
+    }
+
+    @Override
+    public IRI getEdgeClassIri() {
+        return CommonIRI.BABELNET_EDGE;
     }
 }

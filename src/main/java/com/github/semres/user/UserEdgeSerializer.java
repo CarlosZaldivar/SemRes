@@ -18,16 +18,6 @@ public class UserEdgeSerializer extends EdgeSerializer {
     }
 
     @Override
-    public String getEdgeClass() {
-        return "com.github.semres.user.UserEdge";
-    }
-
-    @Override
-    public IRI getEdgeClassIri() {
-        return repository.getValueFactory().createIRI(baseIri + "classes/UserEdge");
-    }
-
-    @Override
     public UserEdge rdfToEdge(IRI edgeIri, Synset pointedSynset, Synset originSynset) {
         ValueFactory factory = repository.getValueFactory();
         String description = null;
@@ -65,5 +55,15 @@ public class UserEdgeSerializer extends EdgeSerializer {
     public UserEdge rdfToEdge(String edgeId, Synset pointedSynset, Synset originSynset) {
         ValueFactory factory = repository.getValueFactory();
         return rdfToEdge(factory.createIRI(baseIri + "outgoingEdges/" + edgeId), pointedSynset, originSynset);
+    }
+
+    @Override
+    public String getEdgeClass() {
+        return "com.github.semres.user.UserEdge";
+    }
+
+    @Override
+    public IRI getEdgeClassIri() {
+        return CommonIRI.USER_EDGE;
     }
 }

@@ -1,12 +1,13 @@
 package com.github.semres.babelnet;
 
-import com.github.semres.EdgeSerializer;
-import com.github.semres.Source;
-import com.github.semres.Synset;
-import com.github.semres.SynsetSerializer;
+import com.github.semres.*;
 import it.uniroma1.lcl.babelnet.*;
 import it.uniroma1.lcl.jlt.Configuration;
 import it.uniroma1.lcl.jlt.util.Language;
+import org.eclipse.rdf4j.model.Model;
+import org.eclipse.rdf4j.model.impl.LinkedHashModel;
+import org.eclipse.rdf4j.model.vocabulary.RDF;
+import org.eclipse.rdf4j.model.vocabulary.RDFS;
 
 import java.io.File;
 import java.io.IOException;
@@ -72,7 +73,15 @@ public class BabelNetManager extends Source {
     }
 
     @Override
-    public Class<? extends Synset> getSynsetClass() {
-        return BabelNetSynset.class;
+    public Model getMetadataStatements() {
+        Model model = new LinkedHashModel();
+
+        model.add(CommonIRI.BABELNET_SYNSET, RDF.TYPE, RDFS.CLASS);
+        model.add(CommonIRI.BABELNET_SYNSET, RDFS.SUBCLASSOF, SR.SYNSET);
+
+        model.add(CommonIRI.BABELNET_EDGE, RDF.TYPE, RDFS.CLASS);
+        model.add(CommonIRI.BABELNET_EDGE, RDFS.SUBCLASSOF, SR.EDGE);
+
+        return model;
     }
 }

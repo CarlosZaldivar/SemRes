@@ -2,9 +2,10 @@ package com.github.semres;
 
 import com.esotericsoftware.yamlbeans.YamlException;
 import com.github.semres.gui.Main;
-import com.github.semres.user.UserEdgeSerializer;
-import com.github.semres.user.UserSynsetSerializer;
 import org.apache.log4j.Logger;
+import org.eclipse.rdf4j.model.Model;
+import org.eclipse.rdf4j.model.impl.LinkedHashModel;
+import org.eclipse.rdf4j.repository.RepositoryConnection;
 import org.eclipse.rdf4j.repository.config.RepositoryConfig;
 import org.eclipse.rdf4j.repository.manager.LocalRepositoryManager;
 import org.eclipse.rdf4j.repository.Repository;
@@ -29,6 +30,7 @@ public class SemRes {
 
     private final List<Class<? extends SynsetSerializer>> synsetSerializerClasses = new ArrayList<>();
     private final List<Class<? extends EdgeSerializer>> edgeSerializerClasses = new ArrayList<>();
+    private final Model metadataStatements;
 
     private Settings settings;
 
@@ -40,12 +42,13 @@ public class SemRes {
     }
 
     SemRes(Settings settings) {
+        this.settings = settings;
+        metadataStatements = new LinkedHashModel();
         for (Source source: settings.getSources()) {
             synsetSerializerClasses.add(source.getSynsetSerializerClass());
             edgeSerializerClasses.add(source.getEdgeSerializerClass());
+            metadataStatements.addAll(source.getMetadataStatements());
         }
-        synsetSerializerClasses.add(UserSynsetSerializer.class);
-        edgeSerializerClasses.add(UserEdgeSerializer.class);
         repositoryManager = new LocalRepositoryManager(new File(settings.getDatabasesDirectory()));
         repositoryManager.initialize();
     }
@@ -87,6 +90,8 @@ public class SemRes {
         }
 
         repositoryManager.addRepositoryConfig(new RepositoryConfig(repositoryId, new SailRepositoryConfig(new MemoryStoreConfig(true))));
+        // Add some initial statements to new repository.
+        initializeRepository(repositoryManager.getRepository(repositoryId));
     }
 
     public void deleteRepository(String repositoryId) {
@@ -120,5 +125,11 @@ public class SemRes {
 
     public void save() {
         repositoryManager.shutDown();
+    }
+
+    private void initializeRepository(Repository repository) {
+        try (RepositoryConnection conn = repository.getConnection()) {
+            conn.add(metadataStatements);
+        }
     }
 }
