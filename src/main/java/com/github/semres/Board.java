@@ -1,5 +1,10 @@
 package com.github.semres;
 
+import org.eclipse.rdf4j.model.Model;
+import org.eclipse.rdf4j.rio.RDFFormat;
+import org.eclipse.rdf4j.rio.Rio;
+
+import java.io.StringWriter;
 import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.util.ArrayList;
@@ -146,7 +151,10 @@ public class Board {
     }
 
     public String export() {
-        return attachedDatabase.export();
+        Model model = attachedDatabase.getAllStatements();
+        StringWriter buffer = new StringWriter();
+        Rio.write(model, buffer, RDFFormat.RDFXML);
+        return buffer.toString();
     }
 
     /**

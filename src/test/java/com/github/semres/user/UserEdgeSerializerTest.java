@@ -3,7 +3,6 @@ package com.github.semres.user;
 import com.github.semres.*;
 import org.eclipse.rdf4j.model.Model;
 import org.eclipse.rdf4j.model.ValueFactory;
-import org.eclipse.rdf4j.model.vocabulary.RDF;
 import org.eclipse.rdf4j.model.vocabulary.RDFS;
 import org.eclipse.rdf4j.repository.Repository;
 import org.eclipse.rdf4j.repository.RepositoryConnection;
@@ -32,7 +31,6 @@ public class UserEdgeSerializerTest {
 
         assertTrue(model.filter(null, SR.ID, factory.createLiteral("124-123")).size() == 1);
         assertTrue(model.filter(null, SR.RELATION_TYPE, SR.HOLONYM).size() == 1);
-        assertTrue(model.filter(null, RDF.TYPE, factory.createIRI("http://example.org/classes/UserEdge")).size() == 1);
         assertTrue(model.filter(null, RDFS.COMMENT, null).size() == 0);
 
         edge.setDescription("Description");

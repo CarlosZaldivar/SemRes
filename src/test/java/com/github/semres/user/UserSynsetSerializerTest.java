@@ -4,7 +4,6 @@ import com.github.semres.SR;
 import com.github.semres.SynsetSerializer;
 import org.eclipse.rdf4j.model.Model;
 import org.eclipse.rdf4j.model.ValueFactory;
-import org.eclipse.rdf4j.model.vocabulary.RDF;
 import org.eclipse.rdf4j.model.vocabulary.RDFS;
 import org.eclipse.rdf4j.repository.Repository;
 import org.eclipse.rdf4j.repository.RepositoryConnection;
@@ -29,7 +28,6 @@ public class UserSynsetSerializerTest {
         Model model = synsetSerializer.synsetToRdf(synset);
 
         assertTrue(model.filter(null, SR.ID, factory.createLiteral("123")).size() == 1);
-        assertTrue(model.filter(null, RDF.TYPE, factory.createIRI("http://example.org/classes/UserSynset")).size() == 1);
         assertTrue(model.filter(null, RDFS.LABEL, null).size() == 1);
         assertTrue(model.filter(null, RDFS.COMMENT, null).size() == 0);
 
