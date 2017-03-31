@@ -21,7 +21,18 @@ var cy = cytoscape({
                 'font-size': '10'
             }
         },
-
+        {
+            selector: 'node[class="BabelNetSynset"]',
+            style: {
+                'background-color': 'blue'
+            }
+        },
+        {
+            selector: 'node[class="UserSynset"]',
+            style: {
+                'background-color': 'green'
+            }
+        },
         {
             selector: '.edgehandles-hover',
             css: {
