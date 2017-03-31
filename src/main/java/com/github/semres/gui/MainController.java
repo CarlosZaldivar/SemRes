@@ -48,10 +48,6 @@ public class MainController extends Controller implements Initializable {
     @FXML
     private MenuItem exportMenuItem;
 
-    public Board getBoard() {
-        return board;
-    }
-
     private Board board;
     private WebEngine engine;
     private BabelNetManager babelNetManager;
@@ -208,8 +204,12 @@ public class MainController extends Controller implements Initializable {
             synset.getOutgoingEdges().values().forEach(MainController.this::addEdgeToView);
         }
 
-        public void removeElement(String id) {
-            board.removeElement(id);
+        public void removeNode(String id) {
+            board.removeNode(id);
+        }
+
+        public void removeEdge(String id) {
+            board.removeEdge(id);
         }
     }
 }

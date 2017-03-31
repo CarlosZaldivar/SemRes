@@ -1,17 +1,11 @@
 package com.github.semres;
 
-import com.github.semres.babelnet.BabelNetEdgeSerializer;
-import com.github.semres.babelnet.BabelNetSynsetSerializer;
-import com.github.semres.user.UserEdgeSerializer;
-import com.github.semres.user.UserSynset;
-import com.github.semres.user.UserSynsetSerializer;
-import org.eclipse.rdf4j.repository.Repository;
-import org.eclipse.rdf4j.repository.sail.SailRepository;
-import org.eclipse.rdf4j.sail.memory.MemoryStore;
-import org.junit.Test;
 
-import java.util.ArrayList;
-import java.util.List;
+import com.github.semres.babelnet.BabelNetEdge;
+import com.github.semres.babelnet.BabelNetSynset;
+import com.github.semres.user.UserEdge;
+import com.github.semres.user.UserSynset;
+import org.junit.Test;
 
 import static org.junit.Assert.*;
 
@@ -19,11 +13,7 @@ public class BoardTest {
 
     @Test
     public void addSynset() throws Exception {
-        Repository repo = new SailRepository(new MemoryStore());
-        List<Class<? extends SynsetSerializer>> serializerClasses = new ArrayList<>();
-        serializerClasses.add(UserSynsetSerializer.class);
-
-        Database database = new Database(serializerClasses, new ArrayList<>(), repo);
+        Database database = DatabaseTest.createTestDatabase();
         Board board = new Board(database);
 
         Synset synset = new UserSynset("Foo");
@@ -37,25 +27,67 @@ public class BoardTest {
 
     @Test
     public void removeSynset() throws Exception {
-        Repository repo = new SailRepository(new MemoryStore());
-        List<Class<? extends SynsetSerializer>> synsetSerializerClasses = new ArrayList<>();
-        List<Class<? extends EdgeSerializer>> edgeSerializerClasses = new ArrayList<>();
-        synsetSerializerClasses.add(UserSynsetSerializer.class);
-        synsetSerializerClasses.add(BabelNetSynsetSerializer.class);
-        edgeSerializerClasses.add(UserEdgeSerializer.class);
-        edgeSerializerClasses.add(BabelNetEdgeSerializer.class);
-
-        Database database = new Database(synsetSerializerClasses, edgeSerializerClasses, repo);
+        Database database = DatabaseTest.createTestDatabase();
         Board board = new Board(database);
 
         Synset synset = new UserSynset("Foo");
         synset.setId("123");
         board.addSynset(synset);
         board.save();
-        board.removeElement("123");
+        board.removeNode("123");
         board.save();
         assertTrue(database.searchSynsets("Foo").size() == 0);
     }
 
+    @Test
+    public void removeEdge() throws Exception {
+        Database database = DatabaseTest.createTestDatabase();
+        Board board = new Board(database);
 
+        Synset originSynset = new UserSynset("Foo");
+        originSynset.setId("123");
+        Synset pointedSynset = new UserSynset("Bar");
+        pointedSynset.setId("124");
+
+        Edge edge = new UserEdge(pointedSynset, originSynset, Edge.RelationType.HOLONYM, 0);
+        board.addSynset(originSynset);
+        board.addSynset(pointedSynset);
+        board.addEdge(edge);
+        board.save();
+        board.removeEdge("123-124");
+        board.save();
+
+        Synset loadedSynset = database.searchSynsets("Foo").get(0);
+        loadedSynset.setOutgoingEdges(database.getOutgoingEdges(loadedSynset));
+
+        assertTrue(loadedSynset.getOutgoingEdges().size() == 0);
+    }
+
+    @Test
+    public void addRemovedBabelnetEdge() throws Exception {
+        Database database = DatabaseTest.createTestDatabase();
+        Board board = new Board(database);
+
+        Synset originSynset = new BabelNetSynset("Foo");
+        originSynset.setId("bn:00024922n");
+        Synset pointedSynset = new BabelNetSynset("Bar");
+        pointedSynset.setId("bn:00024923n");
+
+        Edge edge = new BabelNetEdge(pointedSynset, originSynset, Edge.RelationType.HOLONYM, 0);
+
+        board.addSynset(originSynset);
+        board.addSynset(pointedSynset);
+        board.addEdge(edge);
+        board.save();
+        board.removeEdge("bn:00024922n-bn:00024923n");
+        board.save();
+        // Add removed edge again
+        board.addEdge(edge);
+        board.save();
+
+        Synset loadedSynset = database.searchSynsets("Foo").get(0);
+        loadedSynset.setOutgoingEdges(database.getOutgoingEdges(loadedSynset));
+
+        assertTrue(loadedSynset.getOutgoingEdges().size() == 0);
+    }
 }

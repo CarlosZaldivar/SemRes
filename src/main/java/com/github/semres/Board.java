@@ -13,19 +13,10 @@ import java.util.List;
 import java.util.Map;
 
 public class Board {
-    public Map<String, Synset> getSynsets() {
-        return synsets;
-    }
-
     private final Map<String, Synset> synsets = new HashMap<>();
-    private final Map<String, Edge> edges = new HashMap<>();
-
     private final Map<String, Synset> newSynsets = new HashMap<>();
-    private final Map<String, Edge> newEdges = new HashMap<>();
     private final Map<String, Synset> removedSynsets = new HashMap<>();
-    private final Map<String, Edge> removedEdges = new HashMap<>();
-    private Map<String, SynsetEdit> editedSynsets = new HashMap<>();
-
+    private final Map<String, SynsetEdit> synsetEdits = new HashMap<>();
     private final Database attachedDatabase;
 
     Board(Database attachedDatabase) {
@@ -52,8 +43,9 @@ public class Board {
         }
 
         List<Edge> edges = attachedDatabase.getOutgoingEdges(synset);
+        List<Edge> filteredEdges = new ArrayList<>();
         for (Edge edge : edges) {
-            if (removedEdges.get(edge.getId()) != null) {
+            if (edgeIsRemoved(synset, edge)) {
                 continue;
             }
 
@@ -62,10 +54,20 @@ public class Board {
             } else {
                 synsets.put(edge.getPointedSynset().getId(), edge.getPointedSynset());
             }
-            this.edges.put(edge.getId(), edge);
-            synset.addOutgoingEdge(edge);
-            edge.getPointedSynset().addPointingEdge(edge);
+
+            filteredEdges.add(edge);
         }
+        synset.setOutgoingEdges(filteredEdges);
+    }
+
+    private boolean edgeIsRemoved(Synset synset, Edge edge) {
+        if (synsetEdits.get(synset.getId()) == null) {
+            return false;
+        }
+        if (synsetEdits.get(synset.getId()).getRemovedEdges().get(edge.getId()) == null) {
+            return false;
+        }
+        return true;
     }
 
     public void addSynset(Synset newSynset) {
@@ -81,17 +83,28 @@ public class Board {
         if (synsets.get(originSynsetId) == null) {
             addSynset(newEdge.getOriginSynset());
         } else {
-            newEdge.setOriginSynset(synsets.get(originSynsetId));
+            Synset originalSynset = synsets.get(originSynsetId);
+            Synset editedSynset = originalSynset.addOutgoingEdge(newEdge);
+
+            // Return if no edition was made.
+            if (editedSynset == null) {
+                return;
+            }
+
+            synsets.put(originSynsetId, editedSynset);
+            newEdge.setOriginSynset(editedSynset);
+
+            SynsetEdit synsetEdit = new SynsetEdit(originalSynset, editedSynset);
+            synsetEdit.addEdge(newEdge);
+            synsetEdits.put(originSynsetId, synsetEdit);
         }
+
         String pointedSynsetId = newEdge.getPointedSynset().getId();
         if (synsets.get(pointedSynsetId) == null) {
             addSynset(newEdge.getPointedSynset());
         } else {
             newEdge.setPointedSynset(synsets.get(pointedSynsetId));
         }
-
-        edges.put(newEdge.getId(), newEdge);
-        newEdges.put(newEdge.getId(), newEdge);
 
         synsets.get(originSynsetId).addOutgoingEdge(newEdge);
     }
@@ -111,39 +124,49 @@ public class Board {
         return synsetsFound;
     }
 
-    public void removeElement(String id) {
+    public void removeNode(String id) {
         if (synsets.containsKey(id)) {
             Synset removedSynset = synsets.get(id);
-            for (Edge edge : removedSynset.getOutgoingEdges().values()) {
-                edges.remove(edge.getId());
-            }
-            for (Edge edge : removedSynset.getPointingEdges().values()) {
-                edges.remove(edge.getId());
-            }
             synsets.remove(id);
             removedSynsets.put(id, removedSynset);
-        } else if (edges.containsKey(id)) {
-            Edge removedEdge = edges.get(id);
-            removedEdge.getPointedSynset().removePointingEdge(removedEdge);
-            removedEdge.getOriginSynset().removeOutgoingEdge(removedEdge);
-            edges.remove(id);
-            removedEdges.put(id, removedEdge);
+        }
+    }
+
+    public void removeEdge(String id) {
+        Synset originSynset = synsets.get(extractOriginSynsetId(id));
+        if (originSynset != null) {
+            if (originSynset.getOutgoingEdges().containsKey(id)) {
+                Edge removedEdge = originSynset.getOutgoingEdges().get(id);
+                Synset editedSynset = originSynset.removeOutgoingEdge(id);
+
+                SynsetEdit synsetEdit = new SynsetEdit(originSynset, editedSynset);
+                synsetEdit.removeEdge(removedEdge);
+                synsetEdits.put(originSynset.getId(), synsetEdit);
+                synsets.put(editedSynset.getId(), editedSynset);
+            }
         }
     }
 
     public void save() {
         for (Synset synset : newSynsets.values()) {
             attachedDatabase.addSynset(synset);
+            for (Edge edge : synset.getOutgoingEdges().values()) {
+                attachedDatabase.addEdge(edge);
+            }
         }
         newSynsets.clear();
-        for (Edge edge : newEdges.values()) {
-            attachedDatabase.addEdge(edge);
+
+        for (SynsetEdit synsetEdit : synsetEdits.values()) {
+            for (Edge edge : synsetEdit.getAddedEdges().values()) {
+                attachedDatabase.addEdge(edge);
+            }
+            for (Edge edge : synsetEdit.getRemovedEdges().values()) {
+                attachedDatabase.removeEdge(edge);
+            }
+            attachedDatabase.editSynset(synsetEdit.getEdited(), synsetEdit.getOriginal());
         }
-        newEdges.clear();
-        for (Edge edge : removedEdges.values()) {
-            attachedDatabase.removeEdge(edge);
-        }
-        removedEdges.clear();
+        synsetEdits.clear();
+
         for (Synset synset : removedSynsets.values()) {
             attachedDatabase.removeSynset(synset);
         }
@@ -172,22 +195,8 @@ public class Board {
         }
         return id;
     }
-}
 
-class SynsetEdit {
-    private final Synset original;
-    private final Synset edited;
-
-    public Synset getOriginal() {
-        return original;
-    }
-
-    public Synset getEdited() {
-        return edited;
-    }
-
-    public SynsetEdit(Synset original, Synset edited) {
-        this.original = original;
-        this.edited = edited;
+    private String extractOriginSynsetId(String edgeId) {
+        return edgeId.split("-")[0];
     }
 }

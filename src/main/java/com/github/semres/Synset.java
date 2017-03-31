@@ -8,12 +8,17 @@ import java.util.Map;
 public abstract class Synset {
     private String id;
     protected Map<String, Edge> outgoingEdges = new HashMap<>();
-    private Map<String, Edge> pointingEdges = new HashMap<>();
     protected String representation;
     protected String description;
 
     protected Synset(String representation) {
         this.representation = representation;
+    }
+    protected Synset(Synset copiedSynset) {
+        this.representation = copiedSynset.representation;
+        this.description = copiedSynset.description;
+        this.id = copiedSynset.id;
+        this.outgoingEdges = new HashMap<>(copiedSynset.outgoingEdges);
     }
 
     public void setId(String id) {
@@ -40,45 +45,17 @@ public abstract class Synset {
         outgoingEdges = (newEdges == null) ? new HashMap<>() : new HashMap<>(newEdges);
     }
 
-    public void setOutgoingEdges(List<Edge> newEdges) {
+    protected void setOutgoingEdges(List<Edge> newEdges) {
         for (Edge edge : new ArrayList<>(newEdges)) {
             outgoingEdges.put(edge.getId(), edge);
         }
     }
 
-    Map<String, Edge> getPointingEdges() {
-        return new HashMap<>(pointingEdges);
+    abstract protected Synset addOutgoingEdge(Edge edge);
+
+    Synset removeOutgoingEdge(Edge edge) {
+        return removeOutgoingEdge(edge.getId());
     }
 
-    public void setPointingEdges(Map<String, Edge> newEdges) {
-        pointingEdges = (newEdges == null) ? new HashMap<>() : new HashMap<>(newEdges);
-    }
-
-    public void setPointingEdges(List<Edge> newEdges) {
-        for (Edge edge : new ArrayList<>(newEdges)) {
-            pointingEdges.put(edge.getId(), edge);
-        }
-    }
-
-    void addOutgoingEdge(Edge edge) {
-        outgoingEdges.put(edge.getId(), edge);
-    }
-
-    void addPointingEdge(Edge edge) { pointingEdges.put(edge.getId(), edge); }
-
-    void removeOutgoingEdge(Edge edge) {
-        removeOutgoingEdge(edge.getId());
-    }
-
-    void removePointingEdge(Edge edge) {
-        removePointingEdge(edge.getId());
-    }
-
-    protected void removeOutgoingEdge(String id) {
-        outgoingEdges.remove(id);
-    }
-
-    private void removePointingEdge(String id) {
-        pointingEdges.remove(id);
-    }
+    abstract protected Synset removeOutgoingEdge(String id);
 }

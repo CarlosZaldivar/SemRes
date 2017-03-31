@@ -59,10 +59,16 @@ var cy = cytoscape({
 cy.contextMenus({
     menuItems: [
         {
-            id: 'remove',
+            id: 'removeNode',
             title: 'Remove',
-            selector: 'node, edge',
-            onClickFunction: removeElement
+            selector: 'node',
+            onClickFunction: removeNode
+        },
+        {
+            id: 'removeEdge',
+            title: 'Remove',
+            selector: 'edge',
+            onClickFunction: removeEdge
         },
         {
             id: 'add-node',
@@ -216,8 +222,13 @@ function collapse(cyTarget, synsetsToCollapse) {
     }
 }
 
-function removeElement(event) {
-    javaApp.removeElement(event.cyTarget.id());
+function removeNode(event) {
+    javaApp.removeNode(event.cyTarget.id());
+    cy.remove(event.cyTarget);
+}
+
+function removeEdge(event) {
+    javaApp.removeEdge(event.cyTarget.id());
     cy.remove(event.cyTarget);
 }
 

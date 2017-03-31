@@ -10,14 +10,12 @@ import java.util.*;
 
 public class BabelNetSynset extends Synset {
     private BabelSynset babelSynset;
-
-    public Set<BabelSynsetID> getRemovedRelations() {
-        return removedRelations;
-    }
-
     private Set<BabelSynsetID> removedRelations = new HashSet<>();
     private Date lastUpdateDate;
 
+    private BabelNetSynset(BabelNetSynset babelNetSynset) {
+        super(babelNetSynset);
+    }
     BabelNetSynset(BabelSynset synset) {
         super(synset.getMainSense(BabelNetManager.getInstance().getJltLanguage()).getSenseString());
 
@@ -33,14 +31,6 @@ public class BabelNetSynset extends Synset {
         babelSynset = synset;
     }
 
-    @Override
-    public void removeOutgoingEdge(String id) {
-        if (outgoingEdges.get(id) instanceof BabelNetEdge) {
-            removedRelations.add(((BabelNetSynset) outgoingEdges.get(id).getPointedSynset()).getBabelSynsetID());
-        }
-        super.removeOutgoingEdge(id);
-    }
-
     public BabelNetSynset(String representation) {
         super(representation);
     }
@@ -48,6 +38,30 @@ public class BabelNetSynset extends Synset {
     BabelNetSynset(String representation, Set<BabelSynsetID> removedRelations) {
         super(representation);
         this.removedRelations = removedRelations;
+    }
+
+    public Set<BabelSynsetID> getRemovedRelations() {
+        return removedRelations;
+    }
+
+    @Override
+    public BabelNetSynset removeOutgoingEdge(String id) {
+        BabelNetSynset newSynset = new BabelNetSynset(this);
+        if (outgoingEdges.get(id) instanceof BabelNetEdge) {
+            newSynset.removedRelations.add(((BabelNetSynset) outgoingEdges.get(id).getPointedSynset()).getBabelSynsetID());
+        }
+        newSynset.outgoingEdges.remove(id);
+        return newSynset;
+    }
+
+    @Override
+    protected BabelNetSynset addOutgoingEdge(Edge edge) {
+        if (edge instanceof BabelNetEdge && removedRelations.contains(((BabelNetSynset) edge.getPointedSynset()).getBabelSynsetID())) {
+            return null;
+        }
+        BabelNetSynset newSynset = new BabelNetSynset(this);
+        newSynset.outgoingEdges.put(edge.getId(), edge);
+        return newSynset;
     }
 
     public Date getLastUpdateDate() {

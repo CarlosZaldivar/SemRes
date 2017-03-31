@@ -151,12 +151,13 @@ public class DatabaseTest {
         database.addSynset(pointedSynset);
         database.addEdge(edge);
 
+        originSynset = (BabelNetSynset) database.searchSynsets("Foo").get(0);
+        originSynset.setOutgoingEdges(database.getOutgoingEdges(originSynset));
+
         assertTrue(database.getOutgoingEdges(originSynset).size() == 1);
         assertTrue(originSynset.getRemovedRelations().size() == 0);
 
-        BabelNetSynset editedSynset = (BabelNetSynset) database.searchSynsets("Foo").get(0);
-        editedSynset.setOutgoingEdges(database.getOutgoingEdges(editedSynset));
-        editedSynset.removeOutgoingEdge(edge.getId());
+        BabelNetSynset editedSynset = originSynset.removeOutgoingEdge(edge.getId());
         database.removeEdge(edge);
         database.editSynset(editedSynset, originSynset);
 
@@ -223,7 +224,7 @@ public class DatabaseTest {
         assertTrue(edge.getDescription() == null);
     }
 
-    private Database createTestDatabase() throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
+    static Database createTestDatabase() throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
         Repository repo = new SailRepository(new MemoryStore());
         List<Class<? extends SynsetSerializer>> synsetSerializers = new ArrayList<>();
         synsetSerializers.add(UserSynsetSerializer.class);
