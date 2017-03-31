@@ -147,6 +147,7 @@ public class MainController extends Controller implements Initializable {
         synsetMap.put("description", synset.getDescription());
         synsetMap.put("representation", synset.getRepresentation());
         synsetMap.put("class", synset.getClass().getSimpleName());
+        synsetMap.put("expanded", synset.isExpanded() ? "true" : "false");
         return synsetMap;
     }
 

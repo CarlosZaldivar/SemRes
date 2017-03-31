@@ -109,6 +109,7 @@ public class BabelNetSynset extends Synset {
                 break;
             }
         }
+        isExpanded = true;
     }
 
     private void addEdge(BabelSynsetIDRelation edge) throws IOException {

@@ -137,7 +137,6 @@ function addSynset(synset) {
         return;
     }
 
-    synset.expanded = "false";
     cy.add({
         data: synset,
         style: [{
@@ -156,8 +155,6 @@ function addEdge(edge) {
     if (!origin.data()) {
         addSynset(edge.sourceSynset);
     }
-
-    // cy.getElementById(escapeColon(edge.sourceSynset.id)).data().expanded = "true";
 
     var target = cy.getElementById(escapeColon(edge.targetSynset.id));
     if (!target.data()) {

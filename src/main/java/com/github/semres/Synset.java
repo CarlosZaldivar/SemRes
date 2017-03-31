@@ -1,19 +1,17 @@
 package com.github.semres;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public abstract class Synset {
-    private String id;
     protected Map<String, Edge> outgoingEdges = new HashMap<>();
     protected String representation;
     protected String description;
-
+    private String id;
+    protected boolean isExpanded;
     protected Synset(String representation) {
         this.representation = representation;
     }
+
     protected Synset(Synset copiedSynset) {
         this.representation = copiedSynset.representation;
         this.description = copiedSynset.description;
@@ -21,8 +19,8 @@ public abstract class Synset {
         this.outgoingEdges = new HashMap<>(copiedSynset.outgoingEdges);
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public boolean isExpanded() {
+        return isExpanded;
     }
 
     public String getRepresentation() {
@@ -37,17 +35,27 @@ public abstract class Synset {
         return id;
     }
 
+    public void setId(String id) {
+        this.id = id;
+    }
+
     public Map<String, Edge> getOutgoingEdges() {
         return new HashMap<>(outgoingEdges);
     }
 
-    void setOutgoingEdges(Map<String, Edge> newEdges) {
-        outgoingEdges = (newEdges == null) ? new HashMap<>() : new HashMap<>(newEdges);
+    protected void setOutgoingEdges(Collection<Edge> newEdges) {
+        outgoingEdges.clear();
+        for (Edge edge : newEdges) {
+            outgoingEdges.put(edge.getId(), edge);
+        }
+        isExpanded = true;
     }
 
-    protected void setOutgoingEdges(List<Edge> newEdges) {
-        for (Edge edge : new ArrayList<>(newEdges)) {
-            outgoingEdges.put(edge.getId(), edge);
+    void setOutgoingEdges(Map<String, Edge> newEdges) {
+        if (newEdges == null) {
+            outgoingEdges.clear();
+        } else {
+            setOutgoingEdges(newEdges.values());
         }
     }
 

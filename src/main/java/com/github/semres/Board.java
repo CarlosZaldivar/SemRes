@@ -38,7 +38,7 @@ public class Board {
     public void loadEdges(String synsetId) {
         Synset synset = synsets.get(synsetId);
 
-        if (synset == null || !synset.getOutgoingEdges().isEmpty()) {
+        if (synset == null || !synset.isExpanded()) {
             return;
         }
 
