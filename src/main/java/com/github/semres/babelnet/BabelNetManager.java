@@ -82,6 +82,7 @@ public class BabelNetManager extends Source {
         model.add(CommonIRI.BABELNET_EDGE, RDF.TYPE, RDFS.CLASS);
         model.add(CommonIRI.BABELNET_EDGE, RDFS.SUBCLASSOF, SR.EDGE);
 
+        model.add(CommonIRI.EDGES_DOWNLOADED, RDF.TYPE, RDF.PROPERTY);
         return model;
     }
 }

@@ -2,18 +2,25 @@ package com.github.semres;
 
 import com.github.semres.babelnet.*;
 import com.github.semres.user.*;
+import it.uniroma1.lcl.babelnet.BabelSense;
+import it.uniroma1.lcl.babelnet.BabelSynset;
+import it.uniroma1.lcl.babelnet.BabelSynsetID;
+import it.uniroma1.lcl.jlt.util.Language;
 import org.eclipse.rdf4j.model.Model;
 import org.eclipse.rdf4j.repository.Repository;
 import org.eclipse.rdf4j.repository.RepositoryConnection;
 import org.eclipse.rdf4j.repository.sail.SailRepository;
 import org.eclipse.rdf4j.sail.memory.MemoryStore;
 import org.junit.Test;
+import org.mockito.Mockito;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.Assert.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
 public class DatabaseTest {
 
@@ -222,6 +229,28 @@ public class DatabaseTest {
         assertTrue(edge.getId().equals("123-124"));
         assertTrue(edge.getPointedSynset().getId().equals(pointedSynset.getId()));
         assertTrue(edge.getDescription() == null);
+    }
+
+    @Test
+    public void saveBabelNetSynsetWithDownloadedEdges() throws Exception {
+        // BabelSynset objects are used internally to download edges from BabelNet. We use mocking framework
+        // to avoid making API calls during tests.
+        BabelSynset mockBabelSynset = Mockito.mock(BabelSynset.class);
+
+        BabelSense mockBabelSense = Mockito.mock(BabelSense.class);
+        when(mockBabelSense.getSenseString()).thenReturn("Foo");
+
+        when(mockBabelSynset.getMainSense(any(Language.class))).thenReturn(mockBabelSense);
+        when(mockBabelSynset.getId()).thenReturn(new BabelSynsetID("bn:00024922n"));
+        when(mockBabelSynset.getEdges()).thenReturn(new ArrayList<>());
+
+        BabelNetSynset synset = new BabelNetSynset(mockBabelSynset);
+        synset.loadEdgesFromBabelNet();
+        assertTrue(synset.hasEdgesDownloaded());
+
+        Database database = createTestDatabase();
+        database.addSynset(synset);
+        assertTrue(((BabelNetSynset) database.searchSynsets("Foo").get(0)).hasEdgesDownloaded());
     }
 
     static Database createTestDatabase() throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {

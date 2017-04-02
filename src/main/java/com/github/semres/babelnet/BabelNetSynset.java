@@ -2,6 +2,7 @@ package com.github.semres.babelnet;
 
 import com.github.semres.Edge;
 import com.github.semres.Synset;
+import com.github.semres.gui.EdgesAlreadyLoadedException;
 import it.uniroma1.lcl.babelnet.*;
 import it.uniroma1.lcl.babelnet.data.BabelPointer;
 
@@ -12,11 +13,12 @@ public class BabelNetSynset extends Synset {
     private BabelSynset babelSynset;
     private Set<BabelSynsetID> removedRelations = new HashSet<>();
     private Date lastUpdateDate;
+    private boolean hasEdgesDownloaded;
 
     private BabelNetSynset(BabelNetSynset babelNetSynset) {
         super(babelNetSynset);
     }
-    BabelNetSynset(BabelSynset synset) {
+    public BabelNetSynset(BabelSynset synset) {
         super(synset.getMainSense(BabelNetManager.getInstance().getJltLanguage()).getSenseString());
 
         setId(synset.getId().getID());
@@ -38,6 +40,11 @@ public class BabelNetSynset extends Synset {
     BabelNetSynset(String representation, Set<BabelSynsetID> removedRelations) {
         super(representation);
         this.removedRelations = removedRelations;
+    }
+
+    BabelNetSynset(String representation, Set<BabelSynsetID> removedRelations, boolean hasEdgesDownloaded) {
+        this(representation, removedRelations);
+        this.hasEdgesDownloaded = hasEdgesDownloaded;
     }
 
     public Set<BabelSynsetID> getRemovedRelations() {
@@ -91,6 +98,10 @@ public class BabelNetSynset extends Synset {
     }
 
     public void loadEdgesFromBabelNet() throws IOException, InvalidBabelSynsetIDException {
+        if (hasEdgesDownloaded) {
+            throw new EdgesAlreadyLoadedException();
+        }
+
         if (babelSynset == null) {
             babelSynset = BabelNetManager.getInstance().getBabelSynset(getId());
         }
@@ -110,6 +121,7 @@ public class BabelNetSynset extends Synset {
             }
         }
         isExpanded = true;
+        hasEdgesDownloaded = true;
     }
 
     private void addEdge(BabelSynsetIDRelation edge) throws IOException {
@@ -151,5 +163,9 @@ public class BabelNetSynset extends Synset {
         }
 
         return true;
+    }
+
+    public boolean hasEdgesDownloaded() {
+        return hasEdgesDownloaded;
     }
 }

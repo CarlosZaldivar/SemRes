@@ -7,7 +7,6 @@ import it.uniroma1.lcl.babelnet.BabelSynsetID;
 import it.uniroma1.lcl.babelnet.InvalidBabelSynsetIDException;
 import org.eclipse.rdf4j.model.*;
 import org.eclipse.rdf4j.model.impl.LinkedHashModel;
-import org.eclipse.rdf4j.model.impl.SimpleValueFactory;
 import org.eclipse.rdf4j.model.vocabulary.RDF;
 import org.eclipse.rdf4j.model.vocabulary.RDFS;
 import org.eclipse.rdf4j.query.BindingSet;
@@ -16,6 +15,7 @@ import org.eclipse.rdf4j.query.TupleQuery;
 import org.eclipse.rdf4j.query.TupleQueryResult;
 import org.eclipse.rdf4j.repository.Repository;
 import org.eclipse.rdf4j.repository.RepositoryConnection;
+import org.eclipse.rdf4j.sail.memory.model.BooleanMemLiteral;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -55,6 +55,9 @@ public class BabelNetSynsetSerializer extends SynsetSerializer {
             model.add(factory.createStatement(synsetIri, SR.REMOVED_RELATION, removedRelationIRI));
         }
 
+        // Add information if BabelNet edges has been downloaded.
+        model.add(synsetIri, CommonIRI.EDGES_DOWNLOADED, factory.createLiteral(((BabelNetSynset) synset).hasEdgesDownloaded()));
+
         return model;
     }
 
@@ -70,13 +73,15 @@ public class BabelNetSynsetSerializer extends SynsetSerializer {
         String id;
         String representation;
         String description = null;
+        boolean edgesLoaded;
 
         try (RepositoryConnection conn = repository.getConnection()) {
 
-            // Get synset representation, id and description
-            String queryString = String.format("SELECT ?id ?representation ?description " +
-                            "WHERE { <%s> <%s> ?id . <%s> <%s> ?representation . OPTIONAL { <%s> <%s> ?description }}",
-                    synsetIri.stringValue(), SR.ID, synsetIri.stringValue(), RDFS.LABEL, synsetIri.stringValue(), RDFS.COMMENT);
+            // Get synset representation, id, description and the flag if the edges from BabelNet were loaded or not
+            String queryString = String.format("SELECT ?id ?representation ?edgesLoaded ?description" +
+                            "WHERE { <%s> <%s> ?id . <%s> <%s> ?representation . <%s> <%s> ?edgesLoaded . OPTIONAL { <%s> <%s> ?description }}",
+                    synsetIri.stringValue(), SR.ID, synsetIri.stringValue(), RDFS.LABEL, synsetIri.stringValue(),
+                    CommonIRI.EDGES_DOWNLOADED, synsetIri.stringValue(), RDFS.COMMENT);
 
 
             TupleQuery tupleQuery = conn.prepareTupleQuery(QueryLanguage.SPARQL, queryString);
@@ -87,7 +92,7 @@ public class BabelNetSynsetSerializer extends SynsetSerializer {
 
                     id = bindingSet.getValue("id").stringValue();
                     representation = bindingSet.getValue("representation").stringValue();
-
+                    edgesLoaded = ((BooleanMemLiteral) bindingSet.getValue("edgesLoaded")).booleanValue();
 
                     if (bindingSet.getValue("description") != null) {
                         description = bindingSet.getValue("description").stringValue();
@@ -117,7 +122,7 @@ public class BabelNetSynsetSerializer extends SynsetSerializer {
                 }
             }
 
-            synset = new BabelNetSynset(representation, removedRelations);
+            synset = new BabelNetSynset(representation, removedRelations, edgesLoaded);
             synset.setId(id);
             if (description != null) {
                 synset.setDescription(description);
