@@ -13,7 +13,7 @@ public class BabelNetSynset extends Synset {
     private BabelSynset babelSynset;
     private Set<BabelSynsetID> removedRelations = new HashSet<>();
     private Date lastUpdateDate;
-    private boolean hasEdgesDownloaded;
+    private boolean isDownloadedWithEdges;
 
     private BabelNetSynset(BabelNetSynset babelNetSynset) {
         super(babelNetSynset);
@@ -42,9 +42,9 @@ public class BabelNetSynset extends Synset {
         this.removedRelations = removedRelations;
     }
 
-    BabelNetSynset(String representation, Set<BabelSynsetID> removedRelations, boolean hasEdgesDownloaded) {
+    BabelNetSynset(String representation, Set<BabelSynsetID> removedRelations, boolean isDownloadedWithEdges) {
         this(representation, removedRelations);
-        this.hasEdgesDownloaded = hasEdgesDownloaded;
+        this.isDownloadedWithEdges = isDownloadedWithEdges;
     }
 
     public Set<BabelSynsetID> getRemovedRelations() {
@@ -98,7 +98,7 @@ public class BabelNetSynset extends Synset {
     }
 
     public void loadEdgesFromBabelNet() throws IOException, InvalidBabelSynsetIDException {
-        if (hasEdgesDownloaded) {
+        if (isDownloadedWithEdges) {
             throw new EdgesAlreadyLoadedException();
         }
 
@@ -121,7 +121,7 @@ public class BabelNetSynset extends Synset {
             }
         }
         isExpanded = true;
-        hasEdgesDownloaded = true;
+        isDownloadedWithEdges = true;
     }
 
     private void addEdge(BabelSynsetIDRelation edge) throws IOException {
@@ -165,7 +165,7 @@ public class BabelNetSynset extends Synset {
         return true;
     }
 
-    public boolean hasEdgesDownloaded() {
-        return hasEdgesDownloaded;
+    public boolean isDownloadedWithEdges() {
+        return isDownloadedWithEdges;
     }
 }

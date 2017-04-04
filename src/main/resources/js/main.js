@@ -22,13 +22,13 @@ var cy = cytoscape({
             }
         },
         {
-            selector: 'node[class="BabelNetSynset"]',
+            selector: 'node[class="com.github.semres.babelnet.BabelNetSynset"]',
             style: {
                 'background-color': 'blue'
             }
         },
         {
-            selector: 'node[class="UserSynset"]',
+            selector: 'node[class="com.github.semres.user.UserSynset"]',
             style: {
                 'background-color': 'green'
             }
@@ -90,20 +90,26 @@ cy.contextMenus({
         {
             id: 'add-edge',
             title: 'Add edge',
-            selector: 'node[expanded="true"]',
+            selector: 'node[?expanded]',
             onClickFunction: startEdgeAddition
         },
         {
             id: 'expand',
             title: 'Expand',
-            selector: 'node[expanded="false"]',
+            selector: 'node[!expanded]',
             onClickFunction: expand
         },
         {
             id: 'collapse',
             title: 'Collapse',
-            selector: 'node[expanded="true"]',
+            selector: 'node[?expanded]',
             onClickFunction: function (event) { collapse(event.cyTarget, []); }
+        },
+        {
+            id: 'loadEdgesFromBabelNet',
+            title: 'Load edges from BabelNet',
+            selector: 'node[!downloadedWithEdges][class="com.github.semres.babelnet.BabelNetSynset"]',
+            onClickFunction: downloadEdgesFromBabelNet
         },
         {
             id: 'select-all-nodes',
@@ -186,15 +192,15 @@ function addEdge(edge) {
 
 function expand(event) {
     var synset = event.cyTarget.data();
-    if (synset.expanded === "false") {
+    if (synset.expanded === false) {
         javaApp.loadEdges(synset.id);
-        synset.expanded = "true";
+        synset.expanded = true;
     }
 }
 
 function collapse(cyTarget, synsetsToCollapse) {
     var synset = cyTarget.data();
-    if (synset.expanded === "true") {
+    if (synset.expanded === true) {
         cyTarget.connectedEdges().forEach(function (edge) {
             if (edge.source().data().id === cyTarget.data().id) {
                 var target = edge.target();
@@ -215,7 +221,7 @@ function collapse(cyTarget, synsetsToCollapse) {
                 }
 
                 if (shouldBeRemoved) {
-                    if (target.data().expanded === "true") {
+                    if (target.data().expanded === true) {
                         var newSynsetsToCollapse = synsetsToCollapse.slice();
                         newSynsetsToCollapse.push(synset.id);
                         collapse(target, newSynsetsToCollapse);
@@ -226,8 +232,12 @@ function collapse(cyTarget, synsetsToCollapse) {
                 }
             }
         });
-        synset.expanded = "false";
+        synset.expanded = false;
     }
+}
+
+function downloadEdgesFromBabelNet(event) {
+    javaApp.downloadEdgesFromBabelNet(event.cyTarget.id());
 }
 
 function removeNode(event) {

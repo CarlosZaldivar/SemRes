@@ -56,7 +56,7 @@ public class BabelNetSynsetSerializer extends SynsetSerializer {
         }
 
         // Add information if BabelNet edges has been downloaded.
-        model.add(synsetIri, CommonIRI.EDGES_DOWNLOADED, factory.createLiteral(((BabelNetSynset) synset).hasEdgesDownloaded()));
+        model.add(synsetIri, CommonIRI.EDGES_DOWNLOADED, factory.createLiteral(((BabelNetSynset) synset).isDownloadedWithEdges()));
 
         return model;
     }

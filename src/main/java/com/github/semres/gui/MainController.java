@@ -7,6 +7,7 @@ import com.github.semres.Edge;
 import com.github.semres.Synset;
 import com.github.semres.babelnet.BabelNetManager;
 import com.github.semres.babelnet.BabelNetSynset;
+import it.uniroma1.lcl.babelnet.InvalidBabelSynsetIDException;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -21,8 +22,10 @@ import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import org.apache.commons.beanutils.PropertyUtils;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
@@ -140,14 +143,14 @@ public class MainController extends Controller implements Initializable {
     }
 
     private Map<String, Object> synsetToMap(Synset synset) {
-        Map<String, Object> synsetMap = new HashMap<>();
+        Map<String, Object> synsetMap;
+        try {
+            synsetMap = PropertyUtils.describe(synset);
+        } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+            throw new RuntimeException(e);
+        }
 
-        // Temporary measure to avoid errors when trying to send json with colon.
-        synsetMap.put("id", synset.getId());
-        synsetMap.put("description", synset.getDescription());
-        synsetMap.put("representation", synset.getRepresentation());
-        synsetMap.put("class", synset.getClass().getSimpleName());
-        synsetMap.put("expanded", synset.isExpanded() ? "true" : "false");
+        synsetMap.remove("outgoingEdges");
         return synsetMap;
     }
 
@@ -199,10 +202,10 @@ public class MainController extends Controller implements Initializable {
             board.getSynset(synsetId).getOutgoingEdges().values().forEach(MainController.this::addEdgeToView);
         }
 
-        public void loadEdgesFromBabelNet(String synsetId) {
+        public void downloadEdgesFromBabelNet(String synsetId) throws IOException, InvalidBabelSynsetIDException {
             BabelNetSynset synset = (BabelNetSynset) board.getSynset(synsetId);
-//            synset.loadEdges();
-            synset.getOutgoingEdges().values().forEach(MainController.this::addEdgeToView);
+            synset.loadEdgesFromBabelNet();
+            synset.getOutgoingEdges().values().forEach(MainController.this::addEdge);
         }
 
         public void removeNode(String id) {

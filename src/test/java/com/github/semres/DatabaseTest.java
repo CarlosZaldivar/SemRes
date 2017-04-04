@@ -246,11 +246,11 @@ public class DatabaseTest {
 
         BabelNetSynset synset = new BabelNetSynset(mockBabelSynset);
         synset.loadEdgesFromBabelNet();
-        assertTrue(synset.hasEdgesDownloaded());
+        assertTrue(synset.isDownloadedWithEdges());
 
         Database database = createTestDatabase();
         database.addSynset(synset);
-        assertTrue(((BabelNetSynset) database.searchSynsets("Foo").get(0)).hasEdgesDownloaded());
+        assertTrue(((BabelNetSynset) database.searchSynsets("Foo").get(0)).isDownloadedWithEdges());
     }
 
     static Database createTestDatabase() throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
