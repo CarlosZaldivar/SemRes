@@ -127,8 +127,11 @@ public class BabelNetSynset extends Synset {
     private void addEdge(BabelSynsetIDRelation edge) throws IOException {
         BabelNetSynset referencedSynset = new BabelNetSynset(BabelNet.getInstance().getSynset(edge.getBabelSynsetIDTarget()));
         BabelPointer babelPointer = edge.getPointer();
+
+        Edge.RelationType relationType = Edge.RelationType.valueOf(babelPointer.getRelationGroup().toString());
+
         Edge newEdge =
-                new BabelNetEdge(referencedSynset, this, Edge.RelationType.HOLONYM, babelPointer.getName(), edge.getWeight());
+                new BabelNetEdge(referencedSynset, this, relationType, babelPointer.getName(), edge.getWeight());
         outgoingEdges.put(newEdge.getId(), newEdge);
     }
 
