@@ -62,6 +62,15 @@ class Database {
         }
     }
 
+    boolean hasSynset(String id) {
+        try (RepositoryConnection conn = repository.getConnection()) {
+            String queryString = String.format("ASK  { ?synset <%s> ?type . ?type <%s> <%s> . ?synset <%s> %s }",
+                    RDF.TYPE, RDFS.SUBCLASSOF, SR.SYNSET, SR.ID, conn.getValueFactory().createLiteral(id));
+            BooleanQuery query = conn.prepareBooleanQuery(queryString);
+            return query.evaluate();
+        }
+    }
+
     void removeSynset(Synset synset) {
         try (RepositoryConnection conn = repository.getConnection()) {
             // Remove edges. It could be optimized by checking if the edges are not already loaded.

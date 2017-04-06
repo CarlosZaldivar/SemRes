@@ -253,6 +253,19 @@ public class DatabaseTest {
         assertTrue(((BabelNetSynset) database.searchSynsets("Foo").get(0)).isDownloadedWithEdges());
     }
 
+    @Test
+    public void hasSynset() throws Exception {
+        Database database = createTestDatabase();
+
+        assertTrue(!database.hasSynset("123"));
+
+        UserSynset synset = new UserSynset("Foo");
+        synset.setId("123");
+        database.addSynset(synset);
+
+        assertTrue(database.hasSynset("123"));
+    }
+
     static Database createTestDatabase() throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
         Repository repo = new SailRepository(new MemoryStore());
         List<Class<? extends SynsetSerializer>> synsetSerializers = new ArrayList<>();
