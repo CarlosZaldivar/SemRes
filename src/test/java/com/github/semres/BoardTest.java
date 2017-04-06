@@ -20,8 +20,6 @@ public class BoardTest {
         board.addSynset(synset);
         board.save();
 
-        // Check if id of length 26 has been generated.
-        assertTrue(synset.getId().length() == 26);
         assertTrue(database.searchSynsets("Foo").size() == 1);
     }
 

@@ -10,8 +10,12 @@ import org.eclipse.rdf4j.repository.Repository;
 import org.eclipse.rdf4j.repository.RepositoryConnection;
 
 import java.lang.reflect.InvocationTargetException;
+import java.math.BigInteger;
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 class Database {
     private List<SynsetSerializer> synsetSerializers;
@@ -228,5 +232,21 @@ class Database {
                 .filter(x -> x.getEdgeClassIri().stringValue().equals(type))
                 .findFirst().orElseThrow(IllegalArgumentException::new);
         return serializer;
+    }
+
+    /**
+     * Generate unique synset id.
+     * @return Unique synset id.
+     */
+    public String generateNewSynsetId() {
+        Random random = new Random();
+        String id;
+        while (true) {
+            id = new BigInteger(130, random).toString(32);
+            if (!hasSynset(id)) {
+                break;
+            }
+        }
+        return id;
     }
 }

@@ -266,6 +266,13 @@ public class DatabaseTest {
         assertTrue(database.hasSynset("123"));
     }
 
+    @Test
+    public void generateNewSynsetId() throws Exception {
+        Database database = createTestDatabase();
+        String id = database.generateNewSynsetId();
+        assertTrue(id.length() == 26);
+    }
+
     static Database createTestDatabase() throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
         Repository repo = new SailRepository(new MemoryStore());
         List<Class<? extends SynsetSerializer>> synsetSerializers = new ArrayList<>();

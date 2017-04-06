@@ -5,8 +5,6 @@ import org.eclipse.rdf4j.rio.RDFFormat;
 import org.eclipse.rdf4j.rio.Rio;
 
 import java.io.StringWriter;
-import java.math.BigInteger;
-import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -72,7 +70,7 @@ public class Board {
 
     public void addSynset(Synset newSynset) {
         if (newSynset.getId() == null) {
-            newSynset.setId(getNewSynsetId());
+            newSynset.setId(attachedDatabase.generateNewSynsetId());
         }
         synsets.put(newSynset.getId(), newSynset);
         newSynsets.put(newSynset.getId(), newSynset);
@@ -178,22 +176,6 @@ public class Board {
         StringWriter buffer = new StringWriter();
         Rio.write(model, buffer, RDFFormat.RDFXML);
         return buffer.toString();
-    }
-
-    /**
-     * Generate unique synset id.
-     * @return Unique synset id.
-     */
-    private String getNewSynsetId() {
-        SecureRandom random = new SecureRandom();
-        String id;
-        while (true) {
-            id = new BigInteger(130, random).toString(32);
-            if (!synsets.containsKey(id)) {
-                break;
-            }
-        }
-        return id;
     }
 
     private String extractOriginSynsetId(String edgeId) {
