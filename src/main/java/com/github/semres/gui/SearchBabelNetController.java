@@ -41,8 +41,9 @@ public class SearchBabelNetController extends ChildController implements Initial
     void addSynset(MouseEvent click) {
         if (click.getClickCount() == 2 && synsetsListView.getSelectionModel().getSelectedItem() != null) {
             BabelNetSynset synset = (BabelNetSynset) synsetsListView.getSelectionModel().getSelectedItem().getSynset();
+            List<Synset> relatedSynsets = null;
             try {
-                synset.loadEdgesFromBabelNet();
+                relatedSynsets = synset.loadEdgesFromBabelNet();
             } catch (IOException | InvalidBabelSynsetIDException e) {
                 Alert alert = new Alert(Alert.AlertType.ERROR, e.getMessage());
                 // Resize dialog so that the whole text would fit.
@@ -51,6 +52,9 @@ public class SearchBabelNetController extends ChildController implements Initial
                 return;
             }
             ((MainController) parent).addSynset(synset);
+            for (Synset relatedSynset : relatedSynsets) {
+                ((MainController) parent).addSynset(relatedSynset);
+            }
             for (Edge edge : synset.getOutgoingEdges().values()) {
                 ((MainController) parent).addEdge(edge);
             }

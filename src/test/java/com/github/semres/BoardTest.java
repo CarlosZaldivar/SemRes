@@ -47,7 +47,7 @@ public class BoardTest {
         Synset pointedSynset = new UserSynset("Bar");
         pointedSynset.setId("124");
 
-        Edge edge = new UserEdge(pointedSynset, originSynset, Edge.RelationType.HOLONYM, 0);
+        Edge edge = new UserEdge(pointedSynset.getId(), originSynset.getId(), Edge.RelationType.HOLONYM, 0);
         board.addSynset(originSynset);
         board.addSynset(pointedSynset);
         board.addEdge(edge);
@@ -71,7 +71,7 @@ public class BoardTest {
         Synset pointedSynset = new BabelNetSynset("Bar");
         pointedSynset.setId("bn:00024923n");
 
-        Edge edge = new BabelNetEdge(pointedSynset, originSynset, Edge.RelationType.HOLONYM, 0);
+        Edge edge = new BabelNetEdge(pointedSynset.getId(), originSynset.getId(), Edge.RelationType.HOLONYM, 0);
 
         board.addSynset(originSynset);
         board.addSynset(pointedSynset);

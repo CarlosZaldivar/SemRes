@@ -58,7 +58,7 @@ public class AddingEdgeController extends ChildController implements Initializab
     public void addEdge() {
         double weight = Double.parseDouble(weightTF.getText().replace(',', '.'));
         Edge.RelationType relationType = Edge.RelationType.valueOf(relationTypeCB.getSelectionModel().getSelectedItem().toString());
-        UserEdge newEdge = new UserEdge(destinationSynset, originSynset, relationType, weight);
+        UserEdge newEdge = new UserEdge(destinationSynset.getId(), originSynset.getId(), relationType, weight);
 
         ((MainController) parent).addEdge(newEdge);
 

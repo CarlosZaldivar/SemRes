@@ -90,8 +90,8 @@ public class DatabaseTest {
         UserSynset lastSynset = new UserSynset("Car");
         lastSynset.setId("125");
 
-        Edge firstEdge = new UserEdge(middleSynset, firstSynset, Edge.RelationType.HOLONYM, 1);
-        Edge secondEdge = new UserEdge(lastSynset, middleSynset, Edge.RelationType.HOLONYM, 1);
+        Edge firstEdge = new UserEdge(middleSynset.getId(), firstSynset.getId(), Edge.RelationType.HOLONYM, 1);
+        Edge secondEdge = new UserEdge(lastSynset.getId(), middleSynset.getId(), Edge.RelationType.HOLONYM, 1);
 
         database.addSynset(firstSynset);
         database.addSynset(middleSynset);
@@ -113,7 +113,7 @@ public class DatabaseTest {
         originSynset.setId("123");
         UserSynset pointedSynset = new UserSynset("Bar");
         pointedSynset.setId("124");
-        Edge edge = new UserEdge(pointedSynset, originSynset, Edge.RelationType.HOLONYM, 1);
+        Edge edge = new UserEdge(pointedSynset.getId(), originSynset.getId(), Edge.RelationType.HOLONYM, 1);
 
         database.addSynset(originSynset);
         database.addSynset(pointedSynset);
@@ -152,7 +152,7 @@ public class DatabaseTest {
         originSynset.setId("bn:00024922n");
         BabelNetSynset pointedSynset = new BabelNetSynset("Bar");
         pointedSynset.setId("bn:00024923n");
-        Edge edge = new BabelNetEdge(pointedSynset, originSynset, Edge.RelationType.HOLONYM, "", 1);
+        Edge edge = new BabelNetEdge(pointedSynset.getId(), originSynset.getId(), Edge.RelationType.HOLONYM, 1);
 
         database.addSynset(originSynset);
         database.addSynset(pointedSynset);
@@ -220,14 +220,14 @@ public class DatabaseTest {
 
         database.addSynset(originSynset);
         database.addSynset(pointedSynset);
-        database.addEdge(new UserEdge(pointedSynset, originSynset, Edge.RelationType.OTHER, 1));
+        database.addEdge(new UserEdge(pointedSynset.getId(), originSynset.getId(), Edge.RelationType.OTHER, 1));
 
         Synset loadedSynset = database.searchSynsets("Foo1").get(0);
 
         Edge edge = new ArrayList<>(database.getOutgoingEdges(loadedSynset)).get(0);
 
         assertTrue(edge.getId().equals("123-124"));
-        assertTrue(edge.getPointedSynset().getId().equals(pointedSynset.getId()));
+        assertTrue(edge.getPointedSynset().equals(pointedSynset.getId()));
         assertTrue(edge.getDescription() == null);
     }
 

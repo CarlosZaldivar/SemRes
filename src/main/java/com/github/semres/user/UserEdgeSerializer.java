@@ -3,7 +3,6 @@ package com.github.semres.user;
 import com.github.semres.Edge;
 import com.github.semres.EdgeSerializer;
 import com.github.semres.SR;
-import com.github.semres.Synset;
 import org.eclipse.rdf4j.model.*;
 import org.eclipse.rdf4j.model.vocabulary.RDFS;
 import org.eclipse.rdf4j.query.*;
@@ -18,43 +17,53 @@ public class UserEdgeSerializer extends EdgeSerializer {
     }
 
     @Override
-    public UserEdge rdfToEdge(IRI edgeIri, Synset pointedSynset, Synset originSynset) {
+    public UserEdge rdfToEdge(IRI edgeIri) {
         ValueFactory factory = repository.getValueFactory();
-        String description = null;
-        Edge.RelationType relationType = null;
-        double weight = -1;
 
-        String queryString = String.format("SELECT * WHERE { <%s> ?p ?o }", edgeIri.stringValue());
-        List<BindingSet> results = Repositories.tupleQuery(repository, queryString, (iter) -> QueryResults.asList(iter));
+        String queryString = String.format("SELECT ?originSynsetId ?pointedSynsetId ?weight ?relationType ?description " +
+                "WHERE { ?originSynset <%1$s> ?pointedSynset . <%1$s> <%2$s> ?weight . " +
+                "?originSynset <%5$s> ?originSynsetId . ?pointedSynset <%5$s> ?pointedSynsetId . " +
+                "OPTIONAL { <%1$s> <%3$s> ?description } . OPTIONAL { <%1$s> <%4$s> ?relationType} }",
+                edgeIri.stringValue(), SR.WEIGHT, RDFS.COMMENT, SR.RELATION_TYPE, SR.ID);
+        List<BindingSet> results = Repositories.tupleQuery(repository, queryString, iter -> QueryResults.asList(iter));
 
-        for (BindingSet result: results) {
-            if (result.getValue("p").stringValue().equals(SR.RELATION_TYPE.stringValue())) {
-                IRI relationIri = factory.createIRI(result.getValue("o").stringValue());
-                relationType = relationIriToEnum(relationIri);
-            } else if (result.getValue("p").stringValue().equals(RDFS.COMMENT.stringValue())) {
-                description = result.getValue("o").stringValue();
-            } else if (result.getValue("p").stringValue().equals(SR.WEIGHT.stringValue())) {
-                weight = Double.parseDouble(result.getValue("o").stringValue());
-            }
+        if (results.size() > 1) {
+            throw new RuntimeException("More than one directed edge between synsets saved in the database.");
         }
+        if (results.size() != 1) {
+            throw new RuntimeException("Could not find edge with specified IRI in the database.");
+        }
+
+        BindingSet result = results.get(0);
+
+        String originSynset = result.getValue("originSynsetId").stringValue();
+        String pointedSynset = result.getValue("pointedSynsetId").stringValue();
+
+        Edge.RelationType relationType;
+        if (result.hasBinding("relationType")) {
+            relationType = relationIriToEnum(factory.createIRI(result.getValue("relationType").stringValue()));
+        } else {
+            relationType = Edge.RelationType.OTHER;
+        }
+
+        String description = null;
+        if (result.hasBinding("description")) {
+            description = result.getValue("description").stringValue();
+        }
+
+        double weight = Double.parseDouble(result.getValue("weight").stringValue());
 
         if (relationType == null) {
             relationType = Edge.RelationType.OTHER;
         }
 
-        UserEdge edge = new UserEdge(pointedSynset, originSynset, relationType, weight);
-
-        if (description != null) {
-            edge.setDescription(description);
-        }
-
-        return edge;
+        return new UserEdge(pointedSynset, originSynset, description, relationType, weight);
     }
 
     @Override
-    public UserEdge rdfToEdge(String edgeId, Synset pointedSynset, Synset originSynset) {
+    public UserEdge rdfToEdge(String edgeId) {
         ValueFactory factory = repository.getValueFactory();
-        return rdfToEdge(factory.createIRI(baseIri + "outgoingEdges/" + edgeId), pointedSynset, originSynset);
+        return rdfToEdge(factory.createIRI(baseIri + "outgoingEdges/" + edgeId));
     }
 
     @Override

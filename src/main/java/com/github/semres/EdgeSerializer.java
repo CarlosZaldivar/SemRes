@@ -47,14 +47,14 @@ public abstract class EdgeSerializer {
                 break;
         }
 
-        model.add(factory.createIRI(baseIri + "synsets/" + edge.getOriginSynset().getId()), edgeIri, factory.createIRI(baseIri + "synsets/" + edge.getPointedSynset().getId()));
+        model.add(factory.createIRI(baseIri + "synsets/" + edge.getOriginSynset()), edgeIri, factory.createIRI(baseIri + "synsets/" + edge.getPointedSynset()));
         model.add(edgeIri, SR.WEIGHT, factory.createLiteral(edge.getWeight()));
 
         return model;
     }
 
-    abstract public Edge rdfToEdge(String edgeId, Synset pointedSynset, Synset originSynset);
-    abstract public Edge rdfToEdge(IRI edge, Synset pointedSynset, Synset originSynset);
+    abstract public Edge rdfToEdge(String edgeId);
+    abstract public Edge rdfToEdge(IRI edge);
     abstract public String getEdgeClass();
     abstract public IRI getEdgeClassIri();
 

@@ -11,7 +11,7 @@ import java.util.*;
 
 public class BabelNetSynset extends Synset {
     private BabelSynset babelSynset;
-    private Set<BabelSynsetID> removedRelations = new HashSet<>();
+    private Set<String> removedRelations = new HashSet<>();
     private Date lastUpdateDate;
     private boolean isDownloadedWithEdges;
 
@@ -37,17 +37,17 @@ public class BabelNetSynset extends Synset {
         super(representation);
     }
 
-    BabelNetSynset(String representation, Set<BabelSynsetID> removedRelations) {
+    BabelNetSynset(String representation, Set<String> removedRelations) {
         super(representation);
         this.removedRelations = removedRelations;
     }
 
-    BabelNetSynset(String representation, Set<BabelSynsetID> removedRelations, boolean isDownloadedWithEdges) {
+    BabelNetSynset(String representation, Set<String> removedRelations, boolean isDownloadedWithEdges) {
         this(representation, removedRelations);
         this.isDownloadedWithEdges = isDownloadedWithEdges;
     }
 
-    public Set<BabelSynsetID> getRemovedRelations() {
+    public Set<String> getRemovedRelations() {
         return removedRelations;
     }
 
@@ -55,7 +55,7 @@ public class BabelNetSynset extends Synset {
     public BabelNetSynset removeOutgoingEdge(String id) {
         BabelNetSynset newSynset = new BabelNetSynset(this);
         if (outgoingEdges.get(id) instanceof BabelNetEdge) {
-            newSynset.removedRelations.add(((BabelNetSynset) outgoingEdges.get(id).getPointedSynset()).getBabelSynsetID());
+            newSynset.removedRelations.add(outgoingEdges.get(id).getPointedSynset());
         }
         newSynset.outgoingEdges.remove(id);
         return newSynset;
@@ -63,7 +63,7 @@ public class BabelNetSynset extends Synset {
 
     @Override
     protected BabelNetSynset addOutgoingEdge(Edge edge) {
-        if (edge instanceof BabelNetEdge && removedRelations.contains(((BabelNetSynset) edge.getPointedSynset()).getBabelSynsetID())) {
+        if (edge instanceof BabelNetEdge && removedRelations.contains(edge.getPointedSynset())) {
             return null;
         }
         BabelNetSynset newSynset = new BabelNetSynset(this);
@@ -97,7 +97,7 @@ public class BabelNetSynset extends Synset {
         lastUpdateDate = new Date();
     }
 
-    public void loadEdgesFromBabelNet() throws IOException, InvalidBabelSynsetIDException {
+    public List<Synset> loadEdgesFromBabelNet() throws IOException, InvalidBabelSynsetIDException {
         if (isDownloadedWithEdges) {
             throw new EdgesAlreadyLoadedException();
         }
@@ -109,11 +109,13 @@ public class BabelNetSynset extends Synset {
         List<BabelSynsetIDRelation> babelEdges = babelSynset.getEdges();
         babelEdges.sort(Comparator.comparing(BabelSynsetIDRelation::getWeight));
 
+        List<Synset> relatedSynsets = new ArrayList<>();
         // Download only ten edges.
         int counter = 10;
         for (BabelSynsetIDRelation edge: babelEdges) {
             if (edgeIsRelevant(edge)) {
-                addEdge(edge);
+                Synset relatedSynset = addBabelNetEdge(edge);
+                relatedSynsets.add(relatedSynset);
                 --counter;
             }
             if (counter == 0) {
@@ -122,17 +124,19 @@ public class BabelNetSynset extends Synset {
         }
         isExpanded = true;
         isDownloadedWithEdges = true;
+        return relatedSynsets;
     }
 
-    private void addEdge(BabelSynsetIDRelation edge) throws IOException {
+    private Synset addBabelNetEdge(BabelSynsetIDRelation edge) throws IOException {
         BabelNetSynset referencedSynset = new BabelNetSynset(BabelNet.getInstance().getSynset(edge.getBabelSynsetIDTarget()));
         BabelPointer babelPointer = edge.getPointer();
 
         Edge.RelationType relationType = Edge.RelationType.valueOf(babelPointer.getRelationGroup().toString());
 
         Edge newEdge =
-                new BabelNetEdge(referencedSynset, this, relationType, babelPointer.getName(), edge.getWeight());
+                new BabelNetEdge(referencedSynset.getId(), getId(), babelPointer.getName(), relationType, edge.getWeight());
         outgoingEdges.put(newEdge.getId(), newEdge);
+        return referencedSynset;
     }
 
     public void setDescription(String description) {

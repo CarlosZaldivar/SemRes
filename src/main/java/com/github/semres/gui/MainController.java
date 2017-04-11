@@ -27,10 +27,7 @@ import org.apache.commons.beanutils.PropertyUtils;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.ResourceBundle;
+import java.util.*;
 
 import static es.uvigo.ei.sing.javafx.webview.Java2JavascriptUtils.connectBackendObject;
 
@@ -171,8 +168,8 @@ public class MainController extends Controller implements Initializable {
         edgeMap.put("description", edge.getDescription());
         edgeMap.put("weight", edge.getWeight());
         edgeMap.put("relationType", edge.getRelationType().toString().toLowerCase());
-        edgeMap.put("targetSynset", synsetToMap(edge.getPointedSynset()));
-        edgeMap.put("sourceSynset", synsetToMap(edge.getOriginSynset()));
+        edgeMap.put("targetSynset", synsetToMap(board.getSynset(edge.getPointedSynset())));
+        edgeMap.put("sourceSynset", synsetToMap(board.getSynset(edge.getOriginSynset())));
 
 
         String jsonEdge = null;
@@ -199,7 +196,11 @@ public class MainController extends Controller implements Initializable {
 
         public void loadEdges(String synsetId) {
             board.loadEdges(synsetId);
-            board.getSynset(synsetId).getOutgoingEdges().values().forEach(MainController.this::addEdgeToView);
+            Collection<Edge> edges = board.getSynset(synsetId).getOutgoingEdges().values();
+            for (Edge edge : edges) {
+                addSynsetToView(board.getSynset(edge.getPointedSynset()));
+                addEdgeToView(edge);
+            }
         }
 
         public void downloadEdgesFromBabelNet(String synsetId) throws IOException, InvalidBabelSynsetIDException {

@@ -26,7 +26,7 @@ public class UserEdgeSerializerTest {
         pointedSynset.setId("123");
         originSynset.setId("124");
 
-        UserEdge edge = new UserEdge(pointedSynset, originSynset, Edge.RelationType.HOLONYM, 0.4);
+        UserEdge edge = new UserEdge(pointedSynset.getId(), originSynset.getId(), Edge.RelationType.HOLONYM, 0.4);
         Model model = edgeSerializer.edgeToRdf(edge);
 
         assertTrue(model.filter(null, SR.ID, factory.createLiteral("124-123")).size() == 1);
@@ -52,7 +52,7 @@ public class UserEdgeSerializerTest {
         pointedSynset.setId("123");
         originSynset.setId("124");
 
-        UserEdge edge = new UserEdge(pointedSynset, originSynset, Edge.RelationType.HOLONYM, 0.5);
+        UserEdge edge = new UserEdge(pointedSynset.getId(), originSynset.getId(), Edge.RelationType.HOLONYM, 0.5);
 
         Model model = edgeSerializer.edgeToRdf(edge);
 
@@ -60,11 +60,11 @@ public class UserEdgeSerializerTest {
             connection.add(model);
         }
 
-        edge = edgeSerializer.rdfToEdge("124-123", pointedSynset, originSynset);
+        edge = edgeSerializer.rdfToEdge("124-123");
 
         assertTrue(edge.getId().equals("124-123"));
-        assertTrue(edge.getOriginSynset().getId().equals("124"));
-        assertTrue(edge.getPointedSynset().getId().equals("123"));
+        assertTrue(edge.getOriginSynset().equals("124"));
+        assertTrue(edge.getPointedSynset().equals("123"));
         assertTrue(edge.getDescription() == null);
         assertTrue(edge.getRelationType() == Edge.RelationType.HOLONYM);
         assertTrue(edge.getWeight() == 0.5);

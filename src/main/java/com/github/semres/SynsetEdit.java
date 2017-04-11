@@ -4,11 +4,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 class SynsetEdit {
-    private final Synset edited;
     private final Synset original;
     private final Map<String, Edge> addedEdges;
     private final Map<String, Edge> removedEdges;
-
+    private Synset edited;
     SynsetEdit(Synset original, Synset edited) {
         this.original = original;
         this.edited = edited;
@@ -30,6 +29,10 @@ class SynsetEdit {
 
     Synset getEdited() {
         return edited;
+    }
+
+    public void setEdited(Synset edited) {
+        this.edited = edited;
     }
 
     Map<String, Edge> getAddedEdges() {

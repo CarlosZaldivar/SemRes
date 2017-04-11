@@ -47,10 +47,9 @@ public class Board {
                 continue;
             }
 
-            if (synsets.containsKey(edge.getPointedSynset().getId())) {
-                edge.setPointedSynset(synsets.get(edge.getPointedSynset().getId()));
-            } else {
-                synsets.put(edge.getPointedSynset().getId(), edge.getPointedSynset());
+            if (!synsets.containsKey(edge.getPointedSynset())) {
+                Synset pointedSynset = attachedDatabase.getSynset(edge.getPointedSynset());
+                synsets.put(pointedSynset.getId(), pointedSynset);
             }
 
             filteredEdges.add(edge);
@@ -77,34 +76,35 @@ public class Board {
     }
 
     public void addEdge(Edge newEdge) {
-        String originSynsetId = newEdge.getOriginSynset().getId();
+        String originSynsetId = newEdge.getOriginSynset();
+        String pointedSynsetId = newEdge.getPointedSynset();
+
         if (synsets.get(originSynsetId) == null) {
-            addSynset(newEdge.getOriginSynset());
-        } else {
-            Synset originalSynset = synsets.get(originSynsetId);
-            Synset editedSynset = originalSynset.addOutgoingEdge(newEdge);
-
-            // Return if no edition was made.
-            if (editedSynset == null) {
-                return;
-            }
-
-            synsets.put(originSynsetId, editedSynset);
-            newEdge.setOriginSynset(editedSynset);
-
-            SynsetEdit synsetEdit = new SynsetEdit(originalSynset, editedSynset);
-            synsetEdit.addEdge(newEdge);
-            synsetEdits.put(originSynsetId, synsetEdit);
+            throw new RuntimeException("Trying to add edge without corresponding origin synset on the board.");
         }
-
-        String pointedSynsetId = newEdge.getPointedSynset().getId();
         if (synsets.get(pointedSynsetId) == null) {
-            addSynset(newEdge.getPointedSynset());
-        } else {
-            newEdge.setPointedSynset(synsets.get(pointedSynsetId));
+            throw new RuntimeException("Trying to add edge without corresponding pointed synset on the board.");
         }
 
-        synsets.get(originSynsetId).addOutgoingEdge(newEdge);
+
+        Synset originalSynset = synsets.get(originSynsetId);
+        Synset editedSynset = originalSynset.addOutgoingEdge(newEdge);
+
+        // Return if no edition was made.
+        if (editedSynset == null) {
+            return;
+        }
+
+        synsets.put(originSynsetId, editedSynset);
+
+        SynsetEdit synsetEdit = synsetEdits.get(originSynsetId);
+        if (synsetEdit == null) {
+            synsetEdit = new SynsetEdit(originalSynset, editedSynset);
+            synsetEdits.put(originSynsetId, synsetEdit);
+        } else {
+            synsetEdit.setEdited(editedSynset);
+        }
+        synsetEdit.addEdge(newEdge);
     }
 
     public Synset getSynset(String id) {
@@ -137,10 +137,14 @@ public class Board {
                 Edge removedEdge = originSynset.getOutgoingEdges().get(id);
                 Synset editedSynset = originSynset.removeOutgoingEdge(id);
 
-                SynsetEdit synsetEdit = new SynsetEdit(originSynset, editedSynset);
+                SynsetEdit synsetEdit = synsetEdits.get(originSynset.getId());
+                if (synsetEdit == null) {
+                    synsetEdit = new SynsetEdit(originSynset, editedSynset);
+                    synsetEdits.put(originSynset.getId(), synsetEdit);
+                } else {
+                    synsetEdit.setEdited(editedSynset);
+                }
                 synsetEdit.removeEdge(removedEdge);
-                synsetEdits.put(originSynset.getId(), synsetEdit);
-                synsets.put(editedSynset.getId(), editedSynset);
             }
         }
     }

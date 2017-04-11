@@ -4,13 +4,13 @@ package com.github.semres;
 import org.apache.commons.lang.Validate;
 
 public abstract class Edge {
-    private Synset pointedSynset;
-    private Synset originSynset;
+    private final String pointedSynset;
+    private final String originSynset;
     protected RelationType relationType;
     protected String description;
     protected double weight;
 
-    protected Edge(Synset pointedSynset, Synset originSynset, RelationType relationType, double weight) {
+    protected Edge(String pointedSynset, String originSynset, RelationType relationType, double weight) {
         if (weight < 0) {
             throw new IllegalArgumentException();
         }
@@ -25,12 +25,13 @@ public abstract class Edge {
         this.weight = weight;
     }
 
-    public Synset getPointedSynset() {
-        return pointedSynset;
+    public Edge(String pointedSynset, String originSynset, String description, RelationType relationType, double weight) {
+        this(pointedSynset, originSynset, relationType, weight);
+        this.description = description;
     }
 
-    void setPointedSynset(Synset pointedSynset) {
-        this.pointedSynset = pointedSynset;
+    public String getPointedSynset() {
+        return pointedSynset;
     }
 
     public double getWeight() {
@@ -41,12 +42,8 @@ public abstract class Edge {
         return description;
     }
 
-    public Synset getOriginSynset() {
+    public String getOriginSynset() {
         return originSynset;
-    }
-
-    public void setOriginSynset(Synset originSynset) {
-        this.originSynset = originSynset;
     }
 
     public RelationType getRelationType() {
@@ -56,6 +53,6 @@ public abstract class Edge {
     public enum RelationType {HOLONYM, HYPERNYM, HYPONYM, MERONYM, OTHER}
 
     public String getId() {
-        return originSynset.getId() + "-" + pointedSynset.getId();
+        return originSynset + "-" + pointedSynset;
     }
 }

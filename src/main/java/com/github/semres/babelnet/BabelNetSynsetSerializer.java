@@ -49,9 +49,9 @@ public class BabelNetSynsetSerializer extends SynsetSerializer {
         model.add(synsetIri, RDF.TYPE, getSynsetClassIri());
         model.add(synsetIri, SR.ID, factory.createLiteral(synset.getId()));
 
-        for (BabelSynsetID removedRelation : ((BabelNetSynset) synset).getRemovedRelations()) {
-            IRI removedRelationIRI = factory.createIRI(baseIri + "synsets/" + synset.getId() + "/removedRelations/" + removedRelation.toString());
-            model.add(factory.createStatement(removedRelationIRI, SR.ID, factory.createLiteral(removedRelation.toString())));
+        for (String removedRelation : ((BabelNetSynset) synset).getRemovedRelations()) {
+            IRI removedRelationIRI = factory.createIRI(baseIri + "synsets/" + synset.getId() + "/removedRelations/" + removedRelation);
+            model.add(factory.createStatement(removedRelationIRI, SR.ID, factory.createLiteral(removedRelation)));
             model.add(factory.createStatement(synsetIri, SR.REMOVED_RELATION, removedRelationIRI));
         }
 
@@ -107,7 +107,7 @@ public class BabelNetSynsetSerializer extends SynsetSerializer {
                     synsetIri.stringValue(), SR.REMOVED_RELATION, SR.ID);
             tupleQuery = conn.prepareTupleQuery(QueryLanguage.SPARQL, queryString);
 
-            Set<BabelSynsetID> removedRelations = new HashSet<>();
+            Set<String> removedRelations = new HashSet<>();
 
             try (TupleQueryResult result = tupleQuery.evaluate()) {
                 while (result.hasNext()) {
@@ -115,7 +115,7 @@ public class BabelNetSynsetSerializer extends SynsetSerializer {
 
                     try {
                         BabelSynsetID removedRelation = new BabelSynsetID(bindingSet.getValue("removedRelationId").stringValue());
-                        removedRelations.add(removedRelation);
+                        removedRelations.add(removedRelation.toString());
                     } catch (InvalidBabelSynsetIDException e) {
                         throw new RuntimeException("Invalid BabelNet ID");
                     }
