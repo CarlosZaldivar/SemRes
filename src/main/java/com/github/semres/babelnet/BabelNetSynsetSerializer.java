@@ -62,13 +62,13 @@ public class BabelNetSynsetSerializer extends SynsetSerializer {
     }
 
     @Override
-    public Synset rdfToSynset(String synsetId) {
+    public BabelNetSynset rdfToSynset(String synsetId) {
         ValueFactory factory = repository.getValueFactory();
         return rdfToSynset(factory.createIRI(baseIri + "synsets/" + synsetId));
     }
 
     @Override
-    public Synset rdfToSynset(IRI synsetIri) {
+    public BabelNetSynset rdfToSynset(IRI synsetIri) {
         BabelNetSynset synset;
         String id;
         String representation;
@@ -78,10 +78,9 @@ public class BabelNetSynsetSerializer extends SynsetSerializer {
         try (RepositoryConnection conn = repository.getConnection()) {
 
             // Get synset representation, id, description and the flag if the edges from BabelNet were loaded or not
-            String queryString = String.format("SELECT ?id ?representation ?edgesLoaded ?description" +
-                            "WHERE { <%s> <%s> ?id . <%s> <%s> ?representation . <%s> <%s> ?edgesLoaded . OPTIONAL { <%s> <%s> ?description }}",
-                    synsetIri.stringValue(), SR.ID, synsetIri.stringValue(), RDFS.LABEL, synsetIri.stringValue(),
-                    CommonIRI.EDGES_DOWNLOADED, synsetIri.stringValue(), RDFS.COMMENT);
+            String queryString = String.format("SELECT ?id ?representation ?edgesLoaded ?description " +
+                            "WHERE { <%1$s> <%2$s> ?id . <%1$s> <%3$s> ?representation . <%1$s> <%4$s> ?edgesLoaded . OPTIONAL { <%1$s> <%5$s> ?description }}",
+                    synsetIri.stringValue(), SR.ID, RDFS.LABEL, CommonIRI.EDGES_DOWNLOADED, RDFS.COMMENT);
 
 
             TupleQuery tupleQuery = conn.prepareTupleQuery(QueryLanguage.SPARQL, queryString);

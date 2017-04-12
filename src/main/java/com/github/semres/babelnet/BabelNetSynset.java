@@ -56,6 +56,8 @@ public class BabelNetSynset extends Synset {
         BabelNetSynset newSynset = new BabelNetSynset(this);
         if (outgoingEdges.get(id) instanceof BabelNetEdge) {
             newSynset.removedRelations.add(outgoingEdges.get(id).getPointedSynset());
+        } else {
+            throw new RuntimeException("No edge with specified ID to remove.");
         }
         newSynset.outgoingEdges.remove(id);
         return newSynset;
@@ -156,7 +158,7 @@ public class BabelNetSynset extends Synset {
     }
 
     private boolean edgeIsRelevant(BabelSynsetIDRelation edge) {
-        if (removedRelations.contains(edge.getBabelSynsetIDTarget())) {
+        if (removedRelations.contains(edge.getBabelSynsetIDTarget().getID())) {
             return false;
         }
 

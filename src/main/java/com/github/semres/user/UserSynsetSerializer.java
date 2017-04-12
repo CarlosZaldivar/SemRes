@@ -56,8 +56,8 @@ public class UserSynsetSerializer extends SynsetSerializer {
         String description ;
 
         String queryString = String.format("SELECT ?id ?representation ?description " +
-                        "WHERE { <%s> <%s> ?id . <%s> <%s> ?representation . OPTIONAL { <%s> <%s> ?description }}",
-                        synsetIri.stringValue(), SR.ID, synsetIri.stringValue(), RDFS.LABEL, synsetIri.stringValue(), RDFS.COMMENT);
+                        "WHERE { <%1$s> <%2$s> ?id . <%1$s> <%3$s> ?representation . OPTIONAL { <%1$s> <%4$s> ?description }}",
+                        synsetIri.stringValue(), SR.ID, RDFS.LABEL, RDFS.COMMENT);
 
         try (RepositoryConnection conn = repository.getConnection()) {
             TupleQuery tupleQuery = conn.prepareTupleQuery(QueryLanguage.SPARQL, queryString);

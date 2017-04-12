@@ -1,6 +1,10 @@
-package com.github.semres.user;
+package com.github.semres.babelnet;
 
-import com.github.semres.*;
+import com.github.semres.Edge;
+import com.github.semres.EdgeSerializer;
+import com.github.semres.SR;
+import com.github.semres.Synset;
+import com.github.semres.user.UserSynset;
 import org.eclipse.rdf4j.model.Model;
 import org.eclipse.rdf4j.model.ValueFactory;
 import org.eclipse.rdf4j.model.vocabulary.RDFS;
@@ -10,15 +14,15 @@ import org.eclipse.rdf4j.repository.sail.SailRepository;
 import org.eclipse.rdf4j.sail.memory.MemoryStore;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 
-public class UserEdgeSerializerTest {
+public class BabelNetEdgeSerializerTest {
     @Test
     public void edgeToRdf() throws Exception {
         Repository repo = new SailRepository(new MemoryStore());
         repo.initialize();
         ValueFactory factory = repo.getValueFactory();
-        EdgeSerializer edgeSerializer = new UserEdgeSerializer(repo, "http://example.org/");
+        EdgeSerializer edgeSerializer = new BabelNetEdgeSerializer(repo, "http://example.org/");
 
         Synset pointedSynset = new UserSynset("Foo1");
         Synset originSynset = new UserSynset("Foo2");
@@ -26,14 +30,12 @@ public class UserEdgeSerializerTest {
         pointedSynset.setId("123");
         originSynset.setId("124");
 
-        UserEdge edge = new UserEdge(pointedSynset.getId(), originSynset.getId(), Edge.RelationType.HOLONYM, 0.4);
+        BabelNetEdge edge = new BabelNetEdge(pointedSynset.getId(), originSynset.getId(), Edge.RelationType.HOLONYM, 0.4);
         Model model = edgeSerializer.edgeToRdf(edge);
 
         assertTrue(model.filter(null, SR.ID, factory.createLiteral("124-123")).size() == 1);
         assertTrue(model.filter(null, SR.RELATION_TYPE, SR.HOLONYM).size() == 1);
         assertTrue(model.filter(null, RDFS.COMMENT, null).size() == 0);
-
-        edge.setDescription("Description");
 
         model = edgeSerializer.edgeToRdf(edge);
 
@@ -44,8 +46,7 @@ public class UserEdgeSerializerTest {
     public void rdfToEdge() throws Exception {
         Repository repo = new SailRepository(new MemoryStore());
         repo.initialize();
-        UserEdgeSerializer edgeSerializer = new UserEdgeSerializer(repo, "http://example.org/");
-        UserSynsetSerializer synsetSerializer = new UserSynsetSerializer(repo, "http://example.org/");
+        BabelNetEdgeSerializer edgeSerializer = new BabelNetEdgeSerializer(repo, "http://example.org/");
 
         UserSynset pointedSynset = new UserSynset("Foo1");
         UserSynset originSynset = new UserSynset("Foo2");
@@ -53,11 +54,9 @@ public class UserEdgeSerializerTest {
         pointedSynset.setId("123");
         originSynset.setId("124");
 
-        UserEdge edge = new UserEdge(pointedSynset.getId(), originSynset.getId(), Edge.RelationType.HOLONYM, 0.5);
+        BabelNetEdge edge = new BabelNetEdge(pointedSynset.getId(), originSynset.getId(), Edge.RelationType.HOLONYM, 0.5);
 
         Model model = edgeSerializer.edgeToRdf(edge);
-        model.addAll(synsetSerializer.synsetToRdf(originSynset));
-        model.addAll(synsetSerializer.synsetToRdf(pointedSynset));
 
         try (RepositoryConnection connection = repo.getConnection()) {
             connection.add(model);

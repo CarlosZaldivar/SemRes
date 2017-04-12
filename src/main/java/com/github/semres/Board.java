@@ -145,6 +145,7 @@ public class Board {
                     synsetEdit.setEdited(editedSynset);
                 }
                 synsetEdit.removeEdge(removedEdge);
+                synsets.put(editedSynset.getId(), editedSynset);
             }
         }
     }
