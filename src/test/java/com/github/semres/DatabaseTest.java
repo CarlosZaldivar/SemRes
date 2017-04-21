@@ -257,13 +257,28 @@ public class DatabaseTest {
     public void hasSynset() throws Exception {
         Database database = createTestDatabase();
 
-        assertTrue(!database.hasSynset("123"));
+        assertFalse(database.hasSynset("123"));
 
         UserSynset synset = new UserSynset("Foo");
         synset.setId("123");
         database.addSynset(synset);
 
         assertTrue(database.hasSynset("123"));
+    }
+
+    @Test
+    public void hasEdge() throws Exception {
+        Database database = createTestDatabase();
+        assertFalse(database.hasEdge("123-124"));
+
+        UserSynset originSynset = new UserSynset("Foo");
+        originSynset.setId("123");
+        UserSynset pointedSynset = new UserSynset("Bar");
+        pointedSynset.setId("124");
+        Edge edge = new UserEdge(pointedSynset.getId(), originSynset.getId(), Edge.RelationType.HOLONYM, 1);
+        database.addEdge(edge);
+
+        assertTrue(database.hasEdge(edge.getId()));
     }
 
     @Test

@@ -1,5 +1,6 @@
 package com.github.semres;
 
+import com.github.semres.gui.IDAlreadyTakenException;
 import org.eclipse.rdf4j.model.Model;
 import org.eclipse.rdf4j.rio.RDFFormat;
 import org.eclipse.rdf4j.rio.Rio;
@@ -70,12 +71,18 @@ public class Board {
     public void addSynset(Synset newSynset) {
         if (newSynset.getId() == null) {
             newSynset.setId(attachedDatabase.generateNewSynsetId());
+        } else if (isIdAlreadyTaken(newSynset.getId())) {
+            throw new IDAlreadyTakenException();
         }
         synsets.put(newSynset.getId(), newSynset);
         newSynsets.put(newSynset.getId(), newSynset);
     }
 
     public void addEdge(Edge newEdge) {
+        if (edgeAlreadyExists(newEdge.getId())) {
+            throw new IDAlreadyTakenException();
+        }
+
         String originSynsetId = newEdge.getOriginSynset();
         String pointedSynsetId = newEdge.getPointedSynset();
 
@@ -185,5 +192,29 @@ public class Board {
 
     private String extractOriginSynsetId(String edgeId) {
         return edgeId.split("-")[0];
+    }
+
+    private boolean isIdAlreadyTaken(String id) {
+        if (synsets.containsKey(id)) {
+            return true;
+        }
+        if (attachedDatabase.hasSynset(id)) {
+            return true;
+        }
+        return false;
+    }
+
+    private boolean edgeAlreadyExists(String edgeId) {
+        String originSynsetId = extractOriginSynsetId(edgeId);
+        if (synsets.containsKey(originSynsetId)) {
+            if (synsets.get(originSynsetId).getOutgoingEdges().containsKey(edgeId)) {
+                return true;
+            }
+        }
+
+        if (attachedDatabase.hasEdge(edgeId)) {
+            return true;
+        }
+        return false;
     }
 }
