@@ -188,6 +188,10 @@ function addEdge(edge) {
         group: "edges",
         data: edge
     });
+
+    // Mark source synset as expanded.
+    var sourceSynset = cy.elements('#' + escapeColon(edge.source)).data();
+    sourceSynset.expanded = true;
 }
 
 function expand(event) {
