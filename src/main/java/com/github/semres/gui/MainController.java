@@ -90,6 +90,11 @@ public class MainController extends Controller implements Initializable {
     void addSynset(Synset synset) {
         board.addSynset(synset);
         addSynsetToView(synset);
+        if (synset.isExpanded()) {
+            for (Edge edge : synset.getOutgoingEdges().values()) {
+                addEdgeToView(edge);
+            }
+        }
     }
 
     void addSynsetToView(Synset synset) {
@@ -101,19 +106,30 @@ public class MainController extends Controller implements Initializable {
         addEdgeToView(edge);
     }
 
-    private void addEdgeToView(Edge edge) { engine.executeScript("addEdge(" + edgeToJson(edge) + ");"); }
+    void addEdgeToView(Edge edge) { engine.executeScript("addEdge(" + edgeToJson(edge) + ");"); }
 
+    Synset getSynset(String id) {
+        return board.getSynset(id);
+    }
 
-    List<Synset> loadSynsets(String searchPhrase) {
+    Collection<Synset> loadSynsets(String searchPhrase) {
         return board.loadSynsets(searchPhrase);
+    }
+
+    Synset loadSynset(String id) {
+        return board.loadSynset(id);
+    }
+
+    Collection<Edge> loadEdges(String synsetId) {
+        return board.loadEdges(synsetId);
+    }
+
+    boolean synsetExists(String id) {
+        return board.isIdAlreadyTaken(id);
     }
 
     List<? extends Synset> searchBabelNet(String searchPhrase) throws IOException {
         return babelNetManager.getSynsets(searchPhrase);
-    }
-
-    List<Synset> searchLoadedSynsets(String searchPhrase) {
-        return board.searchLoadedSynsets(searchPhrase);
     }
 
     public void openLoadSynsetWindow() throws IOException {
@@ -195,18 +211,37 @@ public class MainController extends Controller implements Initializable {
         }
 
         public void loadEdges(String synsetId) {
-            board.loadEdges(synsetId);
-            Collection<Edge> edges = board.getSynset(synsetId).getOutgoingEdges().values();
+            Synset synset = board.getSynset(synsetId);
+            Collection<Edge> edges;
+            if (synset.isExpanded()) {
+                edges = synset.getOutgoingEdges().values();
+            } else {
+                edges = MainController.this.loadEdges(synsetId);
+            }
             for (Edge edge : edges) {
-                addSynsetToView(board.getSynset(edge.getPointedSynset()));
-                addEdgeToView(edge);
+                MainController.this.addSynsetToView(board.getSynset(edge.getPointedSynset()));
+                MainController.this.addEdgeToView(edge);
             }
         }
 
         public void downloadEdgesFromBabelNet(String synsetId) throws IOException, InvalidBabelSynsetIDException {
             BabelNetSynset synset = (BabelNetSynset) board.getSynset(synsetId);
-            synset.loadEdgesFromBabelNet();
-            synset.getOutgoingEdges().values().forEach(MainController.this::addEdge);
+            Collection<? extends Synset> downloadedSynsets = synset.loadEdgesFromBabelNet();
+
+            // Check if synsets were downloaded earlier and add or load them if necessary.
+            for (Synset downloadedSynset : downloadedSynsets) {
+                String downloadedSynsetId = downloadedSynset.getId();
+                if (!board.isIdAlreadyTaken(downloadedSynsetId)) {
+                    MainController.this.addSynset(downloadedSynset);
+                } else if (board.getSynset(downloadedSynsetId) == null) {
+                    board.loadSynset(downloadedSynsetId);
+                }
+            }
+
+            for (Edge edge : synset.getOutgoingEdges().values()) {
+                MainController.this.addSynsetToView(board.getSynset(edge.getPointedSynset()));
+                MainController.this.addEdgeToView(edge);
+            }
         }
 
         public void removeNode(String id) {

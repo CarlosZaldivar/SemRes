@@ -20,7 +20,7 @@ import javafx.stage.Stage;
 
 import java.io.File;
 import java.net.URL;
-import java.util.List;
+import java.util.Collection;
 import java.util.ResourceBundle;
 
 public class LoadSynsetController extends ChildController implements Initializable {
@@ -57,11 +57,7 @@ public class LoadSynsetController extends ChildController implements Initializab
             return;
         }
 
-        List<Synset> synsetsFound = ((MainController) parent).searchLoadedSynsets(searchPhrase);
-
-        if (synsetsFound.isEmpty()) {
-            synsetsFound = ((MainController) parent).loadSynsets(searchPhrase);
-        }
+        Collection<Synset> synsetsFound = ((MainController) parent).loadSynsets(searchPhrase);
 
         for (Synset synset : synsetsFound) {
             synsetsObservableList.add(new SynsetMedia(synset));

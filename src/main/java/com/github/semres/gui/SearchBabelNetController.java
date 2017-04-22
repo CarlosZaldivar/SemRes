@@ -17,6 +17,7 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.Collection;
 import java.util.List;
 import java.util.ResourceBundle;
 
@@ -41,22 +42,12 @@ public class SearchBabelNetController extends ChildController implements Initial
     void addSynset(MouseEvent click) {
         if (click.getClickCount() == 2 && synsetsListView.getSelectionModel().getSelectedItem() != null) {
             BabelNetSynset synset = (BabelNetSynset) synsetsListView.getSelectionModel().getSelectedItem().getSynset();
-            List<Synset> relatedSynsets = null;
-            try {
-                relatedSynsets = synset.loadEdgesFromBabelNet();
-            } catch (IOException | InvalidBabelSynsetIDException e) {
-                Alert alert = new Alert(Alert.AlertType.ERROR, e.getMessage());
-                // Resize dialog so that the whole text would fit.
-                alert.getDialogPane().getChildren().stream().filter(node -> node instanceof Label).forEach(node -> ((Label)node).setMinHeight(Region.USE_PREF_SIZE));
-                alert.showAndWait();
-                return;
-            }
-            ((MainController) parent).addSynset(synset);
-            for (Synset relatedSynset : relatedSynsets) {
-                ((MainController) parent).addSynset(relatedSynset);
-            }
-            for (Edge edge : synset.getOutgoingEdges().values()) {
-                ((MainController) parent).addEdge(edge);
+
+            // If synset is already in the database or on the board, load it from there.
+            if (((MainController) parent).synsetExists(synset.getId())) {
+                handleExistingSynset(synset.getId());
+            } else {
+                handleNewSynset(synset);
             }
 
             Stage stage = (Stage) synsetsListView.getScene().getWindow();
@@ -89,6 +80,69 @@ public class SearchBabelNetController extends ChildController implements Initial
         for (Synset synset : synsetsFound) {
             synsetsObservableList.add(new SynsetMedia(synset));
         }
+    }
+
+    private void handleExistingSynset(String synsetId) {
+        BabelNetSynset synset = (BabelNetSynset) ((MainController) parent).loadSynset(synsetId);
+
+        if (!synset.isExpanded()) {
+            ((MainController) parent).loadEdges(synset.getId());
+        }
+        if (!synset.isDownloadedWithEdges()) {
+            Collection<BabelNetSynset> relatedSynsets;
+            try {
+                relatedSynsets = synset.loadEdgesFromBabelNet();
+            } catch (IOException | InvalidBabelSynsetIDException e) {
+                showAlert(e.getMessage());
+                return;
+            }
+
+            // Add or load connected synsets first before adding the "central" synset. Otherwise there can be exceptions
+            // thrown due to missing edge endings.
+            for (Synset relatedSynset : relatedSynsets) {
+                try {
+                    ((MainController) parent).addSynset(relatedSynset);
+                } catch (IDAlreadyTakenException e) {
+                    relatedSynset = ((MainController) parent).loadSynset(relatedSynset.getId());
+                    ((MainController) parent).addSynsetToView(relatedSynset);
+                }
+            }
+        }
+
+        ((MainController) parent).addSynsetToView(synset);
+        for (Edge edge : synset.getOutgoingEdges().values()) {
+            ((MainController) parent).addEdgeToView(edge);
+        }
+
+    }
+
+    private void handleNewSynset(BabelNetSynset synset) {
+        List<? extends Synset> relatedSynsets;
+        try {
+            relatedSynsets = synset.loadEdgesFromBabelNet();
+        } catch (IOException | InvalidBabelSynsetIDException e) {
+            showAlert(e.getMessage());
+            return;
+        }
+
+        // Add or load connected synsets first before adding the "central" synset. Otherwise there can be exceptions
+        // thrown due to missing edge endings.
+        for (Synset relatedSynset : relatedSynsets) {
+            try {
+                ((MainController) parent).addSynset(relatedSynset);
+            } catch (IDAlreadyTakenException e) {
+                relatedSynset = ((MainController) parent).loadSynset(relatedSynset.getId());
+                ((MainController) parent).addSynsetToView(relatedSynset);
+            }
+        }
+        ((MainController) parent).addSynset(synset);
+    }
+
+    private void showAlert(String message) {
+        Alert alert = new Alert(Alert.AlertType.ERROR, message);
+        // Resize dialog so that the whole text would fit.
+        alert.getDialogPane().getChildren().stream().filter(node -> node instanceof Label).forEach(node -> ((Label) node).setMinHeight(Region.USE_PREF_SIZE));
+        alert.showAndWait();
     }
 }
 

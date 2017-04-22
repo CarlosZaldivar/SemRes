@@ -99,7 +99,7 @@ public class BabelNetSynset extends Synset {
         lastUpdateDate = new Date();
     }
 
-    public List<Synset> loadEdgesFromBabelNet() throws IOException, InvalidBabelSynsetIDException {
+    public List<BabelNetSynset> loadEdgesFromBabelNet() throws IOException, InvalidBabelSynsetIDException {
         if (isDownloadedWithEdges) {
             throw new EdgesAlreadyLoadedException();
         }
@@ -111,12 +111,12 @@ public class BabelNetSynset extends Synset {
         List<BabelSynsetIDRelation> babelEdges = babelSynset.getEdges();
         babelEdges.sort(Comparator.comparing(BabelSynsetIDRelation::getWeight));
 
-        List<Synset> relatedSynsets = new ArrayList<>();
+        List<BabelNetSynset> relatedSynsets = new ArrayList<>();
         // Download only ten edges.
         int counter = 10;
         for (BabelSynsetIDRelation edge: babelEdges) {
             if (edgeIsRelevant(edge)) {
-                Synset relatedSynset = addBabelNetEdge(edge);
+                BabelNetSynset relatedSynset = addBabelNetEdge(edge);
                 relatedSynsets.add(relatedSynset);
                 --counter;
             }
@@ -129,7 +129,7 @@ public class BabelNetSynset extends Synset {
         return relatedSynsets;
     }
 
-    private Synset addBabelNetEdge(BabelSynsetIDRelation edge) throws IOException {
+    private BabelNetSynset addBabelNetEdge(BabelSynsetIDRelation edge) throws IOException {
         BabelNetSynset referencedSynset = new BabelNetSynset(BabelNet.getInstance().getSynset(edge.getBabelSynsetIDTarget()));
         BabelPointer babelPointer = edge.getPointer();
 

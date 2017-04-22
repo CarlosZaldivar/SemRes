@@ -27,24 +27,40 @@ public class Board {
         List<Synset> newSynsets = new ArrayList<>();
         for (Synset synset : synsetsFound) {
             if (synsets.get(synset.getId()) == null && removedSynsets.get(synset.getId()) == null) {
-                newSynsets.add(synset);
                 synsets.put(synset.getId(), synset);
             }
         }
         return newSynsets;
     }
 
-    public void loadEdges(String synsetId) {
+    public Synset loadSynset(String id) {
+        if (synsets.containsKey(id)) {
+            return synsets.get(id);
+        }
+
+        if (!removedSynsets.containsKey(id)) {
+            Synset synset = attachedDatabase.getSynset(id);
+            synsets.put(synset.getId(), synset);
+            return synset;
+        } else {
+            return null;
+        }
+    }
+
+    public List<Edge> loadEdges(String synsetId) {
         Synset synset = synsets.get(synsetId);
 
-        if (synset == null || synset.isExpanded()) {
-            return;
+        if (synset == null) {
+            throw new RuntimeException("No synset with specified ID");
+        }
+        if (synset.isExpanded()) {
+            throw new RuntimeException("Edges already loaded");
         }
 
         List<Edge> edges = attachedDatabase.getOutgoingEdges(synset);
         List<Edge> filteredEdges = new ArrayList<>();
         for (Edge edge : edges) {
-            if (edgeIsRemoved(synset, edge)) {
+            if (isEdgeRemoved(edge)) {
                 continue;
             }
 
@@ -56,13 +72,15 @@ public class Board {
             filteredEdges.add(edge);
         }
         synset.setOutgoingEdges(filteredEdges);
+        return filteredEdges;
     }
 
-    private boolean edgeIsRemoved(Synset synset, Edge edge) {
-        if (synsetEdits.get(synset.getId()) == null) {
+    private boolean isEdgeRemoved(Edge edge) {
+        String originSynsetId = edge.getOriginSynset();
+        if (!synsetEdits.containsKey(originSynsetId)) {
             return false;
         }
-        if (synsetEdits.get(synset.getId()).getRemovedEdges().get(edge.getId()) == null) {
+        if (!synsetEdits.get(originSynsetId).getRemovedEdges().containsKey(edge.getId())) {
             return false;
         }
         return true;
@@ -116,17 +134,6 @@ public class Board {
 
     public Synset getSynset(String id) {
         return synsets.get(id);
-    }
-
-    public List<Synset> searchLoadedSynsets(String searchPhrase) {
-        List<Synset> synsetsFound = new ArrayList<>();
-
-        for (Synset synset : synsets.values()) {
-            if (synset.getRepresentation().toLowerCase().contains(searchPhrase.toLowerCase())) {
-                synsetsFound.add(synset);
-            }
-        }
-        return synsetsFound;
     }
 
     public void removeNode(String id) {
@@ -190,11 +197,7 @@ public class Board {
         return buffer.toString();
     }
 
-    private String extractOriginSynsetId(String edgeId) {
-        return edgeId.split("-")[0];
-    }
-
-    private boolean isIdAlreadyTaken(String id) {
+    public boolean isIdAlreadyTaken(String id) {
         if (synsets.containsKey(id)) {
             return true;
         }
@@ -202,6 +205,10 @@ public class Board {
             return true;
         }
         return false;
+    }
+
+    private String extractOriginSynsetId(String edgeId) {
+        return edgeId.split("-")[0];
     }
 
     private boolean edgeAlreadyExists(String edgeId) {
