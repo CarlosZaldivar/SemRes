@@ -5,6 +5,7 @@ import com.github.semres.EdgeSerializer;
 import com.github.semres.SR;
 import com.github.semres.Synset;
 import com.github.semres.user.UserSynset;
+import com.github.semres.user.UserSynsetSerializer;
 import org.eclipse.rdf4j.model.Model;
 import org.eclipse.rdf4j.model.ValueFactory;
 import org.eclipse.rdf4j.model.vocabulary.RDFS;
@@ -37,6 +38,8 @@ public class BabelNetEdgeSerializerTest {
         assertTrue(model.filter(null, SR.RELATION_TYPE, SR.HOLONYM).size() == 1);
         assertTrue(model.filter(null, RDFS.COMMENT, null).size() == 0);
 
+        // Check edge with a description
+        edge = new BabelNetEdge(pointedSynset.getId(), originSynset.getId(), "Description", Edge.RelationType.HOLONYM, 0.4);
         model = edgeSerializer.edgeToRdf(edge);
 
         assertTrue(model.filter(null, RDFS.COMMENT, factory.createLiteral("Description")).size() == 1);
@@ -47,6 +50,8 @@ public class BabelNetEdgeSerializerTest {
         Repository repo = new SailRepository(new MemoryStore());
         repo.initialize();
         BabelNetEdgeSerializer edgeSerializer = new BabelNetEdgeSerializer(repo, "http://example.org/");
+        UserSynsetSerializer synsetSerializer = new UserSynsetSerializer(repo, "http://example.org/");
+
 
         UserSynset pointedSynset = new UserSynset("Foo1");
         UserSynset originSynset = new UserSynset("Foo2");
@@ -57,12 +62,14 @@ public class BabelNetEdgeSerializerTest {
         BabelNetEdge edge = new BabelNetEdge(pointedSynset.getId(), originSynset.getId(), Edge.RelationType.HOLONYM, 0.5);
 
         Model model = edgeSerializer.edgeToRdf(edge);
+        model.addAll(synsetSerializer.synsetToRdf(originSynset));
+        model.addAll(synsetSerializer.synsetToRdf(pointedSynset));
 
         try (RepositoryConnection connection = repo.getConnection()) {
             connection.add(model);
         }
 
-        edge = edgeSerializer.rdfToEdge("124-123");
+        edge = edgeSerializer.rdfToEdge(edge.getId());
 
         assertTrue(edge.getId().equals("124-123"));
         assertTrue(edge.getOriginSynset().equals("124"));

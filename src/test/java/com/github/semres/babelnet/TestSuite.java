@@ -6,7 +6,7 @@ import org.junit.runners.Suite;
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
     BabelNetSynsetSerializerTest.class,
-    BabelNetSynsetSerializerTest.class
+    BabelNetEdgeSerializerTest.class
 })
 
 public class TestSuite {
