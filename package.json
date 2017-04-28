@@ -1,0 +1,14 @@
+{
+  "name": "SemRes",
+  "version": "0.0.1",
+  "repository": "git@github.com:CarlosZaldivar/SemRes.git",
+  "author": "Carlos Zaldivar Batista <carlos.zaldivar.batista@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "cytoscape": "^3.0.0",
+    "cytoscape-context-menus": "^2.1.1",
+    "cytoscape-edgehandles": "^2.11.0",
+    "es6-shim": "^0.35.3",
+    "jquery": "^3.2.1"
+  }
+}

@@ -141,34 +141,22 @@
                 <version>1.2</version>
                 <executions>
                     <execution>
-                        <id>install node and npm</id>
+                        <id>install node and yarn</id>
                         <goals>
-                            <goal>install-node-and-npm</goal>
+                            <goal>install-node-and-yarn</goal>
                         </goals>
-                        <phase>generate-resources</phase>
                         <configuration>
-                            <nodeVersion>v7.0.0</nodeVersion>
-                            <npmVersion>4.0.2</npmVersion>
+                            <nodeVersion>v7.9.0</nodeVersion>
+                            <yarnVersion>v0.23.3</yarnVersion>
                         </configuration>
                     </execution>
                     <execution>
-                        <id>npm install</id>
+                        <id>yarn install</id>
                         <goals>
-                            <goal>npm</goal>
+                            <goal>yarn</goal>
                         </goals>
-                        <phase>generate-resources</phase>
                         <configuration>
-                            <arguments>install bower</arguments>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>bower install</id>
-                        <goals>
-                            <goal>bower</goal>
-                        </goals>
-                        <phase>generate-resources</phase>
-                        <configuration>
-                            <arguments>install --config.directory=./src/main/resources/bower_components/</arguments>
+                            <arguments>install --modules-folder src/main/resources/node_modules</arguments>
                         </configuration>
                     </execution>
                 </executions>
@@ -192,7 +180,7 @@
                             <directory>etc</directory>
                         </fileset>
                         <fileset>
-                            <directory>src/main/resources/bower_components</directory>
+                            <directory>src/main/resources/node_modules</directory>
                         </fileset>
                     </filesets>
                 </configuration>
