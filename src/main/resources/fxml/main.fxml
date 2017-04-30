@@ -4,33 +4,24 @@
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.web.WebView?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0"
-            prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.102" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="com.github.semres.gui.MainController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.102" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.github.semres.gui.MainController">
     <MenuBar fx:id="menuBar" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
         <Menu mnemonicParsing="false" text="File">
-            <MenuItem mnemonicParsing="false" onAction="#openDatabasesWindow" text="Databases"/>
-            <MenuItem fx:id="saveMenuItem" disable="true" mnemonicParsing="false" onAction="#save"
-                      text="Save"/>
-            <MenuItem fx:id="exportMenuItem" disable="true" onAction="#export" text="Export"/>
-            <MenuItem mnemonicParsing="false" text="Close"/>
+            <MenuItem mnemonicParsing="false" onAction="#openDatabasesWindow" text="Databases" />
+            <MenuItem fx:id="saveMenuItem" disable="true" mnemonicParsing="false" onAction="#save" text="Save" />
+            <MenuItem fx:id="exportMenuItem" disable="true" onAction="#export" text="Export" />
+            <MenuItem mnemonicParsing="false" text="Close" />
         </Menu>
         <Menu fx:id="viewMenu" disable="true" mnemonicParsing="false" text="View">
-            <MenuItem mnemonicParsing="false" text="Load synset" onAction="#openLoadSynsetWindow"/>
+            <MenuItem mnemonicParsing="false" onAction="#openLoadSynsetWindow" text="Load synset" />
         </Menu>
         <Menu fx:id="babelNetMenu" disable="true" mnemonicParsing="false" text="BabelNet">
-            <MenuItem mnemonicParsing="false" text="Search" onAction="#openSearchBabelNetWindow"/>
+            <MenuItem mnemonicParsing="false" onAction="#openSearchBabelNetWindow" text="Search" />
         </Menu>
         <Menu mnemonicParsing="false" text="Help">
-            <MenuItem mnemonicParsing="false" text="About"/>
+            <MenuItem mnemonicParsing="false" text="About" />
         </Menu>
     </MenuBar>
-    <AnchorPane layoutY="29.0" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0"
-                AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="29.0">
-        <WebView fx:id="boardView" layoutX="21.0" layoutY="9.0" prefHeight="200.0" prefWidth="200.0"
-                 AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
-                 AnchorPane.topAnchor="0.0"/>
-    </AnchorPane>
+   <AnchorPane fx:id="boardPane" layoutY="29.0" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="29.0" />
 </AnchorPane>

@@ -7,7 +7,14 @@ import com.github.semres.Edge;
 import com.github.semres.Synset;
 import com.github.semres.babelnet.BabelNetManager;
 import com.github.semres.babelnet.BabelNetSynset;
+import com.teamdev.jxbrowser.chromium.Browser;
+import com.teamdev.jxbrowser.chromium.BrowserPreferences;
+import com.teamdev.jxbrowser.chromium.JSValue;
+import com.teamdev.jxbrowser.chromium.events.ScriptContextAdapter;
+import com.teamdev.jxbrowser.chromium.events.ScriptContextEvent;
+import com.teamdev.jxbrowser.chromium.javafx.BrowserView;
 import it.uniroma1.lcl.babelnet.InvalidBabelSynsetIDException;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -18,18 +25,16 @@ import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
-import javafx.scene.web.WebEngine;
-import javafx.scene.web.WebView;
+import javafx.scene.layout.AnchorPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.apache.commons.beanutils.PropertyUtils;
+import org.apache.log4j.Logger;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.util.*;
-
-import static es.uvigo.ei.sing.javafx.webview.Java2JavascriptUtils.connectBackendObject;
 
 public class MainController extends Controller implements Initializable {
 
@@ -37,7 +42,7 @@ public class MainController extends Controller implements Initializable {
     private MenuBar menuBar;
 
     @FXML
-    private WebView boardView;
+    private AnchorPane boardPane;
 
     @FXML
     private Menu viewMenu;
@@ -49,21 +54,43 @@ public class MainController extends Controller implements Initializable {
     private MenuItem exportMenuItem;
 
     private Board board;
-    private WebEngine engine;
+    private BrowserView boardView;
+    private Browser browser;
     private BabelNetManager babelNetManager;
+    static Logger log = Logger.getRootLogger();
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        // Add developer tools
+        BrowserPreferences.setChromiumSwitches("--remote-debugging-port=9222");
         babelNetManager = new BabelNetManager();
-        engine = boardView.getEngine();
-        connectBackendObject(engine, "javaApp", new JavaApp());
+        browser = new Browser();
+        boardView = new BrowserView(browser);
+
+        AnchorPane.setTopAnchor(boardView, 0.0);
+        AnchorPane.setBottomAnchor(boardView, 0.0);
+        AnchorPane.setLeftAnchor(boardView, 0.0);
+        AnchorPane.setRightAnchor(boardView, 0.0);
+
+        boardPane.getChildren().add(boardView);
+
+        // Add javaApp object to javascript.
+        browser.addScriptContextListener(new ScriptContextAdapter() {
+            @Override
+            public void onScriptContextCreated(ScriptContextEvent event) {
+                Browser browser = event.getBrowser();
+                JSValue window = browser.executeJavaScriptAndReturnValue("window");
+                window.asObject().setProperty("javaApp", new JavaApp());
+            }
+        });
     }
 
     void setBoard(Board board) {
         this.board = board;
+        browser.loadURL(getClass().getResource("/html/board.html").toExternalForm());
+        String remoteDebuggingURL = browser.getRemoteDebuggingURL();
+        log.debug("Remote debugging URL: " + remoteDebuggingURL);
 
-        // Reload html
-        engine.load(getClass().getResource("/html/board.html").toExternalForm());
         // Enable some options.
         saveMenuItem.setDisable(false);
         exportMenuItem.setDisable(false);
@@ -98,7 +125,7 @@ public class MainController extends Controller implements Initializable {
     }
 
     void addSynsetToView(Synset synset) {
-        engine.executeScript("addSynset(" + synsetToJson(synset) + ");");
+        browser.executeJavaScript("addSynset(" + synsetToJson(synset) + ");");
     }
 
     void addEdge(Edge edge) {
@@ -106,7 +133,7 @@ public class MainController extends Controller implements Initializable {
         addEdgeToView(edge);
     }
 
-    void addEdgeToView(Edge edge) { engine.executeScript("addEdge(" + edgeToJson(edge) + ");"); }
+    void addEdgeToView(Edge edge) { browser.executeJavaScript("addEdge(" + edgeToJson(edge) + ");"); }
 
     Synset getSynset(String id) {
         return board.getSynset(id);
@@ -198,16 +225,31 @@ public class MainController extends Controller implements Initializable {
         return jsonEdge;
     }
 
+    public void close() {
+        browser.dispose();
+    }
+
     public class JavaApp {
-        public void openNewSynsetWindow() throws IOException {
-            openNewWindow("/fxml/add-synset.fxml", "Add synset", 500, 350);
+        public void openNewSynsetWindow() {
+            Platform.runLater(() -> {
+                try {
+                    openNewWindow("/fxml/add-synset.fxml","Add synset",500,350);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            });
         }
 
-        public void openNewEdgeWindow(String originSynsetId, String destinationSynsetId) throws IOException {
-            AddingEdgeController childController = (AddingEdgeController) openNewWindow("/fxml/add-edge.fxml", "Edge details", 500, 350);
-
-            childController.setOriginSynset(board.getSynset(originSynsetId));
-            childController.setDestinationSynset(board.getSynset(destinationSynsetId));
+        public void openNewEdgeWindow(String originSynsetId, String destinationSynsetId) {
+            Platform.runLater(() -> {
+                try {
+                    AddingEdgeController childController = (AddingEdgeController) openNewWindow("/fxml/add-edge.fxml", "Edge details", 500, 350);
+                    childController.setOriginSynset(board.getSynset(originSynsetId));
+                    childController.setDestinationSynset(board.getSynset(destinationSynsetId));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            });
         }
 
         public void loadEdges(String synsetId) {

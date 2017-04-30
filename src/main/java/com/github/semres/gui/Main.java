@@ -8,9 +8,13 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 public class Main extends Application {
+    private MainController mainController;
+
     @Override
     public void start(Stage primaryStage) throws Exception {
-        Parent root = FXMLLoader.load(getClass().getResource("/fxml/main.fxml"));
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/main.fxml"));
+        Parent root = fxmlLoader.load();
+        mainController = fxmlLoader.getController();
         primaryStage.setTitle("SemRes");
         primaryStage.setScene(new Scene(root, 600, 550));
         primaryStage.show();
@@ -19,5 +23,6 @@ public class Main extends Application {
     @Override
     public void stop() {
         SemRes.getInstance().save();
+        mainController.close();
     }
 }

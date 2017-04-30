@@ -16,6 +16,10 @@
             <id>Releases</id>
             <url>https://oss.sonatype.org/content/repositories/releases</url>
         </repository>
+        <repository>
+            <id>com.teamdev</id>
+            <url>http://maven.teamdev.com/repository/products</url>
+        </repository>
     </repositories>
     <dependencies>
         <dependency>
@@ -67,6 +71,17 @@
             <groupId>commons-beanutils</groupId>
             <artifactId>commons-beanutils</artifactId>
             <version>1.9.3</version>
+        </dependency>
+        <dependency>
+            <groupId>com.teamdev.jxbrowser</groupId>
+            <artifactId>jxbrowser-cross-platform</artifactId>
+            <version>6.14</version>
+            <type>pom</type>
+        </dependency>
+        <dependency>
+            <groupId>jxbrowser</groupId>
+            <artifactId>licence</artifactId>
+            <version>1.0</version>
         </dependency>
     </dependencies>
     <build>
@@ -138,7 +153,7 @@
             <plugin>
                 <groupId>com.github.eirslett</groupId>
                 <artifactId>frontend-maven-plugin</artifactId>
-                <version>1.2</version>
+                <version>1.4</version>
                 <executions>
                     <execution>
                         <id>install node and yarn</id>
