@@ -26,8 +26,9 @@ public class Board {
         List<Synset> synsetsFound = attachedDatabase.searchSynsets(searchPhrase);
         List<Synset> newSynsets = new ArrayList<>();
         for (Synset synset : synsetsFound) {
-            if (synsets.get(synset.getId()) == null && removedSynsets.get(synset.getId()) == null) {
+            if (!synsets.containsKey(synset.getId()) && !removedSynsets.containsKey(synset.getId())) {
                 synsets.put(synset.getId(), synset);
+                newSynsets.add(synset);
             }
         }
         return newSynsets;
