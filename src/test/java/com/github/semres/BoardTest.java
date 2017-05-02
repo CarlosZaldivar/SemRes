@@ -33,7 +33,7 @@ public class BoardTest {
         synset.setId("123");
         board.addSynset(synset);
         board.save();
-        board.removeNode("123");
+        board.removeSynset("123");
         board.save();
         assertTrue(database.searchSynsets("Foo").size() == 0);
     }

@@ -28,13 +28,14 @@ public class AddingSynsetController extends ChildController implements Initializ
         String representation = representationTF.getText();
         String description = descriptionTA.getText();
 
-        if (representation != null && !representation.isEmpty()) {
-            UserSynset newSynset = new UserSynset(representation);
-            newSynset.setDescription(description);
-            ((MainController) parent).addSynset(newSynset);
-            Stage stage = (Stage) addButton.getScene().getWindow();
-            stage.close();
+        UserSynset newSynset = new UserSynset(representation);
+
+        if (!description.isEmpty()) {
+            newSynset = newSynset.changeDescription(description);
         }
+        ((MainController) parent).addSynset(newSynset);
+        Stage stage = (Stage) addButton.getScene().getWindow();
+        stage.close();
     }
 
     @Override

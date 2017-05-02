@@ -31,8 +31,8 @@ public class UserSynsetSerializerTest {
         assertTrue(model.filter(null, RDFS.LABEL, null).size() == 1);
         assertTrue(model.filter(null, RDFS.COMMENT, null).size() == 0);
 
-        synset.setRepresentation("Car");
-        synset.setDescription("Type of vehicle.");
+        synset = synset.changeRepresentation("Car");
+        synset = synset.changeDescription("Type of vehicle.");
 
         model = synsetSerializer.synsetToRdf(synset);
 
@@ -48,7 +48,7 @@ public class UserSynsetSerializerTest {
 
         UserSynset synset = new UserSynset("Car");
         synset.setId("123");
-        synset.setDescription("Type of vehicle.");
+        synset = synset.changeDescription("Type of vehicle.");
 
         Model model = synsetSerializer.synsetToRdf(synset);
 

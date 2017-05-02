@@ -109,6 +109,12 @@ cy.contextMenus({
             onClickFunction: downloadEdgesFromBabelNet
         },
         {
+            id: 'synsetDetails',
+            title: 'Synset details',
+            selector: 'node',
+            onClickFunction: openSynsetDetailsWindow
+        },
+        {
             id: 'select-all-nodes',
             title: 'Select all nodes',
             coreAsWell: true,
@@ -152,6 +158,10 @@ function setEdgeDetails(sourceNode, targetNode, addedEntities) {
         javaApp.openNewEdgeWindow(sourceNode.data().id, targetNode.data().id);
         cy.remove(addedEntities);
     }
+}
+
+function openSynsetDetailsWindow(event) {
+    javaApp.openSynsetDetailsWindow(event.cyTarget.data().id);
 }
 
 function addSynset(synset, pointedSynsets, edges) {
@@ -284,6 +294,13 @@ function addBabelNetEdges(synsetId, pointedSynsets, edges) {
     });
     cy.layout({name: 'cola', fit: false});
 }
+
+function updateSynset(editedSynset) {
+    var oldSynset = cy.getElementById(editedSynset.id);
+    oldSynset.data('representation', editedSynset.representation);
+    oldSynset.data('description', editedSynset.description);
+}
+
 function escapeColon(string) {
     return string.replaceAll(':', '\\:');
 }

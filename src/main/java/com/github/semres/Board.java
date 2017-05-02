@@ -137,7 +137,14 @@ public class Board {
         return synsets.get(id);
     }
 
-    public void removeNode(String id) {
+    // Edit synset's representation or description.
+    public void editSynset(Synset originalSynset, Synset editedSynset) {
+        SynsetEdit synsetEdit = new SynsetEdit(originalSynset, editedSynset);
+        synsetEdits.put(originalSynset.getId(), synsetEdit);
+        synsets.put(originalSynset.getId(), editedSynset);
+    }
+
+    public void removeSynset(String id) {
         if (synsets.containsKey(id)) {
             Synset removedSynset = synsets.get(id);
             synsets.remove(id);

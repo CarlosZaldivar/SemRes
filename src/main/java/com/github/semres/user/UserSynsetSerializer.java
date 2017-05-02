@@ -74,7 +74,7 @@ public class UserSynsetSerializer extends SynsetSerializer {
 
                     if (bindingSet.getValue("description") != null) {
                         description = bindingSet.getValue("description").stringValue();
-                        synset.setDescription(description);
+                        synset = synset.changeDescription(description);
                     }
                 }
             }

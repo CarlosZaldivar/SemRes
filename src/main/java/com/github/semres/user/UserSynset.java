@@ -25,11 +25,15 @@ public class UserSynset extends Synset {
         return newSynset;
     }
 
-    public void setRepresentation(String representation) {
-        this.representation = representation;
+    public UserSynset changeRepresentation(String representation) {
+        UserSynset newSynset = new UserSynset(this);
+        newSynset.representation = representation;
+        return newSynset;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public UserSynset changeDescription(String description) {
+        UserSynset newSynset = new UserSynset(this);
+        newSynset.description = description;
+        return newSynset;
     }
 }

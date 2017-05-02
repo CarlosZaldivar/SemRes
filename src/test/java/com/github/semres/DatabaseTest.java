@@ -39,7 +39,7 @@ public class DatabaseTest {
 
         UserSynset synset1 = new UserSynset("Foo1");
         synset1.setId("123");
-        synset1.setDescription("Bar");
+        synset1 = synset1.changeDescription("Bar");
         Synset synset2 = new UserSynset("Foo2");
         synset2.setId("124");
 
@@ -130,12 +130,12 @@ public class DatabaseTest {
 
         UserSynset originalSynset = new UserSynset("Foo");
         originalSynset.setId("123");
-        originalSynset.setDescription("aaa");
+        originalSynset = originalSynset.changeDescription("aaa");
 
         database.addSynset(originalSynset);
         UserSynset editedSynset = (UserSynset) database.searchSynsets("Foo").get(0);
-        editedSynset.setRepresentation("Bar");
-        editedSynset.setDescription("bbb");
+        editedSynset = editedSynset.changeRepresentation("Bar");
+        editedSynset = editedSynset.changeDescription("bbb");
 
         database.editSynset(editedSynset, originalSynset);
 
@@ -178,10 +178,10 @@ public class DatabaseTest {
 
         UserSynset synset1 = new UserSynset("Foo");
         synset1.setId("123");
-        synset1.setDescription("Foo1");
+        synset1 = synset1.changeDescription("Foo1");
         UserSynset synset2 = new UserSynset("Foo");
         synset2.setId("124");
-        synset2.setDescription("Foo2");
+        synset2 = synset2.changeDescription("Foo2");
         UserSynset synset3 = new UserSynset("Bar");
         synset3.setId("125");
 

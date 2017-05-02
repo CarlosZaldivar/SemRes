@@ -140,6 +140,11 @@ public class MainController extends Controller implements Initializable {
 
     void addEdgeToView(Edge edge) { browser.executeJavaScript("addEdge(" + edgeToJson(edge) + ");"); }
 
+    void editSynset(Synset oldSynset, Synset editedSynset) {
+        board.editSynset(oldSynset, editedSynset);
+        browser.executeJavaScript("updateSynset(" + synsetToJson(editedSynset) + ");");
+    }
+
     Synset getSynset(String id) {
         return board.getSynset(id);
     }
@@ -283,6 +288,19 @@ public class MainController extends Controller implements Initializable {
             });
         }
 
+        public void openSynsetDetailsWindow(String synsetId) {
+            Platform.runLater(() -> {
+                try {
+                    SynsetDetailsController childController =
+                            (SynsetDetailsController) openNewWindow("/fxml/synset-details.fxml", "Synset details", 500, 350);
+                    childController.setSynset(board.getSynset(synsetId));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            });
+        }
+
+
         public void loadEdges(String synsetId) {
             Synset synset = board.getSynset(synsetId);
             Collection<Edge> edges;
@@ -320,14 +338,6 @@ public class MainController extends Controller implements Initializable {
             }
 
             browser.executeJavaScript(String.format("addBabelNetEdges(\"%s\", %s, %s);", synsetId, synsetsToJson(pointedSynsets), edgesToJson(edges)));
-        }
-
-        public void removeNode(String id) {
-            board.removeNode(id);
-        }
-
-        public void removeEdge(String id) {
-            board.removeEdge(id);
         }
     }
 }
