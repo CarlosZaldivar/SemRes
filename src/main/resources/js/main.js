@@ -116,6 +116,14 @@ cy.contextMenus({
                 cy.elements().unselect();
                 cy.nodes().select();
             }
+        },
+        {
+            id: 'fit',
+            title: 'Fit',
+            coreAsWell: true,
+            onClickFunction: function () {
+                cy.fit();
+            }
         }
     ]
 });
