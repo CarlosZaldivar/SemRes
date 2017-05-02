@@ -2,6 +2,16 @@
 # yarn lockfile v1
 
 
+add-event-listener@0.0.1:
+  version "0.0.1"
+  resolved "https://registry.yarnpkg.com/add-event-listener/-/add-event-listener-0.0.1.tgz#a76229ebc64c8aefae204a16273a2f255abea2d0"
+
+cytoscape-cola@^1.6.0:
+  version "1.6.0"
+  resolved "https://registry.yarnpkg.com/cytoscape-cola/-/cytoscape-cola-1.6.0.tgz#8e99be89caad8d2f04c1adcb3916abc1ff7564b2"
+  dependencies:
+    webcola "^3.1.2"
+
 cytoscape-context-menus@~2.1.1:
   version "2.1.1"
   resolved "https://registry.yarnpkg.com/cytoscape-context-menus/-/cytoscape-context-menus-2.1.1.tgz#d4ca45fccb54655478a4d47c9a088c40d692f69b"
@@ -14,6 +24,41 @@ cytoscape@^2.7.17:
   version "2.7.17"
   resolved "https://registry.yarnpkg.com/cytoscape/-/cytoscape-2.7.17.tgz#7d2e7dbaaef553fe4c28700a06ecc1d7a52be1d8"
 
-jquery@^3.2.1:
+fullscreen@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/fullscreen/-/fullscreen-1.1.0.tgz#6a20096999581b3550b9991745e5a184d911dcfb"
+  dependencies:
+    add-event-listener "0.0.1"
+
+graphlib-dot@^0.6.2:
+  version "0.6.2"
+  resolved "https://registry.yarnpkg.com/graphlib-dot/-/graphlib-dot-0.6.2.tgz#872e933d0bb349430cb813a2491943d1c5f1e952"
+  dependencies:
+    graphlib "^1.0.1"
+    lodash "^2.4.1"
+
+graphlib@^1.0.1:
+  version "1.0.7"
+  resolved "https://registry.yarnpkg.com/graphlib/-/graphlib-1.0.7.tgz#0cab2df0ffe6abe070b2625bfa1edb6ec967b8b1"
+  dependencies:
+    lodash "^3.10.0"
+
+jquery@^3.1.1, jquery@^3.2.1:
   version "3.2.1"
   resolved "https://registry.yarnpkg.com/jquery/-/jquery-3.2.1.tgz#5c4d9de652af6cd0a770154a631bba12b015c787"
+
+lodash@^2.4.1:
+  version "2.4.2"
+  resolved "https://registry.yarnpkg.com/lodash/-/lodash-2.4.2.tgz#fadd834b9683073da179b3eae6d9c0d15053f73e"
+
+lodash@^3.10.0:
+  version "3.10.1"
+  resolved "https://registry.yarnpkg.com/lodash/-/lodash-3.10.1.tgz#5bf45e8e49ba4189e17d482789dfd15bd140b7b6"
+
+webcola@^3.1.2:
+  version "3.3.3"
+  resolved "https://registry.yarnpkg.com/webcola/-/webcola-3.3.3.tgz#563e4045d69db0c00acceded3bd6fed119407d9f"
+  dependencies:
+    fullscreen "^1.1.0"
+    graphlib-dot "^0.6.2"
+    jquery "^3.1.1"

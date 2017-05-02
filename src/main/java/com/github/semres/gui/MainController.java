@@ -35,6 +35,7 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class MainController extends Controller implements Initializable {
 
@@ -89,7 +90,7 @@ public class MainController extends Controller implements Initializable {
         this.board = board;
         browser.loadURL(getClass().getResource("/html/board.html").toExternalForm());
         String remoteDebuggingURL = browser.getRemoteDebuggingURL();
-        log.debug("Remote debugging URL: " + remoteDebuggingURL);
+        log.info("Remote debugging URL: " + remoteDebuggingURL);
 
         // Enable some options.
         saveMenuItem.setDisable(false);
@@ -115,17 +116,21 @@ public class MainController extends Controller implements Initializable {
     }
 
     void addSynset(Synset synset) {
-        board.addSynset(synset);
+        addSynsetToBoard(synset);
         addSynsetToView(synset);
-        if (synset.isExpanded()) {
-            for (Edge edge : synset.getOutgoingEdges().values()) {
-                addEdgeToView(edge);
-            }
-        }
+    }
+
+    void addSynsetToBoard(Synset synset) {
+        board.addSynset(synset);
     }
 
     void addSynsetToView(Synset synset) {
-        browser.executeJavaScript("addSynset(" + synsetToJson(synset) + ");");
+        Collection<Edge> edges = synset.getOutgoingEdges().values();
+        List<Synset> pointedSynsets = new ArrayList<>();
+        for (Edge edge : edges) {
+            pointedSynsets.add(board.getSynset(edge.getPointedSynset()));
+        }
+        browser.executeJavaScript(String.format("addSynset(%s, %s, %s)", synsetToJson(synset), synsetsToJson(pointedSynsets), edgesToJson(edges)));
     }
 
     void addEdge(Edge edge) {
@@ -205,7 +210,19 @@ public class MainController extends Controller implements Initializable {
         return jsonSynset;
     }
 
-    private String edgeToJson(Edge edge) {
+    private String synsetsToJson(Collection<? extends Synset> synsets) {
+        List<Map<String, Object>> synsetMaps = synsets.stream().map(this::synsetToMap).collect(Collectors.toList());
+        ObjectMapper mapper = new ObjectMapper();
+        String jsonSynsets = null;
+        try {
+            jsonSynsets = mapper.writeValueAsString(synsetMaps);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+        return jsonSynsets;
+    }
+
+    private Map<String, Object> edgeToMap(Edge edge) {
         Map<String, Object> edgeMap = new HashMap<>();
         edgeMap.put("id", edge.getId());
         edgeMap.put("description", edge.getDescription());
@@ -213,16 +230,30 @@ public class MainController extends Controller implements Initializable {
         edgeMap.put("relationType", edge.getRelationType().toString().toLowerCase());
         edgeMap.put("targetSynset", synsetToMap(board.getSynset(edge.getPointedSynset())));
         edgeMap.put("sourceSynset", synsetToMap(board.getSynset(edge.getOriginSynset())));
+        return edgeMap;
+    }
 
-
+    private String edgeToJson(Edge edge) {
         String jsonEdge = null;
         ObjectMapper mapper = new ObjectMapper();
         try {
-            jsonEdge = mapper.writeValueAsString(edgeMap);
+            jsonEdge = mapper.writeValueAsString(edgeToMap(edge));
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
         return jsonEdge;
+    }
+
+    private String edgesToJson(Collection<? extends Edge> edges) {
+        List<Map<String, Object>> edgeMaps = edges.stream().map(this::edgeToMap).collect(Collectors.toList());
+        ObjectMapper mapper = new ObjectMapper();
+        String jsonEdges = null;
+        try {
+            jsonEdges = mapper.writeValueAsString(edgeMaps);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+        return jsonEdges;
     }
 
     public void close() {
@@ -260,10 +291,12 @@ public class MainController extends Controller implements Initializable {
             } else {
                 edges = MainController.this.loadEdges(synsetId);
             }
+            List<Synset> pointedSynsets = new ArrayList<>();
             for (Edge edge : edges) {
-                MainController.this.addSynsetToView(board.getSynset(edge.getPointedSynset()));
-                MainController.this.addEdgeToView(edge);
+                pointedSynsets.add(board.getSynset(edge.getPointedSynset()));
             }
+
+            browser.executeJavaScript(String.format("expandSynset(\"%s\", %s, %s);", synsetId, synsetsToJson(pointedSynsets), edgesToJson(edges)));
         }
 
         public void downloadEdgesFromBabelNet(String synsetId) throws IOException, InvalidBabelSynsetIDException {
@@ -274,16 +307,19 @@ public class MainController extends Controller implements Initializable {
             for (Synset downloadedSynset : downloadedSynsets) {
                 String downloadedSynsetId = downloadedSynset.getId();
                 if (!board.isIdAlreadyTaken(downloadedSynsetId)) {
-                    MainController.this.addSynset(downloadedSynset);
+                    MainController.this.addSynsetToBoard(downloadedSynset);
                 } else if (board.getSynset(downloadedSynsetId) == null) {
                     board.loadSynset(downloadedSynsetId);
                 }
             }
 
+            Collection<Edge> edges = synset.getOutgoingEdges().values();
+            List<Synset> pointedSynsets = new ArrayList<>();
             for (Edge edge : synset.getOutgoingEdges().values()) {
-                MainController.this.addSynsetToView(board.getSynset(edge.getPointedSynset()));
-                MainController.this.addEdgeToView(edge);
+                pointedSynsets.add(board.getSynset(edge.getPointedSynset()));
             }
+
+            browser.executeJavaScript(String.format("addBabelNetEdges(\"%s\", %s, %s);", synsetId, synsetsToJson(pointedSynsets), edgesToJson(edges)));
         }
 
         public void removeNode(String id) {

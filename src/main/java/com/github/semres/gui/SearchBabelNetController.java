@@ -1,6 +1,5 @@
 package com.github.semres.gui;
 
-import com.github.semres.Edge;
 import com.github.semres.Synset;
 import com.github.semres.babelnet.BabelNetSynset;
 import com.guigarage.controls.Media;
@@ -101,26 +100,21 @@ public class SearchBabelNetController extends ChildController implements Initial
             // thrown due to missing edge endings.
             for (Synset relatedSynset : relatedSynsets) {
                 try {
-                    ((MainController) parent).addSynset(relatedSynset);
+                    ((MainController) parent).addSynsetToBoard(relatedSynset);
                 } catch (IDAlreadyTakenException e) {
-                    relatedSynset = ((MainController) parent).loadSynset(relatedSynset.getId());
-                    ((MainController) parent).addSynsetToView(relatedSynset);
+                    ((MainController) parent).loadSynset(relatedSynset.getId());
                 }
             }
         }
 
         ((MainController) parent).addSynsetToView(synset);
-        for (Edge edge : synset.getOutgoingEdges().values()) {
-            ((MainController) parent).addEdgeToView(edge);
-        }
-
     }
 
     private void handleNewSynset(BabelNetSynset synset) {
         List<? extends Synset> relatedSynsets;
         try {
             relatedSynsets = synset.loadEdgesFromBabelNet();
-        } catch (IOException | InvalidBabelSynsetIDException e) {
+        } catch (IOException | InvalidBabelSynsetIDException | RuntimeException e) {
             showAlert(e.getMessage());
             return;
         }
@@ -129,10 +123,9 @@ public class SearchBabelNetController extends ChildController implements Initial
         // thrown due to missing edge endings.
         for (Synset relatedSynset : relatedSynsets) {
             try {
-                ((MainController) parent).addSynset(relatedSynset);
+                ((MainController) parent).addSynsetToBoard(relatedSynset);
             } catch (IDAlreadyTakenException e) {
-                relatedSynset = ((MainController) parent).loadSynset(relatedSynset.getId());
-                ((MainController) parent).addSynsetToView(relatedSynset);
+                ((MainController) parent).loadSynset(relatedSynset.getId());
             }
         }
         ((MainController) parent).addSynset(synset);

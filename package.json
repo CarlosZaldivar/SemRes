@@ -6,8 +6,8 @@
   "license": "MIT",
   "dependencies": {
     "cytoscape": "^2.7.17",
+    "cytoscape-cola": "^1.6.0",
     "cytoscape-context-menus": "~2.1.1",
-    "cytoscape-edgehandles": "~2.9.0",
-    "jquery": "^3.2.1"
+    "cytoscape-edgehandles": "~2.9.0"
   }
 }

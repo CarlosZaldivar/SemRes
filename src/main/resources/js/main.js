@@ -91,10 +91,10 @@ cy.contextMenus({
             onClickFunction: startEdgeAddition
         },
         {
-            id: 'expand',
+            id: 'sendExpandRequest',
             title: 'Expand',
             selector: 'node[!expanded]',
-            onClickFunction: expand
+            onClickFunction: sendExpandRequest
         },
         {
             id: 'collapse',
@@ -146,33 +146,36 @@ function setEdgeDetails(sourceNode, targetNode, addedEntities) {
     }
 }
 
-function addSynset(synset) {
+function addSynset(synset, pointedSynsets, edges) {
+    addSynsetToCytoscape(synset);
+    pointedSynsets.forEach(function (synset) {
+       addSynsetToCytoscape(synset);
+    });
+    edges.forEach(function (edge) {
+        addEdgeToCytoscape(edge);
+    });
+    cy.layout({name: 'cola', fit: false});
+}
+
+function addSynsetToCytoscape(synset) {
     if (cy.elements('#' + escapeColon(synset.id)).length === 1) {
         return;
     }
-
     cy.add({
         data: synset,
         style: [{
             selector: 'node'
         }]
     });
-    cy.layout({name: 'grid'});
 }
 
 function addEdge(edge) {
+    addEdgeToCytoscape(edge);
+}
+
+function addEdgeToCytoscape(edge) {
     if (cy.elements('#' + escapeColon(edge.id)).length === 1) {
         return;
-    }
-
-    var origin = cy.getElementById(escapeColon(edge.sourceSynset.id));
-    if (!origin.data()) {
-        addSynset(edge.sourceSynset);
-    }
-
-    var target = cy.getElementById(escapeColon(edge.targetSynset.id));
-    if (!target.data()) {
-        addSynset(edge.targetSynset);
     }
 
     edge.target = edge.targetSynset.id;
@@ -185,13 +188,9 @@ function addEdge(edge) {
         group: "edges",
         data: edge
     });
-
-    // Mark source synset as expanded.
-    var sourceSynset = cy.elements('#' + escapeColon(edge.source)).data();
-    sourceSynset.expanded = true;
 }
 
-function expand(event) {
+function sendExpandRequest(event) {
     var synset = event.cyTarget.data();
     if (synset.expanded === false) {
         javaApp.loadEdges(synset.id);
@@ -251,6 +250,32 @@ function removeEdge(event) {
     cy.remove(event.cyTarget);
 }
 
+function expandSynset(synsetId, pointedSynsets, edges) {
+    var originSynset = cy.getElementById(synsetId).data();
+    originSynset.expanded = true;
+
+    pointedSynsets.forEach(function (synset) {
+        addSynsetToCytoscape(synset);
+    });
+    edges.forEach(function (edge) {
+        addEdgeToCytoscape(edge);
+    });
+    cy.layout({name: 'cola', fit: false});
+}
+
+function addBabelNetEdges(synsetId, pointedSynsets, edges) {
+    var originSynset = cy.getElementById(synsetId).data();
+    originSynset.expanded = true;
+    originSynset.downloadedWithEdges = true;
+
+    pointedSynsets.forEach(function (synset) {
+        addSynsetToCytoscape(synset);
+    });
+    edges.forEach(function (edge) {
+        addEdgeToCytoscape(edge);
+    });
+    cy.layout({name: 'cola', fit: false});
+}
 function escapeColon(string) {
     return string.replaceAll(':', '\\:');
 }

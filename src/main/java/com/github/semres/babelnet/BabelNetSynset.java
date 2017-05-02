@@ -166,11 +166,6 @@ public class BabelNetSynset extends Synset {
             return false;
         }
 
-        BabelPointer pointer = edge.getPointer();
-        if (!(pointer.isHolonym() || pointer.isHypernym() || pointer.isMeronym() || pointer.isHyponym())) {
-            return false;
-        }
-
         return true;
     }
 
