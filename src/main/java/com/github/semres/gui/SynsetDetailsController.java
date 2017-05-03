@@ -3,6 +3,7 @@ package com.github.semres.gui;
 import com.github.semres.Synset;
 import com.github.semres.babelnet.BabelNetSynset;
 import com.github.semres.user.UserSynset;
+import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.BooleanProperty;
@@ -43,6 +44,8 @@ public class SynsetDetailsController extends ChildController implements Initiali
 
         BooleanBinding representationValid = Bindings.createBooleanBinding(() -> representationTF.getText().length() > 0, representationTF.textProperty());
         saveButton.disableProperty().bind(representationValid.not());
+
+        Platform.runLater(() -> editButton.requestFocus());
     }
 
     public void setSynset(Synset synset) {
