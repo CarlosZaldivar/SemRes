@@ -45,7 +45,7 @@ public class SynsetDetailsController extends ChildController implements Initiali
         BooleanBinding representationValid = Bindings.createBooleanBinding(() -> representationTF.getText().length() > 0, representationTF.textProperty());
         saveButton.disableProperty().bind(representationValid.not());
 
-        Platform.runLater(() -> editButton.requestFocus());
+        Platform.runLater(() -> idTF.getParent().requestFocus());
     }
 
     public void setSynset(Synset synset) {

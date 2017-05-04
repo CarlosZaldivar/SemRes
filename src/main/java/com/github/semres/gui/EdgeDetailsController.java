@@ -3,6 +3,7 @@ package com.github.semres.gui;
 import com.github.semres.Edge;
 import com.github.semres.babelnet.BabelNetEdge;
 import com.github.semres.user.UserEdge;
+import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.BooleanProperty;
@@ -51,6 +52,8 @@ public class EdgeDetailsController extends ChildController implements Initializa
         relationTypeCB.disableProperty().bind(editing.not());
         weightTF.editableProperty().bind(editing);
         descriptionTA.editableProperty().bind(editing);
+
+        Platform.runLater(() -> relationTypeCB.getParent().requestFocus());
     }
 
     public void setEdge(Edge edge) {
