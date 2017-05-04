@@ -11,14 +11,28 @@ public class UserEdge extends Edge {
         super(pointedSynset, originSynset, description, relationType, weight);
     }
 
-    public void setWeight(double weight) {
-        if (weight < 0) {
-            throw new IllegalArgumentException();
-        }
-        this.weight = weight;
+    public UserEdge(Edge edge) {
+        super(edge);
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public UserEdge changeWeight(double weight) {
+        if (weight < 0 || weight > 1) {
+            throw new IllegalArgumentException();
+        }
+        UserEdge newEdge = new UserEdge(this);
+        newEdge.weight = weight;
+        return newEdge;
+    }
+
+    public UserEdge changeDescription(String description) {
+        UserEdge newEdge = new UserEdge(this);
+        newEdge.description = description;
+        return newEdge;
+    }
+
+    public UserEdge changeRelationType(RelationType relationType) {
+        UserEdge newEdge = new UserEdge(this);
+        newEdge.relationType = relationType;
+        return newEdge;
     }
 }

@@ -30,6 +30,14 @@ public abstract class Edge {
         this.description = description;
     }
 
+    protected Edge(Edge edge) {
+        this.pointedSynset = edge.pointedSynset;
+        this.originSynset = edge.originSynset;
+        this.relationType = edge.relationType;
+        this.description = edge.description;
+        this.weight = edge.weight;
+    }
+
     public String getPointedSynset() {
         return pointedSynset;
     }

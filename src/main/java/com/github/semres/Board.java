@@ -1,6 +1,7 @@
 package com.github.semres;
 
 import com.github.semres.gui.IDAlreadyTakenException;
+import com.github.semres.user.UserEdge;
 import org.eclipse.rdf4j.model.Model;
 import org.eclipse.rdf4j.rio.RDFFormat;
 import org.eclipse.rdf4j.rio.Rio;
@@ -137,11 +138,39 @@ public class Board {
         return synsets.get(id);
     }
 
+    public Edge getEdge(String id) {
+        Synset synset = synsets.get(extractOriginSynsetId(id));
+        return synset.getOutgoingEdges().get(id);
+    }
+
     // Edit synset's representation or description.
     public void editSynset(Synset originalSynset, Synset editedSynset) {
-        SynsetEdit synsetEdit = new SynsetEdit(originalSynset, editedSynset);
-        synsetEdits.put(originalSynset.getId(), synsetEdit);
+        SynsetEdit synsetEdit;
+        if (!synsetEdits.containsKey(originalSynset.getId())) {
+            synsetEdit = new SynsetEdit(originalSynset, editedSynset);
+            synsetEdits.put(originalSynset.getId(), synsetEdit);
+        } else {
+            synsetEdit = synsetEdits.get(originalSynset.getId());
+            synsetEdit.setEdited(editedSynset);
+        }
         synsets.put(originalSynset.getId(), editedSynset);
+    }
+
+    public void editEdge(UserEdge oldEdge, UserEdge editedEdge) {
+        SynsetEdit synsetEdit;
+        String originSynsetId = oldEdge.getOriginSynset();
+        if (!synsetEdits.containsKey(originSynsetId)) {
+            synsetEdit = new SynsetEdit(synsets.get(originSynsetId), synsets.get(originSynsetId));
+            synsetEdits.put(originSynsetId, synsetEdit);
+        } else {
+            synsetEdit = synsetEdits.get(originSynsetId);
+        }
+
+        synsetEdit.editEdge(oldEdge, editedEdge);
+        Synset synset  =synsets.get(originSynsetId);
+        Map<String, Edge> outgoingEdges = synset.getOutgoingEdges();
+        outgoingEdges.put(oldEdge.getId(), editedEdge);
+        synset.setOutgoingEdges(outgoingEdges);
     }
 
     public void removeSynset(String id) {
@@ -187,6 +216,9 @@ public class Board {
             }
             for (Edge edge : synsetEdit.getRemovedEdges().values()) {
                 attachedDatabase.removeEdge(edge);
+            }
+            for (EdgeEdit edgeEdit : synsetEdit.getEdgeEdits().values()) {
+                attachedDatabase.editEdge(edgeEdit.getEdited(), edgeEdit.getOriginal());
             }
             attachedDatabase.editSynset(synsetEdit.getEdited(), synsetEdit.getOriginal());
         }

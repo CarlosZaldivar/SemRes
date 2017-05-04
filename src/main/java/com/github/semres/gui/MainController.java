@@ -7,6 +7,7 @@ import com.github.semres.Edge;
 import com.github.semres.Synset;
 import com.github.semres.babelnet.BabelNetManager;
 import com.github.semres.babelnet.BabelNetSynset;
+import com.github.semres.user.UserEdge;
 import com.teamdev.jxbrowser.chromium.Browser;
 import com.teamdev.jxbrowser.chromium.BrowserPreferences;
 import com.teamdev.jxbrowser.chromium.JSValue;
@@ -143,6 +144,11 @@ public class MainController extends Controller implements Initializable {
     void editSynset(Synset oldSynset, Synset editedSynset) {
         board.editSynset(oldSynset, editedSynset);
         browser.executeJavaScript("updateSynset(" + synsetToJson(editedSynset) + ");");
+    }
+
+    public void editEdge(UserEdge oldEdge, UserEdge editedEdge) {
+        board.editEdge(oldEdge, editedEdge);
+        browser.executeJavaScript("updateEdge(" + edgeToJson(editedEdge) + ");");
     }
 
     Synset getSynset(String id) {
@@ -300,6 +306,17 @@ public class MainController extends Controller implements Initializable {
             });
         }
 
+        public void openEdgeDetailsWindow(String edgeId) {
+            Platform.runLater(() -> {
+                try {
+                    EdgeDetailsController childController =
+                            (EdgeDetailsController) openNewWindow("/fxml/edge-details.fxml", "Edge details", 500, 350);
+                    childController.setEdge(board.getEdge(edgeId));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            });
+        }
 
         public void loadEdges(String synsetId) {
             Synset synset = board.getSynset(synsetId);

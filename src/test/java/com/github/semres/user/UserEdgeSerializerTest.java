@@ -33,7 +33,7 @@ public class UserEdgeSerializerTest {
         assertTrue(model.filter(null, SR.RELATION_TYPE, SR.HOLONYM).size() == 1);
         assertTrue(model.filter(null, RDFS.COMMENT, null).size() == 0);
 
-        edge.setDescription("Description");
+        edge = edge.changeDescription("Description");
 
         model = edgeSerializer.edgeToRdf(edge);
 

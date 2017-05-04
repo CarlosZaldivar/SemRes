@@ -64,6 +64,18 @@ class Database {
         }
     }
 
+
+    void editEdge(Edge edited, Edge original) {
+        if (!edited.getId().equals(original.getId())) {
+            throw new IllegalArgumentException("Original and edited edges have different IDs.");
+        }
+
+        try (RepositoryConnection conn = repository.getConnection()) {
+            conn.remove(getSerializerForEdge(original).edgeToRdf(original));
+            conn.add(getSerializerForEdge(edited).edgeToRdf(edited));
+        }
+    }
+
     boolean hasSynset(String id) {
         try (RepositoryConnection conn = repository.getConnection()) {
             String queryString = String.format("ASK  { ?synset <%s> ?type . ?type <%s> <%s> . ?synset <%s> %s }",

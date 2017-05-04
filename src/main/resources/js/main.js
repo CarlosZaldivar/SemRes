@@ -110,9 +110,15 @@ cy.contextMenus({
         },
         {
             id: 'synsetDetails',
-            title: 'Synset details',
+            title: 'Details',
             selector: 'node',
             onClickFunction: openSynsetDetailsWindow
+        },
+        {
+            id: 'edgeDetails',
+            title: 'Details',
+            selector: 'edge',
+            onClickFunction: openEdgeDetailsWindow
         },
         {
             id: 'select-all-nodes',
@@ -162,6 +168,10 @@ function setEdgeDetails(sourceNode, targetNode, addedEntities) {
 
 function openSynsetDetailsWindow(event) {
     javaApp.openSynsetDetailsWindow(event.cyTarget.data().id);
+}
+
+function openEdgeDetailsWindow(event) {
+    javaApp.openEdgeDetailsWindow(event.cyTarget.data().id);
 }
 
 function addSynset(synset, pointedSynsets, edges) {
@@ -299,6 +309,13 @@ function updateSynset(editedSynset) {
     var oldSynset = cy.getElementById(editedSynset.id);
     oldSynset.data('representation', editedSynset.representation);
     oldSynset.data('description', editedSynset.description);
+}
+
+function updateEdge(editedEdge) {
+    var oldEdge = cy.getElementById(editedEdge.id);
+    oldEdge.data('relationType', editedEdge.relationType);
+    oldEdge.data('description', editedEdge.description);
+    oldEdge.data('weight', editedEdge.weight);
 }
 
 function escapeColon(string) {

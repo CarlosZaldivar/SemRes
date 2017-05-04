@@ -7,6 +7,12 @@ public class UserSynset extends Synset {
     public UserSynset(String representation) {
         super(representation);
     }
+
+    public UserSynset(String representation, String description) {
+        super(representation);
+        this.description = description;
+    }
+
     private UserSynset(UserSynset copiedSynset) {
         super(copiedSynset);
     }
