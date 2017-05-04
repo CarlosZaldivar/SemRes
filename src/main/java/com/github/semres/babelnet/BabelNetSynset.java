@@ -109,10 +109,11 @@ public class BabelNetSynset extends Synset {
         }
 
         List<BabelSynsetIDRelation> babelEdges = babelSynset.getEdges();
-        babelEdges.sort(Comparator.comparing(BabelSynsetIDRelation::getWeight));
+        babelEdges.sort(Comparator.comparing(BabelSynsetIDRelation::getWeight).reversed());
 
         List<BabelNetSynset> relatedSynsets = new ArrayList<>();
-        // Download only ten edges.
+
+        // Download all edges with weight > 0 and if there's less than 10 of them, download edges with weight = 0 too.
         int counter = 10;
         for (BabelSynsetIDRelation edge: babelEdges) {
             if (edgeIsRelevant(edge)) {
@@ -120,7 +121,7 @@ public class BabelNetSynset extends Synset {
                 relatedSynsets.add(relatedSynset);
                 --counter;
             }
-            if (counter == 0) {
+            if (counter <= 0 && edge.getWeight() == 0) {
                 break;
             }
         }
@@ -158,15 +159,7 @@ public class BabelNetSynset extends Synset {
     }
 
     private boolean edgeIsRelevant(BabelSynsetIDRelation edge) {
-        if (removedRelations.contains(edge.getBabelSynsetIDTarget().getID())) {
-            return false;
-        }
-
-        if (edge.getWeight() == 0) {
-            return false;
-        }
-
-        return true;
+        return !removedRelations.contains(edge.getBabelSynsetIDTarget().getID());
     }
 
     public boolean isDownloadedWithEdges() {
