@@ -317,6 +317,14 @@ public class MainController extends Controller implements Initializable {
             });
         }
 
+        public void removeSynset(String id) {
+            board.removeSynset(id);
+        }
+
+        public void removeEdge(String id) {
+            board.removeEdge(id);
+        }
+
         public void loadEdges(String synsetId) {
             Synset synset = board.getSynset(synsetId);
             Collection<Edge> edges;

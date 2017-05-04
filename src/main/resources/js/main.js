@@ -67,10 +67,10 @@ var cy = cytoscape({
 cy.contextMenus({
     menuItems: [
         {
-            id: 'removeNode',
+            id: 'removeSynset',
             title: 'Remove',
             selector: 'node',
-            onClickFunction: removeNode
+            onClickFunction: removeSynset
         },
         {
             id: 'removeEdge',
@@ -268,8 +268,8 @@ function downloadEdgesFromBabelNet(event) {
     javaApp.downloadEdgesFromBabelNet(event.cyTarget.id());
 }
 
-function removeNode(event) {
-    javaApp.removeNode(event.cyTarget.id());
+function removeSynset(event) {
+    javaApp.removeSynset(event.cyTarget.id());
     cy.remove(event.cyTarget);
 }
 
