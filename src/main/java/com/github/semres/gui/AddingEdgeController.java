@@ -9,6 +9,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
@@ -16,15 +17,10 @@ import java.net.URL;
 import java.util.ResourceBundle;
 
 public class AddingEdgeController extends ChildController implements Initializable {
-    @FXML
-    private
-    ComboBox<Edge.RelationType> relationTypeCB;
-    @FXML
-    private
-    TextField weightTF;
-    @FXML
-    private
-    Button addButton;
+    @FXML private ComboBox<Edge.RelationType> relationTypeCB;
+    @FXML private TextField weightTF;
+    @FXML private TextArea descriptionTA;
+    @FXML private Button addButton;
 
     private Synset originSynset;
     private Synset destinationSynset;
@@ -58,7 +54,7 @@ public class AddingEdgeController extends ChildController implements Initializab
     public void addEdge() {
         double weight = Double.parseDouble(weightTF.getText().replace(',', '.'));
         Edge.RelationType relationType = Edge.RelationType.valueOf(relationTypeCB.getSelectionModel().getSelectedItem().toString());
-        UserEdge newEdge = new UserEdge(destinationSynset.getId(), originSynset.getId(), relationType, weight);
+        UserEdge newEdge = new UserEdge(destinationSynset.getId(), originSynset.getId(), descriptionTA.getText(), relationType, weight);
 
         ((MainController) parent).addEdge(newEdge);
 
