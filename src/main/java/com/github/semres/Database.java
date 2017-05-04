@@ -187,7 +187,7 @@ class Database {
         ValueFactory factory = repository.getValueFactory();
         String queryString = String.format("SELECT ?edgeType ?edge" +
                 " WHERE { ?originSynset <%s> %s . ?originSynset ?edge ?pointedSynset . ?edge <%s> ?edgeType . ?edgeType <%s> <%s> }",
-                SR.ID, factory.createLiteral(originSynset.getId()), RDF.TYPE, RDFS.SUBCLASSOF, SR.EDGE, RDF.TYPE);
+                SR.ID, factory.createLiteral(originSynset.getId()), RDF.TYPE, RDFS.SUBCLASSOF, SR.EDGE);
 
         return getEdges(queryString);
     }
@@ -196,7 +196,7 @@ class Database {
         ValueFactory factory = repository.getValueFactory();
         String queryString = String.format("SELECT ?edgeType ?edge" +
                         " WHERE { ?pointedSynset <%s> %s . ?originSynset ?edge ?pointedSynset . ?edge <%s> ?edgeType . ?edgeType <%s> <%s> }",
-                SR.ID, factory.createLiteral(pointedSynset.getId()), RDF.TYPE, RDFS.SUBCLASSOF, SR.EDGE, RDF.TYPE);
+                SR.ID, factory.createLiteral(pointedSynset.getId()), RDF.TYPE, RDFS.SUBCLASSOF, SR.EDGE);
         return getEdges(queryString);
     }
 

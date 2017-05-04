@@ -43,7 +43,7 @@ public abstract class Synset {
         return new HashMap<>(outgoingEdges);
     }
 
-    void setOutgoingEdges(Collection<Edge> newEdges) {
+    protected void setOutgoingEdges(Collection<Edge> newEdges) {
         outgoingEdges.clear();
         for (Edge edge : newEdges) {
             outgoingEdges.put(edge.getId(), edge);

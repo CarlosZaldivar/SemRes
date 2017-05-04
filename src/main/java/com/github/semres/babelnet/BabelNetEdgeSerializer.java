@@ -3,7 +3,6 @@ package com.github.semres.babelnet;
 import com.github.semres.Edge;
 import com.github.semres.EdgeSerializer;
 import com.github.semres.SR;
-import com.github.semres.Synset;
 import org.eclipse.rdf4j.model.*;
 import org.eclipse.rdf4j.model.vocabulary.RDFS;
 import org.eclipse.rdf4j.query.*;

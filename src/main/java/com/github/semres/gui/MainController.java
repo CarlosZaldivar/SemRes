@@ -56,7 +56,6 @@ public class MainController extends Controller implements Initializable {
     private MenuItem exportMenuItem;
 
     private Board board;
-    private BrowserView boardView;
     private Browser browser;
     private BabelNetManager babelNetManager;
     static Logger log = Logger.getRootLogger();
@@ -67,7 +66,7 @@ public class MainController extends Controller implements Initializable {
         BrowserPreferences.setChromiumSwitches("--remote-debugging-port=9222");
         babelNetManager = new BabelNetManager();
         browser = new Browser();
-        boardView = new BrowserView(browser);
+        BrowserView boardView = new BrowserView(browser);
 
         AnchorPane.setTopAnchor(boardView, 0.0);
         AnchorPane.setBottomAnchor(boardView, 0.0);
@@ -105,7 +104,7 @@ public class MainController extends Controller implements Initializable {
     }
 
     public void export() {
-        // For debuging purposes database triplets are written to clipboard. It can be changed to a file later.
+        // For debugging purposes database triplets are written to clipboard. It can be changed to a file later.
         Clipboard clipboard = Clipboard.getSystemClipboard();
         ClipboardContent content = new ClipboardContent();
         content.putString(board.export());

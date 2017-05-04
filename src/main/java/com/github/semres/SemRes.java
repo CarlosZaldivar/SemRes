@@ -32,8 +32,6 @@ public class SemRes {
     private final List<Class<? extends EdgeSerializer>> edgeSerializerClasses = new ArrayList<>();
     private final Model metadataStatements;
 
-    private Settings settings;
-
     private final LocalRepositoryManager repositoryManager;
     private static SemRes semRes;
 
@@ -42,7 +40,6 @@ public class SemRes {
     }
 
     SemRes(Settings settings) {
-        this.settings = settings;
         metadataStatements = new LinkedHashModel();
         for (Source source: settings.getSources()) {
             synsetSerializerClasses.add(source.getSynsetSerializerClass());
