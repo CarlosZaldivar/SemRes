@@ -1,5 +1,6 @@
 package com.github.semres.user;
 
+import com.github.semres.SemRes;
 import org.eclipse.rdf4j.model.IRI;
 import org.eclipse.rdf4j.model.impl.SimpleValueFactory;
 
@@ -9,7 +10,7 @@ public class CommonIRI {
 
     static {
         SimpleValueFactory factory = SimpleValueFactory.getInstance();
-        USER_SYNSET = factory.createIRI("http://github.com/SemRes/User/UserSynset");
-        USER_EDGE = factory.createIRI("http://github.com/SemRes/User/UserEdge");
+        USER_SYNSET = factory.createIRI(SemRes.baseIri + "User/UserSynset");
+        USER_EDGE = factory.createIRI(SemRes.baseIri + "User/UserEdge");
     }
 }

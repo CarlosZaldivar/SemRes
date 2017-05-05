@@ -1,5 +1,6 @@
 package com.github.semres.babelnet;
 
+import com.github.semres.SemRes;
 import org.eclipse.rdf4j.model.IRI;
 import org.eclipse.rdf4j.model.impl.SimpleValueFactory;
 
@@ -10,8 +11,8 @@ public class CommonIRI {
 
     static {
         SimpleValueFactory factory = SimpleValueFactory.getInstance();
-        BABELNET_SYNSET = factory.createIRI("http://github.com/SemRes/BabelNet/BabelNetSynset");
-        BABELNET_EDGE = factory.createIRI("http://github.com/SemRes/BabelNet/BabelNetEdge");
-        EDGES_DOWNLOADED = factory.createIRI("http://github.com/SemRes/BabelNet/EdgesDownloaded");
+        BABELNET_SYNSET = factory.createIRI(SemRes.baseIri + "BabelNet/BabelNetSynset");
+        BABELNET_EDGE = factory.createIRI(SemRes.baseIri + "BabelNet/BabelNetEdge");
+        EDGES_DOWNLOADED = factory.createIRI(SemRes.baseIri + "BabelNet/EdgesDownloaded");
     }
 }

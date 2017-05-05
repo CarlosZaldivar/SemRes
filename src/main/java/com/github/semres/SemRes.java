@@ -28,12 +28,14 @@ public class SemRes {
 
     private final static Logger logger = Logger.getLogger(SemRes.class);
 
+    public static String baseIri = "https://github.com/CarlosZaldivar/SemRes/";
+
+    private static SemRes semRes;
     private final List<Class<? extends SynsetSerializer>> synsetSerializerClasses = new ArrayList<>();
     private final List<Class<? extends EdgeSerializer>> edgeSerializerClasses = new ArrayList<>();
-    private final Model metadataStatements;
 
+    private final Model metadataStatements;
     private final LocalRepositoryManager repositoryManager;
-    private static SemRes semRes;
 
     private SemRes() throws FileNotFoundException, YamlException {
         this(new Settings());

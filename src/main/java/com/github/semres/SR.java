@@ -22,16 +22,16 @@ public class SR {
 
     static {
         SimpleValueFactory factory = SimpleValueFactory.getInstance();
-        SYNSET = factory.createIRI("http://www.example.org/Synset");
-        EDGE = factory.createIRI("http://www.example.org/Edge");
-        ID = factory.createIRI("http://www.example.org/Id");
-        REMOVED_RELATION = factory.createIRI("http://www.example.org/RemovedRelation");
-        RELATION_TYPE = factory.createIRI("http://www.example.org/RelationType");
-        HOLONYM = factory.createIRI("http://www.example.org/Holonym");
-        HYPERNYM = factory.createIRI("http://example.org/Hypernym");
-        HYPONYM = factory.createIRI("http://example.org/Hyponym");
-        MERONYM = factory.createIRI("http://example.org/Meronym");
+        SYNSET = factory.createIRI(SemRes.baseIri + "Synset");
+        EDGE = factory.createIRI(SemRes.baseIri + "Edge");
+        ID = factory.createIRI(SemRes.baseIri + "Id");
+        REMOVED_RELATION = factory.createIRI(SemRes.baseIri + "RemovedRelation");
+        RELATION_TYPE = factory.createIRI(SemRes.baseIri + "RelationType");
+        HOLONYM = factory.createIRI(SemRes.baseIri + "Holonym");
+        HYPERNYM = factory.createIRI(SemRes.baseIri + "Hypernym");
+        HYPONYM = factory.createIRI(SemRes.baseIri + "Hyponym");
+        MERONYM = factory.createIRI(SemRes.baseIri + "Meronym");
 
-        WEIGHT = factory.createIRI("http://example.org/Weight");
+        WEIGHT = factory.createIRI(SemRes.baseIri + "Weight");
     }
 }
