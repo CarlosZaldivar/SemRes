@@ -245,7 +245,7 @@ public class DatabaseTest {
         when(mockBabelSynset.getEdges()).thenReturn(new ArrayList<>());
 
         BabelNetSynset synset = new BabelNetSynset(mockBabelSynset);
-        synset.loadEdgesFromBabelNet();
+        synset = synset.loadEdgesFromBabelNet();
         assertTrue(synset.isDownloadedWithEdges());
 
         Database database = createTestDatabase();
