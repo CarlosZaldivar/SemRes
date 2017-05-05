@@ -1,16 +1,18 @@
 package com.github.semres;
 
+import com.github.semres.babelnet.BabelNetEdge;
+import com.github.semres.babelnet.BabelNetManager;
+import com.github.semres.babelnet.BabelNetSynset;
 import com.github.semres.gui.IDAlreadyTakenException;
 import com.github.semres.user.UserEdge;
 import org.eclipse.rdf4j.model.Model;
 import org.eclipse.rdf4j.rio.RDFFormat;
 import org.eclipse.rdf4j.rio.Rio;
 
+import java.io.IOException;
 import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class Board {
     private final Map<String, Synset> synsets = new HashMap<>();
@@ -75,6 +77,40 @@ public class Board {
         }
         synset.setOutgoingEdges(filteredEdges);
         return filteredEdges;
+    }
+
+    public List<Edge> downloadBabelNetEdges(String synsetId) throws IOException {
+        BabelNetSynset updatedSynset = ((BabelNetSynset) synsets.get(synsetId)).loadEdgesFromBabelNet();
+
+        SynsetEdit synsetEdit;
+        if (!synsetEdits.containsKey(synsetId)) {
+            synsetEdit = new SynsetEdit(synsets.get(synsetId), updatedSynset);
+            synsetEdits.put(synsetId, synsetEdit);
+        } else {
+            synsetEdit = synsetEdits.get(synsetId);
+            synsetEdit.setEdited(updatedSynset);
+        }
+        synsets.put(updatedSynset.getId(), updatedSynset);
+
+        // Get BabelNetEdges
+        List<Edge> edges = updatedSynset.getOutgoingEdges().values().stream()
+                .filter((edge) -> edge instanceof BabelNetEdge)
+                .collect(Collectors.toList());
+
+        for (Edge edge : edges) {
+            synsetEdit.addEdge(edge);
+            String pointedSynsetId = edge.getPointedSynset();
+
+            // If pointed synset is not already on board or in the database download it from BabelNet.
+            if (!synsets.containsKey(pointedSynsetId)) {
+                if (attachedDatabase.hasSynset(pointedSynsetId)) {
+                    loadSynset(pointedSynsetId);
+                } else {
+                    addSynset(BabelNetManager.getInstance().getSynset(pointedSynsetId));
+                }
+            }
+        }
+        return edges;
     }
 
     private boolean isEdgeRemoved(Edge edge) {

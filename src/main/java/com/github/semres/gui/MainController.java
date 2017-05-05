@@ -6,7 +6,6 @@ import com.github.semres.Board;
 import com.github.semres.Edge;
 import com.github.semres.Synset;
 import com.github.semres.babelnet.BabelNetManager;
-import com.github.semres.babelnet.BabelNetSynset;
 import com.github.semres.user.UserEdge;
 import com.teamdev.jxbrowser.chromium.Browser;
 import com.teamdev.jxbrowser.chromium.BrowserPreferences;
@@ -14,7 +13,6 @@ import com.teamdev.jxbrowser.chromium.JSValue;
 import com.teamdev.jxbrowser.chromium.events.ScriptContextAdapter;
 import com.teamdev.jxbrowser.chromium.events.ScriptContextEvent;
 import com.teamdev.jxbrowser.chromium.javafx.BrowserView;
-import it.uniroma1.lcl.babelnet.InvalidBabelSynsetIDException;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -166,6 +164,10 @@ public class MainController extends Controller implements Initializable {
         return board.loadEdges(synsetId);
     }
 
+    Collection<Edge> downloadBabelNetEdges(String synsetId) throws IOException {
+        return board.downloadBabelNetEdges(synsetId);
+    }
+
     boolean synsetExists(String id) {
         return board.isIdAlreadyTaken(id);
     }
@@ -276,7 +278,7 @@ public class MainController extends Controller implements Initializable {
                 try {
                     openNewWindow("/fxml/add-synset.fxml","Add synset",500,350);
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    Utils.showAlert(e.getMessage());
                 }
             });
         }
@@ -288,7 +290,7 @@ public class MainController extends Controller implements Initializable {
                     childController.setOriginSynset(board.getSynset(originSynsetId));
                     childController.setDestinationSynset(board.getSynset(destinationSynsetId));
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    Utils.showAlert(e.getMessage());
                 }
             });
         }
@@ -300,7 +302,7 @@ public class MainController extends Controller implements Initializable {
                             (SynsetDetailsController) openNewWindow("/fxml/synset-details.fxml", "Synset details", 500, 350);
                     childController.setSynset(board.getSynset(synsetId));
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    Utils.showAlert(e.getMessage());
                 }
             });
         }
@@ -312,7 +314,7 @@ public class MainController extends Controller implements Initializable {
                             (EdgeDetailsController) openNewWindow("/fxml/edge-details.fxml", "Edge details", 500, 350);
                     childController.setEdge(board.getEdge(edgeId));
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    Utils.showAlert(e.getMessage());
                 }
             });
         }
@@ -341,23 +343,16 @@ public class MainController extends Controller implements Initializable {
             browser.executeJavaScript(String.format("expandSynset(\"%s\", %s, %s);", synsetId, synsetsToJson(pointedSynsets), edgesToJson(edges)));
         }
 
-        public void downloadEdgesFromBabelNet(String synsetId) throws IOException, InvalidBabelSynsetIDException {
-            BabelNetSynset synset = (BabelNetSynset) board.getSynset(synsetId);
-            Collection<? extends Synset> downloadedSynsets = synset.loadEdgesFromBabelNet();
-
-            // Check if synsets were downloaded earlier and add or load them if necessary.
-            for (Synset downloadedSynset : downloadedSynsets) {
-                String downloadedSynsetId = downloadedSynset.getId();
-                if (!board.isIdAlreadyTaken(downloadedSynsetId)) {
-                    MainController.this.addSynsetToBoard(downloadedSynset);
-                } else if (board.getSynset(downloadedSynsetId) == null) {
-                    board.loadSynset(downloadedSynsetId);
-                }
+        public void downloadEdgesFromBabelNet(String synsetId) {
+            Collection<Edge> edges = null;
+            try {
+                edges = MainController.this.downloadBabelNetEdges(synsetId);
+            } catch (IOException e) {
+                Utils.showAlert(e.getMessage());
+                return;
             }
-
-            Collection<Edge> edges = synset.getOutgoingEdges().values();
             List<Synset> pointedSynsets = new ArrayList<>();
-            for (Edge edge : synset.getOutgoingEdges().values()) {
+            for (Edge edge : edges) {
                 pointedSynsets.add(board.getSynset(edge.getPointedSynset()));
             }
 

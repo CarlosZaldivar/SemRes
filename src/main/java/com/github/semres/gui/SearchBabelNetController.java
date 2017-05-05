@@ -42,13 +42,19 @@ public class SearchBabelNetController extends ChildController implements Initial
         if (click.getClickCount() == 2 && synsetsListView.getSelectionModel().getSelectedItem() != null) {
             BabelNetSynset synset = (BabelNetSynset) synsetsListView.getSelectionModel().getSelectedItem().getSynset();
 
-            // If synset is already in the database or on the board, load it from there.
             if (((MainController) parent).synsetExists(synset.getId())) {
-                handleExistingSynset(synset.getId());
+                ((MainController) parent).loadSynset(synset.getId());
+                ((MainController) parent).addSynsetToView(((MainController) parent).getSynset(synset.getId()));
             } else {
-                handleNewSynset(synset);
+                ((MainController) parent).addSynsetToBoard(synset);
             }
 
+            try {
+                ((MainController) parent).downloadBabelNetEdges(synset.getId());
+            } catch (IOException e) {
+                Utils.showAlert(e.getMessage());
+            }
+            ((MainController) parent).addSynsetToView(((MainController) parent).getSynset(synset.getId()));
             Stage stage = (Stage) synsetsListView.getScene().getWindow();
             stage.close();
         }
@@ -79,63 +85,6 @@ public class SearchBabelNetController extends ChildController implements Initial
         for (Synset synset : synsetsFound) {
             synsetsObservableList.add(new SynsetMedia(synset));
         }
-    }
-
-    private void handleExistingSynset(String synsetId) {
-        BabelNetSynset synset = (BabelNetSynset) ((MainController) parent).loadSynset(synsetId);
-
-        if (!synset.isExpanded()) {
-            ((MainController) parent).loadEdges(synset.getId());
-        }
-        if (!synset.isDownloadedWithEdges()) {
-            Collection<BabelNetSynset> relatedSynsets;
-            try {
-                relatedSynsets = synset.loadEdgesFromBabelNet();
-            } catch (IOException | InvalidBabelSynsetIDException e) {
-                showAlert(e.getMessage());
-                return;
-            }
-
-            // Add or load connected synsets first before adding the "central" synset. Otherwise there can be exceptions
-            // thrown due to missing edge endings.
-            for (Synset relatedSynset : relatedSynsets) {
-                try {
-                    ((MainController) parent).addSynsetToBoard(relatedSynset);
-                } catch (IDAlreadyTakenException e) {
-                    ((MainController) parent).loadSynset(relatedSynset.getId());
-                }
-            }
-        }
-
-        ((MainController) parent).addSynsetToView(synset);
-    }
-
-    private void handleNewSynset(BabelNetSynset synset) {
-        List<? extends Synset> relatedSynsets;
-        try {
-            relatedSynsets = synset.loadEdgesFromBabelNet();
-        } catch (IOException | InvalidBabelSynsetIDException | RuntimeException e) {
-            showAlert(e.getMessage());
-            return;
-        }
-
-        // Add or load connected synsets first before adding the "central" synset. Otherwise there can be exceptions
-        // thrown due to missing edge endings.
-        for (Synset relatedSynset : relatedSynsets) {
-            try {
-                ((MainController) parent).addSynsetToBoard(relatedSynset);
-            } catch (IDAlreadyTakenException e) {
-                ((MainController) parent).loadSynset(relatedSynset.getId());
-            }
-        }
-        ((MainController) parent).addSynset(synset);
-    }
-
-    private void showAlert(String message) {
-        Alert alert = new Alert(Alert.AlertType.ERROR, message);
-        // Resize dialog so that the whole text would fit.
-        alert.getDialogPane().getChildren().stream().filter(node -> node instanceof Label).forEach(node -> ((Label) node).setMinHeight(Region.USE_PREF_SIZE));
-        alert.showAndWait();
     }
 }
 

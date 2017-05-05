@@ -99,63 +99,52 @@ public class BabelNetSynset extends Synset {
         lastUpdateDate = new Date();
     }
 
-    public List<BabelNetSynset> loadEdgesFromBabelNet() throws IOException, InvalidBabelSynsetIDException {
+    public BabelNetSynset loadEdgesFromBabelNet() throws IOException {
         if (isDownloadedWithEdges) {
             throw new EdgesAlreadyLoadedException();
         }
 
         if (babelSynset == null) {
-            babelSynset = BabelNetManager.getInstance().getBabelSynset(getId());
+            try {
+                babelSynset = BabelNetManager.getInstance().getBabelSynset(getId());
+            } catch (InvalidBabelSynsetIDException e) {
+                throw new Error(e.getMessage());
+            }
         }
+
+        BabelNetSynset newSynset = new BabelNetSynset(this);
 
         List<BabelSynsetIDRelation> babelEdges = babelSynset.getEdges();
         babelEdges.sort(Comparator.comparing(BabelSynsetIDRelation::getWeight).reversed());
-
-        List<BabelNetSynset> relatedSynsets = new ArrayList<>();
 
         // Download all edges with weight > 0 and if there's less than 10 of them, download edges with weight = 0 too.
         int counter = 10;
         for (BabelSynsetIDRelation edge: babelEdges) {
             if (edgeIsRelevant(edge)) {
-                BabelNetSynset relatedSynset = addBabelNetEdge(edge);
-                relatedSynsets.add(relatedSynset);
+                newSynset.addBabelNetEdge(edge);
                 --counter;
             }
             if (counter <= 0 && edge.getWeight() == 0) {
                 break;
             }
         }
-        isExpanded = true;
-        isDownloadedWithEdges = true;
-        return relatedSynsets;
+        newSynset.isExpanded = true;
+        newSynset.isDownloadedWithEdges = true;
+        return newSynset;
     }
 
-    private BabelNetSynset addBabelNetEdge(BabelSynsetIDRelation edge) throws IOException {
-        BabelNetSynset referencedSynset = new BabelNetSynset(BabelNet.getInstance().getSynset(edge.getBabelSynsetIDTarget()));
+    private void addBabelNetEdge(BabelSynsetIDRelation edge) throws IOException {
         BabelPointer babelPointer = edge.getPointer();
 
         Edge.RelationType relationType = Edge.RelationType.valueOf(babelPointer.getRelationGroup().toString());
 
         Edge newEdge =
-                new BabelNetEdge(referencedSynset.getId(), getId(), babelPointer.getName(), relationType, edge.getWeight());
+                new BabelNetEdge(edge.getBabelSynsetIDTarget().getID(), getId(), babelPointer.getName(), relationType, edge.getWeight());
         outgoingEdges.put(newEdge.getId(), newEdge);
-        return referencedSynset;
     }
 
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    private BabelSynsetID getBabelSynsetID() {
-        if (babelSynset != null) {
-            return babelSynset.getId();
-        } else {
-            try {
-                return new BabelSynsetID(getId());
-            } catch (InvalidBabelSynsetIDException e) {
-                throw new RuntimeException("Invalid BabelNet ID");
-            }
-        }
     }
 
     private boolean edgeIsRelevant(BabelSynsetIDRelation edge) {

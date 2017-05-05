@@ -62,6 +62,14 @@ public class BabelNetManager extends Source {
         return returnedSynsets;
     }
 
+    public BabelNetSynset getSynset(String id) throws IOException {
+        try {
+            return new BabelNetSynset(BabelNet.getInstance().getSynset(new BabelSynsetID(id)));
+        } catch (InvalidBabelSynsetIDException e) {
+            throw new Error(e.getMessage());
+        }
+    }
+
     @Override
     public Class<? extends SynsetSerializer> getSynsetSerializerClass() {
         return BabelNetSynsetSerializer.class;

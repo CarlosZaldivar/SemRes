@@ -116,7 +116,7 @@ public class BabelNetSynsetSerializer extends SynsetSerializer {
                         BabelSynsetID removedRelation = new BabelSynsetID(bindingSet.getValue("removedRelationId").stringValue());
                         removedRelations.add(removedRelation.toString());
                     } catch (InvalidBabelSynsetIDException e) {
-                        throw new RuntimeException("Invalid BabelNet ID");
+                        throw new Error("Invalid BabelNet ID");
                     }
                 }
             }
