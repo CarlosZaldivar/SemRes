@@ -14,7 +14,6 @@ class EdgeEdit {
     }
 
     Edge getOriginal() {
-
         return original;
     }
 

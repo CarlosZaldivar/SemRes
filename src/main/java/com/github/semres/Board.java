@@ -3,6 +3,7 @@ package com.github.semres;
 import com.github.semres.babelnet.BabelNetEdge;
 import com.github.semres.babelnet.BabelNetManager;
 import com.github.semres.babelnet.BabelNetSynset;
+import com.github.semres.babelnet.CommonIRI;
 import com.github.semres.gui.IDAlreadyTakenException;
 import com.github.semres.user.UserEdge;
 import org.eclipse.rdf4j.model.Model;
@@ -20,9 +21,16 @@ public class Board {
     private final Map<String, Synset> removedSynsets = new HashMap<>();
     private final Map<String, SynsetEdit> synsetEdits = new HashMap<>();
     private final Database attachedDatabase;
+    private final BabelNetManager babelNetManager;
 
     Board(Database attachedDatabase) {
         this.attachedDatabase = attachedDatabase;
+        babelNetManager = new BabelNetManager();
+    }
+
+    Board(Database attachedDatabase, BabelNetManager babelNetManager) {
+        this.attachedDatabase = attachedDatabase;
+        this.babelNetManager = babelNetManager;
     }
 
     public List<Synset> loadSynsets(String searchPhrase) {
@@ -106,7 +114,7 @@ public class Board {
                 if (attachedDatabase.hasSynset(pointedSynsetId)) {
                     loadSynset(pointedSynsetId);
                 } else {
-                    addSynset(BabelNetManager.getInstance().getSynset(pointedSynsetId));
+                    addSynset(babelNetManager.getSynset(pointedSynsetId));
                 }
             }
         }
@@ -266,6 +274,74 @@ public class Board {
         removedSynsets.clear();
     }
 
+    public List<SynsetUpdate> checkForUpdates() throws IOException {
+        if (isBoardEdited()) {
+            throw new RuntimeException("Cannot check for updates with unsaved changes.");
+        }
+
+        List<Synset> synsets = attachedDatabase.getSynsets(CommonIRI.BABELNET_SYNSET);
+        List<SynsetUpdate> updates = new ArrayList<>();
+        for (Synset synset : synsets) {
+            BabelNetSynset originalSynset = (BabelNetSynset) synset;
+            originalSynset.setOutgoingEdges(attachedDatabase.getOutgoingEdges(originalSynset));
+
+            BabelNetSynset updatedSynset = babelNetManager.getSynset(originalSynset.getId());
+            updatedSynset = updatedSynset.loadEdgesFromBabelNet();
+
+            Map<String, BabelNetSynset> relatedSynsets = new HashMap();
+
+            for (Edge edge : originalSynset.getOutgoingEdges().values().stream().filter((e) -> e instanceof BabelNetEdge).collect(Collectors.toList())) {
+                relatedSynsets.put(edge.getPointedSynset(), (BabelNetSynset) loadSynset(edge.getPointedSynset()));
+            }
+
+            for (Edge edge : updatedSynset.getOutgoingEdges().values()) {
+                if (isIdAlreadyTaken(edge.getPointedSynset())) {
+                    relatedSynsets.put(edge.getPointedSynset(), (BabelNetSynset) loadSynset(edge.getPointedSynset()));
+                } else {
+                    relatedSynsets.put(edge.getPointedSynset(), babelNetManager.getSynset(edge.getPointedSynset()));
+                }
+            }
+
+            SynsetUpdate update = new SynsetUpdate(originalSynset, updatedSynset, relatedSynsets);
+            if (update.isSynsetUpdated()) {
+                updates.add(update);
+            }
+        }
+        return updates;
+    }
+
+    public void update(List<SynsetUpdate> updates) {
+        if (isBoardEdited()) {
+            throw new RuntimeException("Cannot update with unsaved changes.");
+        }
+
+        for (SynsetUpdate update : updates) {
+            if (update.isSynsetDataUpdated()) {
+                attachedDatabase.editSynset(update.getUpdatedSynset(), update.getOriginalSynset());
+            }
+
+            for (Edge edge : update.getRemovedEdges().values()) {
+                attachedDatabase.removeEdge(edge);
+            }
+
+            for (Edge edge : update.getAddedEdges().values()) {
+                if (!isIdAlreadyTaken(edge.getPointedSynset())) {
+                    attachedDatabase.addSynset(update.getPointedSynset(edge));
+                }
+                attachedDatabase.addEdge(edge);
+            }
+
+            for (EdgeEdit edgeEdit : update.getEdgeEdits().values()) {
+                attachedDatabase.editEdge(edgeEdit.getEdited(), edgeEdit.getOriginal());
+            }
+
+            // If synset is already loaded on board replace it with the updated version.
+            if (synsets.containsKey(update.getOriginalSynset().getId())) {
+                synsets.put(update.getOriginalSynset().getId(), update.getUpdatedSynset());
+            }
+        }
+    }
+
     public String export() {
         Model model = attachedDatabase.getAllStatements();
         StringWriter buffer = new StringWriter();
@@ -281,6 +357,10 @@ public class Board {
             return true;
         }
         return false;
+    }
+
+    public boolean isBoardEdited() {
+        return !removedSynsets.isEmpty() || !newSynsets.isEmpty() || !synsetEdits.isEmpty();
     }
 
     private String extractOriginSynsetId(String edgeId) {

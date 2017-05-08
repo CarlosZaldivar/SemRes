@@ -15,14 +15,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class BabelNetManager extends Source {
-    public static BabelNetManager getInstance() {
-        return instance;
-    }
+    private static Language language = Language.EN;
 
-    private static final BabelNetManager instance = new BabelNetManager();
-    private Language language = Language.EN;
-
-    public void loadConfiguration(String path) {
+    public static void loadConfiguration(String path) {
         Configuration jltConf = Configuration.getInstance();
         jltConf.setConfigurationFile(new File(path + "config/jlt.properties"));
 
@@ -31,15 +26,15 @@ public class BabelNetManager extends Source {
         babelnetConf.setBasePath(path);
     }
 
-    public String getLanguage() {
+    public static String getLanguage() {
         return language.toString();
     }
 
-    Language getJltLanguage() {
+    public static Language getJltLanguage() {
         return language;
     }
 
-    public void setLanguage(String languageCode) {
+    public static void setLanguage(String languageCode) {
         language = Language.valueOf(languageCode);
     }
 

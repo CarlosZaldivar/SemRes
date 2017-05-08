@@ -149,6 +149,24 @@ class Database {
         return getSynsets(queryString);
     }
 
+    List<Synset> getSynsets(IRI typeIri) {
+        String queryString = String.format("SELECT ?synset WHERE { ?synset <%s> <%s> }", RDF.TYPE, typeIri.stringValue());
+        List<Synset> synsets = new ArrayList<>();
+        ValueFactory factory = repository.getValueFactory();
+        try (RepositoryConnection conn = repository.getConnection()) {
+            TupleQuery tupleQuery = conn.prepareTupleQuery(QueryLanguage.SPARQL, queryString);
+
+            try (TupleQueryResult result = tupleQuery.evaluate()) {
+                while (result.hasNext()) {
+                    BindingSet bindingSet = result.next();
+                    IRI synsetIri = factory.createIRI(bindingSet.getValue("synset").stringValue());
+                    synsets.add(getSynset(synsetIri, typeIri.stringValue()));
+                }
+            }
+        }
+        return synsets;
+    }
+
     List<Synset> searchSynsets(String searchPhrase) {
         String queryString = String.format("SELECT ?type ?synset WHERE { ?synset <%s> ?type . ?type <%s> <%s> . ?synset <%s> ?label ." +
                         " filter contains(lcase(str(?label)), lcase(str(\"%s\"))) }",

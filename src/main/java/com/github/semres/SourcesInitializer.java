@@ -10,9 +10,9 @@ class SourcesInitializer {
             case "BabelNet": {
                 String basePath = SemRes.getBaseDirectory();
                 String confDirectory = (String) parameters.get("directory");
-                BabelNetManager.getInstance().loadConfiguration(basePath + confDirectory);
-                BabelNetManager.getInstance().setLanguage((String) parameters.get("language"));
-                return BabelNetManager.getInstance();
+                BabelNetManager.loadConfiguration(basePath + confDirectory);
+                BabelNetManager.setLanguage((String) parameters.get("language"));
+                return new BabelNetManager();
             }
         }
         return null;

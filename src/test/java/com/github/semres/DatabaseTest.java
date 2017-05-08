@@ -2,6 +2,7 @@ package com.github.semres;
 
 import com.github.semres.babelnet.*;
 import com.github.semres.user.*;
+import com.github.semres.user.CommonIRI;
 import it.uniroma1.lcl.babelnet.BabelSense;
 import it.uniroma1.lcl.babelnet.BabelSynset;
 import it.uniroma1.lcl.babelnet.BabelSynsetID;
@@ -64,6 +65,26 @@ public class DatabaseTest {
                     throw new Exception();
             }
         }
+    }
+
+    @Test
+    public void getSynsetsByType() throws Exception {
+        Database database = createTestDatabase();
+
+        UserSynset userSynset = new UserSynset("Foo");
+        userSynset.setId("123");
+        BabelNetSynset babelNetSynset = new BabelNetSynset("Bar");
+        babelNetSynset.setId("124");
+
+        database.addSynset(userSynset);
+        database.addSynset(babelNetSynset);
+
+        List<Synset> synsets = database.getSynsets(CommonIRI.USER_SYNSET);
+        assertTrue(synsets.size() == 1);
+        assertTrue(synsets.get(0).getId().equals("123"));
+        synsets = database.getSynsets(com.github.semres.babelnet.CommonIRI.BABELNET_SYNSET);
+        assertTrue(synsets.size() == 1);
+        assertTrue(synsets.get(0).getId().equals("124"));
     }
 
     @Test
@@ -299,7 +320,7 @@ public class DatabaseTest {
 
         Database database = new Database(synsetSerializers, edgeSerializers, repo);
         try (RepositoryConnection conn = repo.getConnection()) {
-            conn.add(BabelNetManager.getInstance().getMetadataStatements());
+            conn.add(new BabelNetManager().getMetadataStatements());
             conn.add(new UserManager().getMetadataStatements());
         }
         return database;

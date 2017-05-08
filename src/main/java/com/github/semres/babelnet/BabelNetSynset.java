@@ -12,20 +12,21 @@ import java.util.*;
 public class BabelNetSynset extends Synset {
     private BabelSynset babelSynset;
     private Set<String> removedRelations = new HashSet<>();
-    private Date lastUpdateDate;
     private boolean isDownloadedWithEdges;
+    private BabelNetManager babelNetManager;
 
     private BabelNetSynset(BabelNetSynset babelNetSynset) {
         super(babelNetSynset);
+        babelNetManager = new BabelNetManager();
     }
     public BabelNetSynset(BabelSynset synset) {
-        super(synset.getMainSense(BabelNetManager.getInstance().getJltLanguage()).getSenseString());
-
+        super(synset.getMainSense(BabelNetManager.getJltLanguage()).getSenseString());
         setId(synset.getId().getID());
+        babelNetManager = new BabelNetManager();
 
         String description;
         try {
-            description = synset.getMainGloss(BabelNetManager.getInstance().getJltLanguage()).getGloss();
+            description = synset.getMainGloss(BabelNetManager.getJltLanguage()).getGloss();
         } catch (IOException | NullPointerException e) {
             description = null;
         }
@@ -64,39 +65,13 @@ public class BabelNetSynset extends Synset {
     }
 
     @Override
-    protected BabelNetSynset addOutgoingEdge(Edge edge) {
+    public BabelNetSynset addOutgoingEdge(Edge edge) {
         if (edge instanceof BabelNetEdge && removedRelations.contains(edge.getPointedSynset())) {
             return null;
         }
         BabelNetSynset newSynset = new BabelNetSynset(this);
         newSynset.outgoingEdges.put(edge.getId(), edge);
         return newSynset;
-    }
-
-    public Date getLastUpdateDate() {
-        return lastUpdateDate;
-    }
-
-    public void update() throws IOException, InvalidBabelSynsetIDException {
-        if (babelSynset == null) {
-            babelSynset = BabelNetManager.getInstance().getBabelSynset(getId());
-        }
-
-        BabelSense sense = babelSynset.getMainSense(BabelNetManager.getInstance().getJltLanguage());
-        String representation = null;
-        if (sense != null) {
-            representation = sense.getSenseString();
-        }
-        String description;
-        try {
-            description = babelSynset.getMainGloss(BabelNetManager.getInstance().getJltLanguage()).toString();
-        } catch (IOException e) {
-            description = null;
-        }
-
-        this.representation = representation;
-        this.description = description;
-        lastUpdateDate = new Date();
     }
 
     public BabelNetSynset loadEdgesFromBabelNet() throws IOException {
@@ -106,7 +81,7 @@ public class BabelNetSynset extends Synset {
 
         if (babelSynset == null) {
             try {
-                babelSynset = BabelNetManager.getInstance().getBabelSynset(getId());
+                babelSynset = babelNetManager.getBabelSynset(getId());
             } catch (InvalidBabelSynsetIDException e) {
                 throw new Error(e.getMessage());
             }
