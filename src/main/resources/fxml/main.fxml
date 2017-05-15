@@ -18,6 +18,7 @@
         </Menu>
         <Menu fx:id="babelNetMenu" disable="true" mnemonicParsing="false" text="BabelNet">
             <MenuItem mnemonicParsing="false" onAction="#openSearchBabelNetWindow" text="Search" />
+            <MenuItem fx:id="updateMenuItem" mnemonicParsing="false" onAction="#openUpdatesWindow" text="Check for updates"/>
         </Menu>
         <Menu mnemonicParsing="false" text="Help">
             <MenuItem mnemonicParsing="false" text="About" />

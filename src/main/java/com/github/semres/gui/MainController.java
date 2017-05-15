@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.semres.Board;
 import com.github.semres.Edge;
 import com.github.semres.Synset;
+import com.github.semres.SynsetUpdate;
 import com.github.semres.babelnet.BabelNetManager;
 import com.github.semres.user.UserEdge;
 import com.teamdev.jxbrowser.chromium.Browser;
@@ -38,20 +39,13 @@ import java.util.stream.Collectors;
 
 public class MainController extends Controller implements Initializable {
 
-    @FXML
-    private MenuBar menuBar;
-
-    @FXML
-    private AnchorPane boardPane;
-
-    @FXML
-    private Menu viewMenu;
-    @FXML
-    private Menu babelNetMenu;
-    @FXML
-    private MenuItem saveMenuItem;
-    @FXML
-    private MenuItem exportMenuItem;
+    @FXML private MenuBar menuBar;
+    @FXML private AnchorPane boardPane;
+    @FXML private Menu viewMenu;
+    @FXML private Menu babelNetMenu;
+    @FXML private MenuItem saveMenuItem;
+    @FXML private MenuItem exportMenuItem;
+    @FXML private MenuItem updateMenuItem;
 
     private Board board;
     private Browser browser;
@@ -109,10 +103,6 @@ public class MainController extends Controller implements Initializable {
         clipboard.setContent(content);
     }
 
-    public void openDatabasesWindow() throws IOException {
-        openNewWindow("/fxml/databases-list.fxml", "Databases", 300, 275);
-    }
-
     void addSynset(Synset synset) {
         addSynsetToBoard(synset);
         addSynsetToView(synset);
@@ -168,6 +158,10 @@ public class MainController extends Controller implements Initializable {
         return board.downloadBabelNetEdges(synsetId);
     }
 
+    List<SynsetUpdate> checkForUpdates() throws IOException {
+        return board.checkForUpdates();
+    }
+
     boolean synsetExists(String id) {
         return board.isIdAlreadyTaken(id);
     }
@@ -176,12 +170,20 @@ public class MainController extends Controller implements Initializable {
         return babelNetManager.getSynsets(searchPhrase);
     }
 
+    public void openDatabasesWindow() throws IOException {
+        openNewWindow("/fxml/databases-list.fxml", "Databases", 300, 275);
+    }
+
     public void openLoadSynsetWindow() throws IOException {
         openNewWindow("/fxml/load-synset.fxml", "Load synset", 500, 350);
     }
 
     public void openSearchBabelNetWindow() throws IOException {
         openNewWindow("/fxml/search-babelnet.fxml", "Search BabelNet", 500, 350);
+    }
+
+    public void openUpdatesWindow() throws IOException {
+        openNewWindow("/fxml/updates-list.fxml", "BabelNet updates", 500, 350);
     }
 
     private Controller openNewWindow(String fxmlPath, String title, int width, int height) throws IOException {
@@ -344,7 +346,7 @@ public class MainController extends Controller implements Initializable {
         }
 
         public void downloadEdgesFromBabelNet(String synsetId) {
-            Collection<Edge> edges = null;
+            Collection<Edge> edges;
             try {
                 edges = MainController.this.downloadBabelNetEdges(synsetId);
             } catch (IOException e) {
