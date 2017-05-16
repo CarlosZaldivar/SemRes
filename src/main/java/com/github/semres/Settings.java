@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-class Settings {
+public class Settings {
     private String databasesDirectory;
     private List<Source> sources = new ArrayList<>();
 

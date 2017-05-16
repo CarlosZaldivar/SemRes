@@ -17,8 +17,9 @@ public class BabelNetSynset extends Synset {
 
     private BabelNetSynset(BabelNetSynset babelNetSynset) {
         super(babelNetSynset);
-        babelNetManager = new BabelNetManager();
+        babelNetManager = babelNetSynset.babelNetManager;
     }
+
     public BabelNetSynset(BabelSynset synset) {
         super(synset.getMainSense(BabelNetManager.getJltLanguage()).getSenseString());
         setId(synset.getId().getID());
@@ -46,6 +47,10 @@ public class BabelNetSynset extends Synset {
     BabelNetSynset(String representation, Set<String> removedRelations, boolean isDownloadedWithEdges) {
         this(representation, removedRelations);
         this.isDownloadedWithEdges = isDownloadedWithEdges;
+    }
+
+    public void setBabelNetManager(BabelNetManager babelNetManager) {
+        this.babelNetManager = babelNetManager;
     }
 
     public Set<String> getRemovedRelations() {

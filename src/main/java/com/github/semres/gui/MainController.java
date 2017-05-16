@@ -2,10 +2,7 @@ package com.github.semres.gui;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.semres.Board;
-import com.github.semres.Edge;
-import com.github.semres.Synset;
-import com.github.semres.SynsetUpdate;
+import com.github.semres.*;
 import com.github.semres.babelnet.BabelNetManager;
 import com.github.semres.user.UserEdge;
 import com.teamdev.jxbrowser.chromium.Browser;
@@ -39,6 +36,7 @@ import java.util.stream.Collectors;
 
 public class MainController extends Controller implements Initializable {
 
+    static Logger log = Logger.getRootLogger();
     @FXML private MenuBar menuBar;
     @FXML private AnchorPane boardPane;
     @FXML private Menu viewMenu;
@@ -46,11 +44,10 @@ public class MainController extends Controller implements Initializable {
     @FXML private MenuItem saveMenuItem;
     @FXML private MenuItem exportMenuItem;
     @FXML private MenuItem updateMenuItem;
-
     private Board board;
     private Browser browser;
     private BabelNetManager babelNetManager;
-    static Logger log = Logger.getRootLogger();
+    private DatabasesManager databasesManager;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -80,6 +77,7 @@ public class MainController extends Controller implements Initializable {
 
     void setBoard(Board board) {
         this.board = board;
+        board.setBabelNetManager(babelNetManager);
         browser.loadURL(getClass().getResource("/html/board.html").toExternalForm());
         String remoteDebuggingURL = browser.getRemoteDebuggingURL();
         log.info("Remote debugging URL: " + remoteDebuggingURL);
@@ -272,6 +270,18 @@ public class MainController extends Controller implements Initializable {
 
     public void close() {
         browser.dispose();
+    }
+
+    public void setBabelNetManager(BabelNetManager babelNetManager) {
+        this.babelNetManager = babelNetManager;
+    }
+
+    public DatabasesManager getDatabasesManager() {
+        return databasesManager;
+    }
+
+    public void setDatabasesManager(DatabasesManager databasesManager) {
+        this.databasesManager = databasesManager;
     }
 
     public class JavaApp {

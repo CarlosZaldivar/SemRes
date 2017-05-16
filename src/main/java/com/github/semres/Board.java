@@ -21,7 +21,7 @@ public class Board {
     private final Map<String, Synset> removedSynsets = new HashMap<>();
     private final Map<String, SynsetEdit> synsetEdits = new HashMap<>();
     private final Database attachedDatabase;
-    private final BabelNetManager babelNetManager;
+    private BabelNetManager babelNetManager;
 
     Board(Database attachedDatabase) {
         this.attachedDatabase = attachedDatabase;
@@ -30,6 +30,10 @@ public class Board {
 
     Board(Database attachedDatabase, BabelNetManager babelNetManager) {
         this.attachedDatabase = attachedDatabase;
+        this.babelNetManager = babelNetManager;
+    }
+
+    public void setBabelNetManager(BabelNetManager babelNetManager) {
         this.babelNetManager = babelNetManager;
     }
 
@@ -88,6 +92,7 @@ public class Board {
     }
 
     public List<Edge> downloadBabelNetEdges(String synsetId) throws IOException {
+        ((BabelNetSynset) synsets.get(synsetId)).setBabelNetManager(babelNetManager);
         BabelNetSynset updatedSynset = ((BabelNetSynset) synsets.get(synsetId)).loadEdgesFromBabelNet();
 
         SynsetEdit synsetEdit;

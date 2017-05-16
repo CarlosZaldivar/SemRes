@@ -7,7 +7,7 @@ import org.junit.runners.Suite;
 @Suite.SuiteClasses({
         BoardTest.class,
         DatabaseTest.class,
-        SemResTest.class,
+        DatabasesManagerTest.class,
         com.github.semres.user.TestSuite.class,
         com.github.semres.babelnet.TestSuite.class
 })

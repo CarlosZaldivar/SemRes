@@ -8,17 +8,17 @@ import java.util.ArrayList;
 
 import static org.junit.Assert.*;
 
-public class SemResTest {
+public class DatabasesManagerTest {
 
     @Test
     public void addRepository() throws Exception {
         try {
             Settings settings = new Settings("/tmp/semres-tests", new ArrayList<>());
-            SemRes semRes = new SemRes(settings);
-            assertTrue(semRes.getRepositoryIDs().size() == 1);
+            DatabasesManager databasesManager = new DatabasesManager(settings);
+            assertTrue(databasesManager.getRepositoryIDs().size() == 1);
 
-            semRes.addRepository("new-repo");
-            assertTrue(semRes.getRepositoryIDs().size() == 2);
+            databasesManager.addRepository("new-repo");
+            assertTrue(databasesManager.getRepositoryIDs().size() == 2);
         } finally {
             FileUtils.deleteDirectory(new File("/tmp/semres-tests"));
         }
