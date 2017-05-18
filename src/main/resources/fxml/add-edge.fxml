@@ -37,7 +37,7 @@
         </GridPane>
     </center>
     <bottom>
-        <ButtonBar prefHeight="40.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+        <ButtonBar BorderPane.alignment="CENTER">
             <buttons>
                 <Button fx:id="addButton" mnemonicParsing="false" onAction="#addEdge" text="Add" />
             </buttons>
@@ -45,7 +45,7 @@
                 <Insets />
             </BorderPane.margin>
             <padding>
-                <Insets right="20.0" />
+                <Insets bottom="10.0" left="20.0" right="20.0" top="10.0" />
             </padding>
         </ButtonBar>
     </bottom>

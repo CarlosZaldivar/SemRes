@@ -36,17 +36,14 @@
         </GridPane>
     </center>
     <bottom>
-        <ButtonBar fx:id="buttonBar" prefHeight="40.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+        <ButtonBar fx:id="buttonBar" BorderPane.alignment="CENTER">
             <buttons>
                 <Button fx:id="editButton" mnemonicParsing="false" onAction="#startEditing" text="Edit" />
                 <Button fx:id="cancelButton" mnemonicParsing="false" onAction="#cancelEditing" text="Cancel" />
                 <Button fx:id="saveButton" mnemonicParsing="false" onAction="#save" text="Save" />
             </buttons>
-            <BorderPane.margin>
-                <Insets />
-            </BorderPane.margin>
             <padding>
-                <Insets right="20.0" />
+                <Insets bottom="10.0" left="20.0" right="20.0" top="10.0" />
             </padding>
         </ButtonBar>
     </bottom>
