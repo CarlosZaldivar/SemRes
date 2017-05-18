@@ -43,4 +43,8 @@ public class Main extends Application {
         databasesManager.save();
         mainController.close();
     }
+
+    public MainController getMainController() {
+        return mainController;
+    }
 }

@@ -28,7 +28,7 @@ public class Board {
         babelNetManager = new BabelNetManager();
     }
 
-    Board(Database attachedDatabase, BabelNetManager babelNetManager) {
+    public Board(Database attachedDatabase, BabelNetManager babelNetManager) {
         this.attachedDatabase = attachedDatabase;
         this.babelNetManager = babelNetManager;
     }

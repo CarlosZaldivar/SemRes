@@ -160,6 +160,10 @@ public class MainController extends Controller implements Initializable {
         return board.checkForUpdates();
     }
 
+    public void update(List<SynsetUpdate> updates) {
+        board.update(updates);
+    }
+
     boolean synsetExists(String id) {
         return board.isIdAlreadyTaken(id);
     }
@@ -272,16 +276,20 @@ public class MainController extends Controller implements Initializable {
         browser.dispose();
     }
 
-    public void setBabelNetManager(BabelNetManager babelNetManager) {
-        this.babelNetManager = babelNetManager;
-    }
-
     public DatabasesManager getDatabasesManager() {
         return databasesManager;
     }
 
     public void setDatabasesManager(DatabasesManager databasesManager) {
         this.databasesManager = databasesManager;
+    }
+
+    public BabelNetManager getBabelNetManager() {
+        return babelNetManager;
+    }
+
+    public void setBabelNetManager(BabelNetManager babelNetManager) {
+        this.babelNetManager = babelNetManager;
     }
 
     public class JavaApp {

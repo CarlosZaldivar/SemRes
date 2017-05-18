@@ -85,11 +85,7 @@ public class BabelNetSynset extends Synset {
         }
 
         if (babelSynset == null) {
-            try {
-                babelSynset = babelNetManager.getBabelSynset(getId());
-            } catch (InvalidBabelSynsetIDException e) {
-                throw new Error(e.getMessage());
-            }
+            babelSynset = babelNetManager.getBabelSynset(getId());
         }
 
         BabelNetSynset newSynset = new BabelNetSynset(this);

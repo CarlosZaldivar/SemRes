@@ -1,45 +1,66 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.ProgressIndicator?>
 <?import javafx.scene.control.Accordion?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ProgressIndicator?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TitledPane?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.102" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.github.semres.gui.UpdatesListController">
-  <Accordion fx:id="accordion">
-    <panes>
-      <TitledPane animated="false" text="Added edges">
-          <AnchorPane layoutX="62.0" layoutY="62.0" prefHeight="160.0" prefWidth="163.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-            <TableView fx:id="addedEdgesTable" layoutX="7.0" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-              <columnResizePolicy><TableView fx:constant="CONSTRAINED_RESIZE_POLICY" /></columnResizePolicy>
-              <columns>
-                <TableColumn fx:id="addedEdgeFromColumn" prefWidth="75.0" text="From" />
-                <TableColumn fx:id="addedEdgeToColumn" prefWidth="75.0" text="To" />
-                <TableColumn fx:id="addedEdgeTypeColumn" prefWidth="75.0" text="Type" />
-                <TableColumn fx:id="addedEdgeWeightColumn" prefWidth="75.0" text="Weight" />
-                <TableColumn prefWidth="75.0" />
-              </columns>
-            </TableView>
-          </AnchorPane>
-      </TitledPane>
-      <TitledPane animated="false" text="Deleted edges">
-        <AnchorPane layoutX="62.0" layoutY="62.0" prefHeight="160.0" prefWidth="163.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-          <TableView fx:id="removedEdgesTable" layoutX="7.0" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-            <columnResizePolicy><TableView fx:constant="CONSTRAINED_RESIZE_POLICY" /></columnResizePolicy>
-            <columns>
-              <TableColumn fx:id="removedEdgeFromColumn" prefWidth="75.0" text="From" />
-              <TableColumn fx:id="removedEdgeToColumn" prefWidth="75.0" text="To" />
-              <TableColumn fx:id="removedEdgeTypeColumn" prefWidth="75.0" text="Type" />
-              <TableColumn fx:id="removedEdgeWeightColumn" prefWidth="75.0" text="Weight" />
-              <TableColumn prefWidth="75.0" />
-            </columns>
-          </TableView>
-        </AnchorPane>
-      </TitledPane>
-    </panes>
-  </Accordion>
-  <ProgressIndicator fx:id="progressIndicator"/>
-</VBox>
+<?import javafx.scene.layout.BorderPane?>
+
+<?import javafx.scene.control.ButtonBar?>
+<?import javafx.geometry.Insets?>
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.102" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.github.semres.gui.UpdatesListController">
+  <BorderPane fx:id="mainPane" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+    <top>
+      <Accordion>
+        <panes>
+          <TitledPane animated="false" text="Added edges">
+              <AnchorPane layoutX="62.0" layoutY="62.0" prefHeight="160.0" prefWidth="163.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                <TableView fx:id="addedEdgesTable" layoutX="7.0" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                  <columnResizePolicy><TableView fx:constant="CONSTRAINED_RESIZE_POLICY" /></columnResizePolicy>
+                  <columns>
+                    <TableColumn fx:id="addedEdgeFromColumn" prefWidth="75.0" text="From" />
+                    <TableColumn fx:id="addedEdgeToColumn" prefWidth="75.0" text="To" />
+                    <TableColumn fx:id="addedEdgeTypeColumn" prefWidth="75.0" text="Type" />
+                    <TableColumn fx:id="addedEdgeWeightColumn" prefWidth="75.0" text="Weight" />
+                    <TableColumn prefWidth="75.0" />
+                  </columns>
+                </TableView>
+              </AnchorPane>
+          </TitledPane>
+          <TitledPane animated="false" text="Deleted edges">
+            <AnchorPane layoutX="62.0" layoutY="62.0" prefHeight="160.0" prefWidth="163.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+              <TableView fx:id="removedEdgesTable" layoutX="7.0" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                <columnResizePolicy><TableView fx:constant="CONSTRAINED_RESIZE_POLICY" /></columnResizePolicy>
+                <columns>
+                  <TableColumn fx:id="removedEdgeFromColumn" prefWidth="75.0" text="From" />
+                  <TableColumn fx:id="removedEdgeToColumn" prefWidth="75.0" text="To" />
+                  <TableColumn fx:id="removedEdgeTypeColumn" prefWidth="75.0" text="Type" />
+                  <TableColumn fx:id="removedEdgeWeightColumn" prefWidth="75.0" text="Weight" />
+                  <TableColumn prefWidth="75.0" />
+                </columns>
+              </TableView>
+            </AnchorPane>
+          </TitledPane>
+        </panes>
+      </Accordion>
+    </top>
+    <bottom>
+      <ButtonBar BorderPane.alignment="CENTER">
+        <buttons>
+          <Button fx:id="applyButton" onAction="#applyUpdates" text="Apply" />
+        </buttons>
+        <padding>
+          <Insets right="20.0" bottom="10" left="20" top="10"/>
+        </padding>
+      </ButtonBar>
+    </bottom>
+  </BorderPane>
+  <VBox fx:id="progressIndicatorVB" alignment="CENTER" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+    <ProgressIndicator/>
+  </VBox>
+</AnchorPane>

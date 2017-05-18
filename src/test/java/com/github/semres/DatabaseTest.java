@@ -309,7 +309,7 @@ public class DatabaseTest {
         assertTrue(id.length() == 26);
     }
 
-    static Database createTestDatabase() throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
+    public static Database createTestDatabase() throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
         Repository repo = new SailRepository(new MemoryStore());
         List<Class<? extends SynsetSerializer>> synsetSerializers = new ArrayList<>();
         synsetSerializers.add(UserSynsetSerializer.class);

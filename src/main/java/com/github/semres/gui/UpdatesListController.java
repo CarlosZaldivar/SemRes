@@ -4,15 +4,16 @@ import com.github.semres.Edge;
 import com.github.semres.SynsetUpdate;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Accordion;
-import javafx.scene.control.ProgressIndicator;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.net.URL;
@@ -20,6 +21,9 @@ import java.util.List;
 import java.util.ResourceBundle;
 
 public class UpdatesListController extends ChildController implements Initializable {
+    @FXML private BorderPane mainPane;
+    @FXML private VBox progressIndicatorVB;
+    @FXML private Button applyButton;
     @FXML private TableView<EdgeData> removedEdgesTable;
     @FXML private TableView<EdgeData> addedEdgesTable;
     @FXML private TableColumn<EdgeData, String> addedEdgeFromColumn;
@@ -30,8 +34,6 @@ public class UpdatesListController extends ChildController implements Initializa
     @FXML private TableColumn<EdgeData, String> removedEdgeToColumn;
     @FXML private TableColumn<EdgeData, Edge.RelationType> removedEdgeTypeColumn;
     @FXML private TableColumn<EdgeData, Double> removedEdgeWeightColumn;
-    @FXML private ProgressIndicator progressIndicator;
-    @FXML private Accordion accordion;
 
     private List<SynsetUpdate> updates;
     private ObservableList<EdgeData> addedEdges;
@@ -52,14 +54,14 @@ public class UpdatesListController extends ChildController implements Initializa
     public void initialize(URL location, ResourceBundle resources) {
         updateTask = new Task<List<SynsetUpdate>>() {
             @Override
-            protected List<SynsetUpdate> call() throws IOException {
+            protected List<SynsetUpdate> call() throws IOException, InterruptedException {
                 return ((MainController) parent).checkForUpdates();
             }
         };
-        progressIndicator.visibleProperty().bind(updateTask.runningProperty());
-        progressIndicator.managedProperty().bind(updateTask.runningProperty());
-        accordion.visibleProperty().bind(updateTask.runningProperty().not());
-        accordion.visibleProperty().bind(updateTask.runningProperty().not());
+        mainPane.visibleProperty().bind(updateTask.runningProperty().not());
+        mainPane.managedProperty().bind(updateTask.runningProperty().not());
+        progressIndicatorVB.visibleProperty().bind(updateTask.runningProperty());
+        progressIndicatorVB.managedProperty().bind(updateTask.runningProperty());
 
         updateTask.setOnSucceeded(workerStateEvent -> showUpdates());
         updateTask.setOnFailed(workerStateEvent -> Utils.showAlert(updateTask.getException().getMessage()));
@@ -74,8 +76,17 @@ public class UpdatesListController extends ChildController implements Initializa
         removedEdgeTypeColumn.setCellValueFactory(new PropertyValueFactory<>("type"));
         removedEdgeWeightColumn.setCellValueFactory(new PropertyValueFactory<>("weight"));
 
+        addedEdges = FXCollections.observableArrayList();
+        removedEdges = FXCollections.observableArrayList();
+
         addedEdgesTable.setItems(addedEdges);
         removedEdgesTable.setItems(removedEdges);
+    }
+
+    public void applyUpdates() {
+        ((MainController) parent).update(updates);
+        Stage stage = (Stage) applyButton.getScene().getWindow();
+        stage.close();
     }
 
     private void showUpdates() {
@@ -92,7 +103,7 @@ public class UpdatesListController extends ChildController implements Initializa
     }
 
     private void addEdgeToObservableList(Edge edge, SynsetUpdate update, ObservableList<EdgeData> list) {
-        String from = update.getOriginSynset(edge).getRepresentation();
+        String from = update.getOriginalSynset().getRepresentation();
         String to = update.getPointedSynset(edge).getRepresentation();
         list.add(new EdgeData(from, to, edge.getRelationType().toString(), edge.getWeight()));
     }

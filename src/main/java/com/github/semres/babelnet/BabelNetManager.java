@@ -38,8 +38,12 @@ public class BabelNetManager extends Source {
         language = Language.valueOf(languageCode);
     }
 
-    BabelSynset getBabelSynset(String id) throws InvalidBabelSynsetIDException, IOException {
-        return getBabelSynset(new BabelSynsetID(id));
+    public BabelSynset getBabelSynset(String id) throws IOException {
+        try {
+            return getBabelSynset(new BabelSynsetID(id));
+        } catch (InvalidBabelSynsetIDException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private BabelSynset getBabelSynset(BabelSynsetID id) throws IOException {

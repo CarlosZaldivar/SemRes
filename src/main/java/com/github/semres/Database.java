@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-class Database {
+public class Database {
     private List<SynsetSerializer> synsetSerializers;
     private List<EdgeSerializer> edgeSerializers;
     private Repository repository;
@@ -41,13 +41,13 @@ class Database {
         this.repository.initialize();
     }
 
-    void addSynset(Synset synset) {
+    public void addSynset(Synset synset) {
         try (RepositoryConnection conn = repository.getConnection()) {
             conn.add(getSerializerForSynset(synset).synsetToRdf(synset));
         }
     }
 
-    void addEdge(Edge edge) {
+    public void addEdge(Edge edge) {
         try (RepositoryConnection conn = repository.getConnection()) {
             conn.add(getSerializerForEdge(edge).edgeToRdf(edge));
         }

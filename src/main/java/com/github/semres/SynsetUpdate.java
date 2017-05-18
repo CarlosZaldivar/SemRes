@@ -94,10 +94,6 @@ public class SynsetUpdate {
         return new HashMap<>(edgeEdits);
     }
 
-    public BabelNetSynset getOriginSynset(Edge edge) {
-        return relatedSynsets.get(edge.getOriginSynset());
-    }
-
     public BabelNetSynset getPointedSynset(Edge edge) {
         return relatedSynsets.get(edge.getPointedSynset());
     }
