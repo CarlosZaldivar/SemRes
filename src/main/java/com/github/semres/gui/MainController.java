@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.semres.*;
 import com.github.semres.babelnet.BabelNetManager;
+import com.github.semres.babelnet.BabelNetSynset;
 import com.github.semres.user.UserEdge;
 import com.teamdev.jxbrowser.chromium.Browser;
 import com.teamdev.jxbrowser.chromium.BrowserPreferences;
@@ -168,7 +169,7 @@ public class MainController extends Controller implements Initializable {
         return board.isIdAlreadyTaken(id);
     }
 
-    List<? extends Synset> searchBabelNet(String searchPhrase) throws IOException {
+    List<BabelNetSynset> searchBabelNet(String searchPhrase) throws IOException {
         return babelNetManager.getSynsets(searchPhrase);
     }
 
