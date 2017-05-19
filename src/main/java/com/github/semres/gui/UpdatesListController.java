@@ -59,9 +59,7 @@ public class UpdatesListController extends ChildController implements Initializa
             }
         };
         mainPane.visibleProperty().bind(updateTask.runningProperty().not());
-        mainPane.managedProperty().bind(updateTask.runningProperty().not());
         progressIndicatorVB.visibleProperty().bind(updateTask.runningProperty());
-        progressIndicatorVB.managedProperty().bind(updateTask.runningProperty());
 
         updateTask.setOnSucceeded(workerStateEvent -> showUpdates());
         updateTask.setOnFailed(workerStateEvent -> Utils.showAlert(updateTask.getException().getMessage()));
