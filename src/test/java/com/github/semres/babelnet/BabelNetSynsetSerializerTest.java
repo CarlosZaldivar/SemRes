@@ -1,7 +1,7 @@
 package com.github.semres.babelnet;
 
 import com.github.semres.Edge;
-import com.github.semres.SR;
+import com.github.semres.SemRes;
 import org.eclipse.rdf4j.model.Model;
 import org.eclipse.rdf4j.model.ValueFactory;
 import org.eclipse.rdf4j.model.vocabulary.RDFS;
@@ -28,7 +28,7 @@ public class BabelNetSynsetSerializerTest {
         synset.setId("123");
         Model model = synsetSerializer.synsetToRdf(synset);
 
-        assertTrue(model.filter(null, SR.ID, factory.createLiteral("123")).size() == 1);
+        assertTrue(model.filter(null, SemRes.ID, factory.createLiteral("123")).size() == 1);
         assertTrue(model.filter(null, RDFS.LABEL, null).size() == 1);
         assertTrue(model.filter(null, RDFS.COMMENT, null).size() == 0);
 
@@ -45,7 +45,7 @@ public class BabelNetSynsetSerializerTest {
 
         model = synsetSerializer.synsetToRdf(synsetWithRemovedEdge);
 
-        assertTrue(model.filter(null, SR.REMOVED_RELATION,
+        assertTrue(model.filter(null, SemRes.REMOVED_RELATION,
                 factory.createIRI(baseIri + "synsets/" + synset.getId() + "/removedRelations/" + "124")).size() == 1);
     }
 

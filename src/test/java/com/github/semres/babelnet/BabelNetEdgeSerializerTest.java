@@ -2,7 +2,7 @@ package com.github.semres.babelnet;
 
 import com.github.semres.Edge;
 import com.github.semres.EdgeSerializer;
-import com.github.semres.SR;
+import com.github.semres.SemRes;
 import com.github.semres.Synset;
 import com.github.semres.user.UserSynset;
 import com.github.semres.user.UserSynsetSerializer;
@@ -34,8 +34,8 @@ public class BabelNetEdgeSerializerTest {
         BabelNetEdge edge = new BabelNetEdge(pointedSynset.getId(), originSynset.getId(), Edge.RelationType.HOLONYM, 0.4);
         Model model = edgeSerializer.edgeToRdf(edge);
 
-        assertTrue(model.filter(null, SR.ID, factory.createLiteral("124-123")).size() == 1);
-        assertTrue(model.filter(null, SR.RELATION_TYPE, SR.HOLONYM).size() == 1);
+        assertTrue(model.filter(null, SemRes.ID, factory.createLiteral("124-123")).size() == 1);
+        assertTrue(model.filter(null, SemRes.RELATION_TYPE, SemRes.HOLONYM).size() == 1);
         assertTrue(model.filter(null, RDFS.COMMENT, null).size() == 0);
 
         // Check edge with a description

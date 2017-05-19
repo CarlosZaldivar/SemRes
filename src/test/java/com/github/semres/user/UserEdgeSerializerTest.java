@@ -29,8 +29,8 @@ public class UserEdgeSerializerTest {
         UserEdge edge = new UserEdge(pointedSynset.getId(), originSynset.getId(), Edge.RelationType.HOLONYM, 0.4);
         Model model = edgeSerializer.edgeToRdf(edge);
 
-        assertTrue(model.filter(null, SR.ID, factory.createLiteral("124-123")).size() == 1);
-        assertTrue(model.filter(null, SR.RELATION_TYPE, SR.HOLONYM).size() == 1);
+        assertTrue(model.filter(null, SemRes.ID, factory.createLiteral("124-123")).size() == 1);
+        assertTrue(model.filter(null, SemRes.RELATION_TYPE, SemRes.HOLONYM).size() == 1);
         assertTrue(model.filter(null, RDFS.COMMENT, null).size() == 0);
 
         edge = edge.changeDescription("Description");

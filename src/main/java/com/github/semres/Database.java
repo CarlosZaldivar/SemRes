@@ -79,7 +79,7 @@ public class Database {
     boolean hasSynset(String id) {
         try (RepositoryConnection conn = repository.getConnection()) {
             String queryString = String.format("ASK  { ?synset <%s> ?type . ?type <%s> <%s> . ?synset <%s> %s }",
-                    RDF.TYPE, RDFS.SUBCLASSOF, SR.SYNSET, SR.ID, conn.getValueFactory().createLiteral(id));
+                    RDF.TYPE, RDFS.SUBCLASSOF, SemRes.SYNSET, SemRes.ID, conn.getValueFactory().createLiteral(id));
             BooleanQuery query = conn.prepareBooleanQuery(queryString);
             return query.evaluate();
         }
@@ -88,7 +88,7 @@ public class Database {
     boolean hasEdge(String id) {
         try (RepositoryConnection conn = repository.getConnection()) {
             String queryString = String.format("ASK  { ?edge <%s> ?type . ?type <%s> <%s> . ?edge <%s> %s }",
-                    RDF.TYPE, RDFS.SUBCLASSOF, SR.EDGE, SR.ID, conn.getValueFactory().createLiteral(id));
+                    RDF.TYPE, RDFS.SUBCLASSOF, SemRes.EDGE, SemRes.ID, conn.getValueFactory().createLiteral(id));
             BooleanQuery query = conn.prepareBooleanQuery(queryString);
             return query.evaluate();
         }
@@ -117,7 +117,7 @@ public class Database {
     public Synset getSynset(String id) {
         ValueFactory factory = repository.getValueFactory();
         String queryString = String.format("SELECT ?synset ?synsetType WHERE { ?synset <%s> %s . ?synset <%s> ?synsetType }",
-                SR.ID, factory.createLiteral(id), RDF.TYPE);
+                SemRes.ID, factory.createLiteral(id), RDF.TYPE);
         try (RepositoryConnection conn = repository.getConnection()) {
             TupleQuery tupleQuery = conn.prepareTupleQuery(queryString);
 
@@ -145,7 +145,7 @@ public class Database {
     }
 
     List<Synset> getSynsets() {
-        String queryString = String.format("SELECT ?type ?synset WHERE { ?synset <%s> ?type . ?type <%s> <%s> }", RDF.TYPE, RDFS.SUBCLASSOF, SR.SYNSET);
+        String queryString = String.format("SELECT ?type ?synset WHERE { ?synset <%s> ?type . ?type <%s> <%s> }", RDF.TYPE, RDFS.SUBCLASSOF, SemRes.SYNSET);
         return getSynsets(queryString);
     }
 
@@ -170,7 +170,7 @@ public class Database {
     List<Synset> searchSynsets(String searchPhrase) {
         String queryString = String.format("SELECT ?type ?synset WHERE { ?synset <%s> ?type . ?type <%s> <%s> . ?synset <%s> ?label ." +
                         " filter contains(lcase(str(?label)), lcase(str(\"%s\"))) }",
-                RDF.TYPE, RDFS.SUBCLASSOF, SR.SYNSET, RDFS.LABEL, searchPhrase);
+                RDF.TYPE, RDFS.SUBCLASSOF, SemRes.SYNSET, RDFS.LABEL, searchPhrase);
         return getSynsets(queryString);
     }
 
@@ -205,7 +205,7 @@ public class Database {
         ValueFactory factory = repository.getValueFactory();
         String queryString = String.format("SELECT ?edgeType ?edge" +
                 " WHERE { ?originSynset <%s> %s . ?originSynset ?edge ?pointedSynset . ?edge <%s> ?edgeType . ?edgeType <%s> <%s> }",
-                SR.ID, factory.createLiteral(originSynset.getId()), RDF.TYPE, RDFS.SUBCLASSOF, SR.EDGE);
+                SemRes.ID, factory.createLiteral(originSynset.getId()), RDF.TYPE, RDFS.SUBCLASSOF, SemRes.EDGE);
 
         return getEdges(queryString);
     }
@@ -214,7 +214,7 @@ public class Database {
         ValueFactory factory = repository.getValueFactory();
         String queryString = String.format("SELECT ?edgeType ?edge" +
                         " WHERE { ?pointedSynset <%s> %s . ?originSynset ?edge ?pointedSynset . ?edge <%s> ?edgeType . ?edgeType <%s> <%s> }",
-                SR.ID, factory.createLiteral(pointedSynset.getId()), RDF.TYPE, RDFS.SUBCLASSOF, SR.EDGE);
+                SemRes.ID, factory.createLiteral(pointedSynset.getId()), RDF.TYPE, RDFS.SUBCLASSOF, SemRes.EDGE);
         return getEdges(queryString);
     }
 

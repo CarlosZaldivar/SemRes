@@ -1,7 +1,7 @@
 package com.github.semres.user;
 
 import com.github.semres.EdgeSerializer;
-import com.github.semres.SR;
+import com.github.semres.SemRes;
 import com.github.semres.Source;
 import com.github.semres.SynsetSerializer;
 import org.eclipse.rdf4j.model.Model;
@@ -25,10 +25,10 @@ public class UserManager extends Source {
         Model model = new LinkedHashModel();
 
         model.add(CommonIRI.USER_SYNSET, RDF.TYPE, RDFS.CLASS);
-        model.add(CommonIRI.USER_SYNSET, RDFS.SUBCLASSOF, SR.SYNSET);
+        model.add(CommonIRI.USER_SYNSET, RDFS.SUBCLASSOF, SemRes.SYNSET);
 
         model.add(CommonIRI.USER_EDGE, RDF.TYPE, RDFS.CLASS);
-        model.add(CommonIRI.USER_EDGE, RDFS.SUBCLASSOF, SR.EDGE);
+        model.add(CommonIRI.USER_EDGE, RDFS.SUBCLASSOF, SemRes.EDGE);
 
         return model;
     }

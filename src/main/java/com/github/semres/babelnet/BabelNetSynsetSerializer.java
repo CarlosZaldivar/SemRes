@@ -1,6 +1,6 @@
 package com.github.semres.babelnet;
 
-import com.github.semres.SR;
+import com.github.semres.SemRes;
 import com.github.semres.SynsetSerializer;
 import com.github.semres.Synset;
 import it.uniroma1.lcl.babelnet.BabelSynsetID;
@@ -47,12 +47,12 @@ public class BabelNetSynsetSerializer extends SynsetSerializer {
         }
 
         model.add(synsetIri, RDF.TYPE, getSynsetClassIri());
-        model.add(synsetIri, SR.ID, factory.createLiteral(synset.getId()));
+        model.add(synsetIri, SemRes.ID, factory.createLiteral(synset.getId()));
 
         for (String removedRelation : ((BabelNetSynset) synset).getRemovedRelations()) {
             IRI removedRelationIRI = factory.createIRI(baseIri + "synsets/" + synset.getId() + "/removedRelations/" + removedRelation);
-            model.add(factory.createStatement(removedRelationIRI, SR.ID, factory.createLiteral(removedRelation)));
-            model.add(factory.createStatement(synsetIri, SR.REMOVED_RELATION, removedRelationIRI));
+            model.add(factory.createStatement(removedRelationIRI, SemRes.ID, factory.createLiteral(removedRelation)));
+            model.add(factory.createStatement(synsetIri, SemRes.REMOVED_RELATION, removedRelationIRI));
         }
 
         // Add information if BabelNet edges has been downloaded.
@@ -80,7 +80,7 @@ public class BabelNetSynsetSerializer extends SynsetSerializer {
             // Get synset representation, id, description and the flag if the edges from BabelNet were loaded or not
             String queryString = String.format("SELECT ?id ?representation ?edgesLoaded ?description " +
                             "WHERE { <%1$s> <%2$s> ?id . <%1$s> <%3$s> ?representation . <%1$s> <%4$s> ?edgesLoaded . OPTIONAL { <%1$s> <%5$s> ?description }}",
-                    synsetIri.stringValue(), SR.ID, RDFS.LABEL, CommonIRI.EDGES_DOWNLOADED, RDFS.COMMENT);
+                    synsetIri.stringValue(), SemRes.ID, RDFS.LABEL, CommonIRI.EDGES_DOWNLOADED, RDFS.COMMENT);
 
 
             TupleQuery tupleQuery = conn.prepareTupleQuery(QueryLanguage.SPARQL, queryString);
@@ -103,7 +103,7 @@ public class BabelNetSynsetSerializer extends SynsetSerializer {
 
             // Get removed relations
             queryString = String.format("SELECT ?removedRelationId WHERE { <%s> <%s> ?removedRelation . ?removedRelation <%s> ?removedRelationId }",
-                    synsetIri.stringValue(), SR.REMOVED_RELATION, SR.ID);
+                    synsetIri.stringValue(), SemRes.REMOVED_RELATION, SemRes.ID);
             tupleQuery = conn.prepareTupleQuery(QueryLanguage.SPARQL, queryString);
 
             Set<String> removedRelations = new HashSet<>();

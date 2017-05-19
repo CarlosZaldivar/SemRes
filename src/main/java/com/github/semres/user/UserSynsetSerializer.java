@@ -1,6 +1,6 @@
 package com.github.semres.user;
 
-import com.github.semres.SR;
+import com.github.semres.SemRes;
 import com.github.semres.Synset;
 import com.github.semres.SynsetSerializer;
 import org.eclipse.rdf4j.model.*;
@@ -28,7 +28,7 @@ public class UserSynsetSerializer extends SynsetSerializer {
         ValueFactory factory = repository.getValueFactory();
 
         model.add(getSynsetClassIri(), RDF.TYPE, RDFS.CLASS);
-        model.add(getSynsetClassIri(), RDFS.SUBCLASSOF, SR.SYNSET);
+        model.add(getSynsetClassIri(), RDFS.SUBCLASSOF, SemRes.SYNSET);
 
         IRI synsetIri = factory.createIRI(baseIri + "synsets/" + synset.getId());
 
@@ -43,7 +43,7 @@ public class UserSynsetSerializer extends SynsetSerializer {
         }
 
         model.add(synsetIri, RDF.TYPE, getSynsetClassIri());
-        model.add(synsetIri, SR.ID, factory.createLiteral(synset.getId()));
+        model.add(synsetIri, SemRes.ID, factory.createLiteral(synset.getId()));
 
         return model;
     }
@@ -57,7 +57,7 @@ public class UserSynsetSerializer extends SynsetSerializer {
 
         String queryString = String.format("SELECT ?id ?representation ?description " +
                         "WHERE { <%1$s> <%2$s> ?id . <%1$s> <%3$s> ?representation . OPTIONAL { <%1$s> <%4$s> ?description }}",
-                        synsetIri.stringValue(), SR.ID, RDFS.LABEL, RDFS.COMMENT);
+                        synsetIri.stringValue(), SemRes.ID, RDFS.LABEL, RDFS.COMMENT);
 
         try (RepositoryConnection conn = repository.getConnection()) {
             TupleQuery tupleQuery = conn.prepareTupleQuery(QueryLanguage.SPARQL, queryString);

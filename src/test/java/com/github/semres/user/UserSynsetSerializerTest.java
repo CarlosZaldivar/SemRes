@@ -1,6 +1,6 @@
 package com.github.semres.user;
 
-import com.github.semres.SR;
+import com.github.semres.SemRes;
 import com.github.semres.SynsetSerializer;
 import org.eclipse.rdf4j.model.Model;
 import org.eclipse.rdf4j.model.ValueFactory;
@@ -27,7 +27,7 @@ public class UserSynsetSerializerTest {
         synset.setId("123");
         Model model = synsetSerializer.synsetToRdf(synset);
 
-        assertTrue(model.filter(null, SR.ID, factory.createLiteral("123")).size() == 1);
+        assertTrue(model.filter(null, SemRes.ID, factory.createLiteral("123")).size() == 1);
         assertTrue(model.filter(null, RDFS.LABEL, null).size() == 1);
         assertTrue(model.filter(null, RDFS.COMMENT, null).size() == 0);
 

@@ -30,25 +30,25 @@ public abstract class EdgeSerializer {
         }
 
         model.add(edgeIri, RDF.TYPE, getEdgeClassIri());
-        model.add(edgeIri, SR.ID, factory.createLiteral(edge.getId()));
+        model.add(edgeIri, SemRes.ID, factory.createLiteral(edge.getId()));
 
         switch (edge.getRelationType()) {
             case HOLONYM:
-                model.add(edgeIri, SR.RELATION_TYPE, SR.HOLONYM);
+                model.add(edgeIri, SemRes.RELATION_TYPE, SemRes.HOLONYM);
                 break;
             case HYPERNYM:
-                model.add(edgeIri, SR.RELATION_TYPE, SR.HYPERNYM);
+                model.add(edgeIri, SemRes.RELATION_TYPE, SemRes.HYPERNYM);
                 break;
             case HYPONYM:
-                model.add(edgeIri, SR.RELATION_TYPE, SR.HYPONYM);
+                model.add(edgeIri, SemRes.RELATION_TYPE, SemRes.HYPONYM);
                 break;
             case MERONYM:
-                model.add(edgeIri, SR.RELATION_TYPE, SR.MERONYM);
+                model.add(edgeIri, SemRes.RELATION_TYPE, SemRes.MERONYM);
                 break;
         }
 
         model.add(factory.createIRI(baseIri + "synsets/" + edge.getOriginSynset()), edgeIri, factory.createIRI(baseIri + "synsets/" + edge.getPointedSynset()));
-        model.add(edgeIri, SR.WEIGHT, factory.createLiteral(edge.getWeight()));
+        model.add(edgeIri, SemRes.WEIGHT, factory.createLiteral(edge.getWeight()));
 
         return model;
     }
@@ -59,13 +59,13 @@ public abstract class EdgeSerializer {
     abstract public IRI getEdgeClassIri();
 
     protected Edge.RelationType relationIriToEnum(IRI relationIri) {
-        if (relationIri.stringValue().equals(SR.HOLONYM.stringValue())) {
+        if (relationIri.stringValue().equals(SemRes.HOLONYM.stringValue())) {
             return Edge.RelationType.HOLONYM;
-        } if (relationIri.stringValue().equals(SR.HYPERNYM.stringValue())) {
+        } if (relationIri.stringValue().equals(SemRes.HYPERNYM.stringValue())) {
             return Edge.RelationType.HYPERNYM;
-        } if (relationIri.stringValue().equals(SR.HYPONYM.stringValue())) {
+        } if (relationIri.stringValue().equals(SemRes.HYPONYM.stringValue())) {
             return Edge.RelationType.HYPONYM;
-        } else if (relationIri.stringValue().equals(SR.MERONYM.stringValue())) {
+        } else if (relationIri.stringValue().equals(SemRes.MERONYM.stringValue())) {
             return Edge.RelationType.MERONYM;
         } else {
             return Edge.RelationType.OTHER;

@@ -84,10 +84,10 @@ public class BabelNetManager extends Source {
         Model model = new LinkedHashModel();
 
         model.add(CommonIRI.BABELNET_SYNSET, RDF.TYPE, RDFS.CLASS);
-        model.add(CommonIRI.BABELNET_SYNSET, RDFS.SUBCLASSOF, SR.SYNSET);
+        model.add(CommonIRI.BABELNET_SYNSET, RDFS.SUBCLASSOF, SemRes.SYNSET);
 
         model.add(CommonIRI.BABELNET_EDGE, RDF.TYPE, RDFS.CLASS);
-        model.add(CommonIRI.BABELNET_EDGE, RDFS.SUBCLASSOF, SR.EDGE);
+        model.add(CommonIRI.BABELNET_EDGE, RDFS.SUBCLASSOF, SemRes.EDGE);
 
         model.add(CommonIRI.EDGES_DOWNLOADED, RDF.TYPE, RDF.PROPERTY);
         return model;
