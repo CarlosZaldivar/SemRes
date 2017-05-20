@@ -163,6 +163,14 @@ public class MainController extends Controller implements Initializable {
 
     public void update(List<SynsetUpdate> updates) {
         board.update(updates);
+        redrawNodes();
+    }
+
+    private void redrawNodes() {
+        browser.executeJavaScript("clear()");
+        for (Synset synset : board.getSynsets().values().stream().filter(Synset::isExpanded).collect(Collectors.toList())) {
+            addSynsetToView(synset);
+        }
     }
 
     boolean synsetExists(String id) {

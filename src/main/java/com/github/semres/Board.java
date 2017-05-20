@@ -331,7 +331,9 @@ public class Board {
 
             for (Edge edge : update.getAddedEdges().values()) {
                 if (!isIdAlreadyTaken(edge.getPointedSynset())) {
-                    attachedDatabase.addSynset(update.getPointedSynset(edge));
+                    Synset pointedSynset = update.getPointedSynset(edge);
+                    attachedDatabase.addSynset(pointedSynset);
+                    synsets.put(pointedSynset.getId(), pointedSynset);
                 }
                 attachedDatabase.addEdge(edge);
             }
@@ -384,5 +386,9 @@ public class Board {
             return true;
         }
         return false;
+    }
+
+    public Map<String,Synset> getSynsets() {
+        return synsets;
     }
 }
