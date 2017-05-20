@@ -20,6 +20,10 @@ public class SynsetUpdate {
     public SynsetUpdate(BabelNetSynset originalSynset, BabelNetSynset updatedSynset, Map<String, BabelNetSynset> relatedSynsets) {
         this.originalSynset = originalSynset;
         this.relatedSynsets = relatedSynsets;
+        if (updatedSynset == null) {
+            this.updatedSynset = null;
+            return;
+        }
 
         isSynsetDataUpdated = synsetsAreDifferent(originalSynset, updatedSynset);
 

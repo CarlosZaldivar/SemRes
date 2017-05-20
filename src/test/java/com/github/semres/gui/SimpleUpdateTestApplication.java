@@ -20,7 +20,7 @@ import java.util.Set;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
-public class TestApplication extends Main {
+public class SimpleUpdateTestApplication extends Main {
     String originSynsetId = "bn:00024922n";
     String pointedRemovedSynsetId = "bn:00024923n";
     String pointedEditedSynsetId = "bn:00024924n";

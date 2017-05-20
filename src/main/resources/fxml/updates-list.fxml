@@ -48,6 +48,19 @@
                 </TableView>
               </AnchorPane>
             </TitledPane>
+            <TitledPane text="Deleted synsets">
+              <AnchorPane layoutX="62.0" layoutY="62.0" prefHeight="160.0" prefWidth="163.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                <TableView fx:id="removedSynsetsTable" layoutX="7.0" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                  <columnResizePolicy><TableView fx:constant="CONSTRAINED_RESIZE_POLICY" /></columnResizePolicy>
+                  <columns>
+                    <TableColumn fx:id="removedSynsetIdColumn" prefWidth="75.0" text="ID" />
+                    <TableColumn fx:id="removedSynsetRepresentationColumn" prefWidth="75.0" text="Representation" />
+                    <TableColumn fx:id="removedSynsetDescriptionColumn" prefWidth="75.0" text="Description" />
+                    <TableColumn prefWidth="75.0" />
+                  </columns>
+                </TableView>
+              </AnchorPane>
+            </TitledPane>
           </panes>
         </Accordion>
       </top>

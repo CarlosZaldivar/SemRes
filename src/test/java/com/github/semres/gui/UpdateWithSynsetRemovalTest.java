@@ -5,17 +5,16 @@ import javafx.scene.input.MouseButton;
 import javafx.stage.Stage;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Test;
 import org.testfx.api.FxToolkit;
 import org.testfx.framework.junit.ApplicationTest;
 
 import java.util.concurrent.TimeoutException;
 
-
-public class TestFXBase extends ApplicationTest {
-
+public class UpdateWithSynsetRemovalTest extends ApplicationTest {
     @Before
     public void setUpClass() throws Exception {
-        ApplicationTest.launch(TestApplication.class);
+        ApplicationTest.launch(UpdateWithSynsetRemovalTestApplication.class);
     }
 
     @Override
@@ -28,5 +27,18 @@ public class TestFXBase extends ApplicationTest {
         FxToolkit.hideStage();
         release(new KeyCode[]{});
         release(new MouseButton[]{});
+    }
+
+    @Test
+    public void updateTest() throws Exception {
+        clickOn("#fileMenu");
+        clickOn("#databasesMenuItem");
+        doubleClickOn("Test database");
+        clickOn("#babelNetMenu");
+        clickOn("#updateMenuItem");
+
+        // Sleep to give some additional time to the thread that loads updates.
+        sleep(1000);
+        clickOn("#applyButton");
     }
 }

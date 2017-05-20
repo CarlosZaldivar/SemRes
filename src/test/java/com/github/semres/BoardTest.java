@@ -368,6 +368,41 @@ public class BoardTest {
         assertTrue(board.getSynset(originSynsetId).getOutgoingEdges().size() == 0);
     }
 
+    @Test
+    public void removeSynsetInAnUpdate() throws Exception {
+        BabelNetSynset originalSynset = new BabelNetSynset("Foo");
+        String originSynsetId = "bn:00024922n";
+        originalSynset.setId(originSynsetId);
+
+        BabelNetSynset pointedSynset = new BabelNetSynset("Bar");
+        String pointedSynsetId = "bn:00024923n";
+        pointedSynset.setId(pointedSynsetId);
+
+        BabelNetEdge edge = new BabelNetEdge(pointedSynset.getId(), originalSynset.getId(), Edge.RelationType.HOLONYM, 0.0);
+
+        BabelNetSynset updatedOriginSynset = getMockOriginBabelNetSynsetWithoutEdges(originSynsetId);
+
+        BabelNetManager mockManager = Mockito.mock(BabelNetManager.class);
+        when(mockManager.getSynset(originSynsetId)).thenReturn(updatedOriginSynset);
+
+        Database database = DatabaseTest.createTestDatabase();
+        Board board = new Board(database, mockManager);
+
+        board.addSynset(originalSynset);
+        board.addSynset(pointedSynset);
+        board.addEdge(edge);
+        board.save();
+
+        assertTrue(board.getSynsets().size() == 2);
+        assertTrue(database.getSynset(pointedSynsetId) != null);
+
+        board.update(board.checkForUpdates());
+
+        assertTrue(board.getSynset(originSynsetId).getOutgoingEdges().size() == 0);
+        assertTrue(board.getSynsets().size() == 1);
+        assertTrue(database.getSynset(pointedSynsetId) == null);
+    }
+
     private BabelSense getMockOriginBabelSense() {
         BabelSense mockBabelSense = Mockito.mock(BabelSense.class);
         when(mockBabelSense.getSenseString()).thenReturn("Foo");

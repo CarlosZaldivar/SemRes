@@ -1,6 +1,7 @@
 package com.github.semres.gui;
 
 import com.github.semres.Edge;
+import com.github.semres.Synset;
 import com.github.semres.SynsetUpdate;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -26,6 +27,7 @@ public class UpdatesListController extends ChildController implements Initializa
     @FXML private Button applyButton;
     @FXML private TableView<EdgeData> removedEdgesTable;
     @FXML private TableView<EdgeData> addedEdgesTable;
+    @FXML private TableView<Synset> removedSynsetsTable;
     @FXML private TableColumn<EdgeData, String> addedEdgeFromColumn;
     @FXML private TableColumn<EdgeData, String> addedEdgeToColumn;
     @FXML private TableColumn<EdgeData, Edge.RelationType> addedEdgeTypeColumn;
@@ -34,10 +36,14 @@ public class UpdatesListController extends ChildController implements Initializa
     @FXML private TableColumn<EdgeData, String> removedEdgeToColumn;
     @FXML private TableColumn<EdgeData, Edge.RelationType> removedEdgeTypeColumn;
     @FXML private TableColumn<EdgeData, Double> removedEdgeWeightColumn;
+    @FXML private TableColumn<Synset, String> removedSynsetIdColumn;
+    @FXML private TableColumn<Synset, String> removedSynsetRepresentationColumn;
+    @FXML private TableColumn<Synset, String> removedSynsetDescriptionColumn;
 
     private List<SynsetUpdate> updates;
     private ObservableList<EdgeData> addedEdges;
     private ObservableList<EdgeData> removedEdges;
+    private ObservableList<Synset> removedSynsets;
     private Task<List<SynsetUpdate>> updateTask;
 
     @Override
@@ -74,11 +80,17 @@ public class UpdatesListController extends ChildController implements Initializa
         removedEdgeTypeColumn.setCellValueFactory(new PropertyValueFactory<>("type"));
         removedEdgeWeightColumn.setCellValueFactory(new PropertyValueFactory<>("weight"));
 
+        removedSynsetIdColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
+        removedSynsetRepresentationColumn.setCellValueFactory(new PropertyValueFactory<>("representation"));
+        removedSynsetDescriptionColumn.setCellValueFactory(new PropertyValueFactory<>("description"));
+
         addedEdges = FXCollections.observableArrayList();
         removedEdges = FXCollections.observableArrayList();
+        removedSynsets = FXCollections.observableArrayList();
 
         addedEdgesTable.setItems(addedEdges);
         removedEdgesTable.setItems(removedEdges);
+        removedSynsetsTable.setItems(removedSynsets);
     }
 
     public void applyUpdates() {
@@ -90,6 +102,11 @@ public class UpdatesListController extends ChildController implements Initializa
     private void showUpdates() {
         updates = updateTask.getValue();
         for (SynsetUpdate update : updates) {
+            if (update.getUpdatedSynset() == null) {
+                removedSynsets.add(update.getOriginalSynset());
+                continue;
+            }
+
             for (Edge edge : update.getAddedEdges().values()) {
                 addEdgeToObservableList(edge, update, addedEdges);
             }

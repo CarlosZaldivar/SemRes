@@ -289,11 +289,17 @@ public class Board {
         for (Synset synset : synsets) {
             BabelNetSynset originalSynset = (BabelNetSynset) synset;
             originalSynset.setOutgoingEdges(attachedDatabase.getOutgoingEdges(originalSynset));
-
             BabelNetSynset updatedSynset = babelNetManager.getSynset(originalSynset.getId());
+
+            // If synset is not found in BabelNet, remove it.
+            if (updatedSynset == null) {
+                updates.add(new SynsetUpdate(originalSynset, null, null));
+                continue;
+            }
+
             updatedSynset = updatedSynset.loadEdgesFromBabelNet();
 
-            Map<String, BabelNetSynset> relatedSynsets = new HashMap();
+            Map<String, BabelNetSynset> relatedSynsets = new HashMap<>();
 
             for (Edge edge : originalSynset.getOutgoingEdges().values().stream().filter((e) -> e instanceof BabelNetEdge).collect(Collectors.toList())) {
                 relatedSynsets.put(edge.getPointedSynset(), (BabelNetSynset) loadSynset(edge.getPointedSynset()));
@@ -321,6 +327,12 @@ public class Board {
         }
 
         for (SynsetUpdate update : updates) {
+            if (update.getUpdatedSynset() == null) {
+                attachedDatabase.removeSynset(update.getOriginalSynset());
+                synsets.remove(update.getOriginalSynset().getId());
+                continue;
+            }
+
             if (update.isSynsetDataUpdated()) {
                 attachedDatabase.editSynset(update.getUpdatedSynset(), update.getOriginalSynset());
             }
