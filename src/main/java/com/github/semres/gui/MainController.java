@@ -8,6 +8,7 @@ import com.github.semres.babelnet.BabelNetSynset;
 import com.github.semres.user.UserEdge;
 import com.teamdev.jxbrowser.chromium.Browser;
 import com.teamdev.jxbrowser.chromium.BrowserPreferences;
+import com.teamdev.jxbrowser.chromium.JSArray;
 import com.teamdev.jxbrowser.chromium.JSValue;
 import com.teamdev.jxbrowser.chromium.events.ScriptContextAdapter;
 import com.teamdev.jxbrowser.chromium.events.ScriptContextEvent;
@@ -167,9 +168,10 @@ public class MainController extends Controller implements Initializable {
     }
 
     private void redrawNodes() {
-        browser.executeJavaScript("clear()");
-        for (Synset synset : board.getSynsets().values().stream().filter(Synset::isExpanded).collect(Collectors.toList())) {
-            addSynsetToView(synset);
+        JSArray synsetIds =  browser.executeJavaScriptAndReturnValue("clear()").asArray();
+        for (int i = 0; i < synsetIds.length(); ++i) {
+            String id = synsetIds.get(0).getStringValue();
+            addSynsetToView(board.getSynset(id));
         }
     }
 

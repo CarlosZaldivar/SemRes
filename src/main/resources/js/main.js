@@ -279,7 +279,11 @@ function removeEdge(event) {
 }
 
 function clear() {
+    var synsetIds = cy.nodes().map(function (synset) {
+        return synset.data().id;
+    });
     cy.elements().remove();
+    return synsetIds;
 }
 
 function expandSynset(synsetId, pointedSynsets, edges) {

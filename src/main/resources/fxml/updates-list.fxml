@@ -29,7 +29,7 @@
                       <TableColumn fx:id="addedEdgeToColumn" prefWidth="75.0" text="To" />
                       <TableColumn fx:id="addedEdgeTypeColumn" prefWidth="75.0" text="Type" />
                       <TableColumn fx:id="addedEdgeWeightColumn" prefWidth="75.0" text="Weight" />
-                      <TableColumn prefWidth="75.0" />
+                      <TableColumn fx:id="addedEdgeCancelColumn" prefWidth="75.0" />
                     </columns>
                   </TableView>
                 </AnchorPane>
@@ -43,7 +43,7 @@
                     <TableColumn fx:id="removedEdgeToColumn" prefWidth="75.0" text="To" />
                     <TableColumn fx:id="removedEdgeTypeColumn" prefWidth="75.0" text="Type" />
                     <TableColumn fx:id="removedEdgeWeightColumn" prefWidth="75.0" text="Weight" />
-                    <TableColumn prefWidth="75.0" />
+                    <TableColumn fx:id="removedEdgeCancelColumn" prefWidth="75.0"/>
                   </columns>
                 </TableView>
               </AnchorPane>
@@ -56,7 +56,7 @@
                     <TableColumn fx:id="removedSynsetIdColumn" prefWidth="75.0" text="ID" />
                     <TableColumn fx:id="removedSynsetRepresentationColumn" prefWidth="75.0" text="Representation" />
                     <TableColumn fx:id="removedSynsetDescriptionColumn" prefWidth="75.0" text="Description" />
-                    <TableColumn prefWidth="75.0" />
+                    <TableColumn fx:id="removedSynsetCancelColumn" prefWidth="75.0" />
                   </columns>
                 </TableView>
               </AnchorPane>

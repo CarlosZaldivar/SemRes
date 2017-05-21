@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 
 public class SynsetUpdate {
     private final BabelNetSynset originalSynset;
-    private final BabelNetSynset updatedSynset;
+    private BabelNetSynset updatedSynset;
     private final Map<String, Edge> addedEdges = new HashMap<>();
     private final Map<String, Edge> removedEdges = new HashMap<>();
     private final Map<String, EdgeEdit> edgeEdits = new HashMap<>();
@@ -102,19 +102,23 @@ public class SynsetUpdate {
         return relatedSynsets.get(edge.getPointedSynset());
     }
 
-    void cancelEdgeRemoval(String id) {
+    public void cancelEdgeRemoval(String id) {
+        updatedSynset = updatedSynset.addOutgoingEdge(originalSynset.getOutgoingEdges().get(id));
         removedEdges.remove(id);
     }
 
-    void cancelEdgeAddition(String id) {
+    public void cancelEdgeAddition(String id) {
+        updatedSynset = updatedSynset.removeOutgoingEdge(id);
+        // Since removing edge updates removedRelations set, we also want to update the synset itself
+        isSynsetDataUpdated = true;
         addedEdges.remove(id);
     }
 
-    void cancelEdgeEdition(String id) {
+    public void cancelEdgeEdition(String id) {
         edgeEdits.remove(id);
     }
 
-    void cancelSynsetEdition() {
+    public void cancelSynsetEdition() {
         isSynsetDataUpdated = false;
     }
 }
