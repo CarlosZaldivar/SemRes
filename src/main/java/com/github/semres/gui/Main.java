@@ -41,7 +41,7 @@ public class Main extends Application {
     @Override
     public void stop() {
         databasesManager.save();
-        mainController.close();
+        mainController.dispose();
     }
 
     public MainController getMainController() {

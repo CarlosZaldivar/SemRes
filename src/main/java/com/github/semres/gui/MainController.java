@@ -283,7 +283,7 @@ public class MainController extends Controller implements Initializable {
         return jsonEdges;
     }
 
-    public void close() {
+    public void dispose() {
         browser.dispose();
     }
 
@@ -301,6 +301,11 @@ public class MainController extends Controller implements Initializable {
 
     public void setBabelNetManager(BabelNetManager babelNetManager) {
         this.babelNetManager = babelNetManager;
+    }
+
+    public void exit() {
+        Stage stage = (Stage) menuBar.getScene().getWindow();
+        stage.close();
     }
 
     public class JavaApp {
