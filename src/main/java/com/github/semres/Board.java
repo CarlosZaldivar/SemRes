@@ -361,10 +361,10 @@ public class Board {
         }
     }
 
-    public String export() {
+    public String export(RDFFormat format) {
         Model model = attachedDatabase.getAllStatements();
         StringWriter buffer = new StringWriter();
-        Rio.write(model, buffer, RDFFormat.RDFXML);
+        Rio.write(model, buffer, format);
         return buffer.toString();
     }
 

@@ -10,7 +10,11 @@
         <Menu fx:id="fileMenu" mnemonicParsing="false" text="File">
             <MenuItem fx:id="databasesMenuItem" mnemonicParsing="false" onAction="#openDatabasesWindow" text="Databases" />
             <MenuItem fx:id="saveMenuItem" disable="true" mnemonicParsing="false" onAction="#save" text="Save" />
-            <MenuItem fx:id="exportMenuItem" disable="true" mnemonicParsing="false" onAction="#export" text="Export" />
+            <Menu fx:id="exportSubmenu" disable="true" mnemonicParsing="false" text="Export">
+                <MenuItem fx:id="turtleMenuItem" text="Turtle" onAction="#export"/>
+                <MenuItem fx:id="nTriplesMenuItem" text="N-Triples" onAction="#export"/>
+                <MenuItem text="RDF/XML" onAction="#export"/>
+            </Menu>
             <MenuItem mnemonicParsing="false" text="Exit" onAction="#exit"/>
         </Menu>
         <Menu fx:id="viewMenu" disable="true" mnemonicParsing="false" text="View">

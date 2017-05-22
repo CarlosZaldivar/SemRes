@@ -14,6 +14,7 @@ import com.teamdev.jxbrowser.chromium.events.ScriptContextAdapter;
 import com.teamdev.jxbrowser.chromium.events.ScriptContextEvent;
 import com.teamdev.jxbrowser.chromium.javafx.BrowserView;
 import javafx.application.Platform;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -22,14 +23,16 @@ import javafx.scene.Scene;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
-import javafx.scene.input.Clipboard;
-import javafx.scene.input.ClipboardContent;
 import javafx.scene.layout.AnchorPane;
+import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.log4j.Logger;
+import org.eclipse.rdf4j.rio.RDFFormat;
 
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
@@ -40,11 +43,13 @@ public class MainController extends Controller implements Initializable {
 
     static Logger log = Logger.getRootLogger();
     @FXML private MenuBar menuBar;
+    @FXML private MenuItem turtleMenuItem;
+    @FXML private MenuItem nTriplesMenuItem;
     @FXML private AnchorPane boardPane;
     @FXML private Menu viewMenu;
     @FXML private Menu babelNetMenu;
+    @FXML private Menu exportSubmenu;
     @FXML private MenuItem saveMenuItem;
-    @FXML private MenuItem exportMenuItem;
     @FXML private MenuItem updateMenuItem;
     private Board board;
     private Browser browser;
@@ -86,7 +91,7 @@ public class MainController extends Controller implements Initializable {
 
         // Enable some options.
         saveMenuItem.setDisable(false);
-        exportMenuItem.setDisable(false);
+        exportSubmenu.setDisable(false);
         viewMenu.setDisable(false);
         babelNetMenu.setDisable(false);
     }
@@ -95,12 +100,41 @@ public class MainController extends Controller implements Initializable {
         board.save();
     }
 
-    public void export() {
-        // For debugging purposes database triplets are written to clipboard. It can be changed to a file later.
-        Clipboard clipboard = Clipboard.getSystemClipboard();
-        ClipboardContent content = new ClipboardContent();
-        content.putString(board.export());
-        clipboard.setContent(content);
+    public void export(ActionEvent event) {
+        MenuItem clickedMenuItem = ((MenuItem) event.getSource());
+
+        RDFFormat format;
+        FileChooser.ExtensionFilter extensionFilter;
+        if (clickedMenuItem == turtleMenuItem) {
+            format = RDFFormat.TURTLE;
+            extensionFilter = new FileChooser.ExtensionFilter("Turtle text files (*.ttl)", "*.ttl");
+        } else if (clickedMenuItem == nTriplesMenuItem) {
+            format = RDFFormat.NTRIPLES;
+            extensionFilter = new FileChooser.ExtensionFilter("N-Triples text files (*.nt)", "*.ttl");
+        } else {
+            format = RDFFormat.RDFXML;
+            extensionFilter = new FileChooser.ExtensionFilter("RDF/XML text files (*.nt)", "*.rdf");
+        }
+
+        String content = board.export(format);
+
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.getExtensionFilters().add(extensionFilter);
+        File file = fileChooser.showSaveDialog(menuBar.getScene().getWindow());
+
+        if (file != null) {
+            try {
+                saveFile(content, file);
+            } catch (IOException e) {
+                Utils.showAlert("Could not save file.");
+            }
+        }
+    }
+
+    private void saveFile(String content, File file) throws IOException {
+        FileWriter fileWriter = new FileWriter(file);
+        fileWriter.write(content);
+        fileWriter.close();
     }
 
     void addSynset(Synset synset) {
