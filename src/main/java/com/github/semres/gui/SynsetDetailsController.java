@@ -24,7 +24,7 @@ public class SynsetDetailsController extends ChildController implements Initiali
     @FXML private TextArea descriptionTA;
     @FXML private ButtonBar buttonBar;
     @FXML private Button editButton;
-    @FXML private Button saveButton;
+    @FXML private Button okButton;
     @FXML private Button cancelButton;
 
     private BooleanProperty editing = new SimpleBooleanProperty(false);
@@ -32,8 +32,8 @@ public class SynsetDetailsController extends ChildController implements Initiali
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        saveButton.visibleProperty().bind(editing);
-        saveButton.managedProperty().bind(saveButton.visibleProperty());
+        okButton.visibleProperty().bind(editing);
+        okButton.managedProperty().bind(okButton.visibleProperty());
         cancelButton.visibleProperty().bind(editing);
         cancelButton.managedProperty().bind(cancelButton.visibleProperty());
         editButton.visibleProperty().bind(editing.not());
@@ -43,7 +43,7 @@ public class SynsetDetailsController extends ChildController implements Initiali
         descriptionTA.editableProperty().bind(editing);
 
         BooleanBinding representationValid = Bindings.createBooleanBinding(() -> representationTF.getText().length() > 0, representationTF.textProperty());
-        saveButton.disableProperty().bind(representationValid.not());
+        okButton.disableProperty().bind(representationValid.not());
 
         Platform.runLater(() -> idTF.getParent().requestFocus());
     }

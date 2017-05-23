@@ -21,7 +21,7 @@ public class EdgeDetailsController extends ChildController implements Initializa
     @FXML private TextArea descriptionTA;
     @FXML private Button editButton;
     @FXML private Button cancelButton;
-    @FXML private Button saveButton;
+    @FXML private Button okButton;
     @FXML private ButtonBar buttonBar;
     private BooleanProperty editing = new SimpleBooleanProperty(false);
     private Edge edge;
@@ -40,10 +40,10 @@ public class EdgeDetailsController extends ChildController implements Initializa
             }
             return weight >=0 && weight <= 1;
         }, weightTF.textProperty());
-        saveButton.disableProperty().bind(weightValid.not());
+        okButton.disableProperty().bind(weightValid.not());
 
-        saveButton.visibleProperty().bind(editing);
-        saveButton.managedProperty().bind(saveButton.visibleProperty());
+        okButton.visibleProperty().bind(editing);
+        okButton.managedProperty().bind(okButton.visibleProperty());
         cancelButton.visibleProperty().bind(editing);
         cancelButton.managedProperty().bind(cancelButton.visibleProperty());
         editButton.visibleProperty().bind(editing.not());

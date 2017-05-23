@@ -1,0 +1,7 @@
+.text-input:readonly {
+    -fx-opacity: 0.5;
+}
+
+.text-area:readonly {
+    -fx-opacity: 0.5;
+}
