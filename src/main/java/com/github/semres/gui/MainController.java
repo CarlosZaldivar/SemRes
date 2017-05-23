@@ -51,6 +51,7 @@ public class MainController extends Controller implements Initializable {
     @FXML private Menu exportSubmenu;
     @FXML private MenuItem saveMenuItem;
     @FXML private MenuItem updateMenuItem;
+    BrowserView boardView;
     private Board board;
     private Browser browser;
     private BabelNetManager babelNetManager;
@@ -62,7 +63,7 @@ public class MainController extends Controller implements Initializable {
         BrowserPreferences.setChromiumSwitches("--remote-debugging-port=9222");
         babelNetManager = new BabelNetManager();
         browser = new Browser();
-        BrowserView boardView = new BrowserView(browser);
+        boardView = new BrowserView(browser);
 
         AnchorPane.setTopAnchor(boardView, 0.0);
         AnchorPane.setBottomAnchor(boardView, 0.0);
@@ -244,6 +245,20 @@ public class MainController extends Controller implements Initializable {
 
         ChildController childController = loader.getController();
         childController.setParent(MainController.this);
+
+        // Block input on BrowserView and return to default handlers when window is closed.
+        boardView.setMouseEventsHandler((e) -> true);
+        boardView.setScrollEventsHandler((e) -> true);
+        boardView.setGestureEventsHandler((e) -> true);
+        boardView.setKeyEventsHandler((e) -> true);
+        newStage.setOnHidden((e) -> {
+                boardView.setMouseEventsHandler(null);
+                boardView.setScrollEventsHandler(null);
+                boardView.setGestureEventsHandler(null);
+                boardView.setKeyEventsHandler(null);
+            }
+        );
+
         newStage.show();
         return childController;
     }
