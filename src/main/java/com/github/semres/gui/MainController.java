@@ -81,6 +81,9 @@ public class MainController extends Controller implements Initializable {
                 window.asObject().setProperty("javaApp", new JavaApp());
             }
         });
+
+        // updateMenuItem should be disabled if there are unsaved changes on the board.
+        babelNetMenu.setOnShowing(e -> updateMenuItem.setDisable(board.isBoardEdited()));
     }
 
     void setBoard(Board board) {
