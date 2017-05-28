@@ -18,27 +18,29 @@ public class SemRes {
     public static final IRI HYPERNYM;
     public static final IRI HYPONYM;
     public static final IRI MERONYM;
+    public static final IRI RELATION_TYPE_CLASS;
 
     // Properties
     public static final IRI ID;
-    public static final IRI RELATION_TYPE;
+    public static final IRI RELATION_TYPE_PROPERTY;
     public static final IRI REMOVED_RELATION;
-
     public static final IRI WEIGHT;
+    public static final IRI SOURCE;
 
     static {
         SimpleValueFactory factory = SimpleValueFactory.getInstance();
-        SYNSET = factory.createIRI(SemRes.baseIri + "Synset");
-        EDGE = factory.createIRI(SemRes.baseIri + "Edge");
-        ID = factory.createIRI(SemRes.baseIri + "Id");
-        REMOVED_RELATION = factory.createIRI(SemRes.baseIri + "RemovedRelation");
-        RELATION_TYPE = factory.createIRI(SemRes.baseIri + "RelationType");
-        HOLONYM = factory.createIRI(SemRes.baseIri + "Holonym");
-        HYPERNYM = factory.createIRI(SemRes.baseIri + "Hypernym");
-        HYPONYM = factory.createIRI(SemRes.baseIri + "Hyponym");
-        MERONYM = factory.createIRI(SemRes.baseIri + "Meronym");
-
-        WEIGHT = factory.createIRI(SemRes.baseIri + "Weight");
+        SYNSET = factory.createIRI(baseIri + "classes/Synset");
+        EDGE = factory.createIRI(baseIri + "classes/Edge");
+        HOLONYM = factory.createIRI(baseIri + "classes/Holonym");
+        HYPERNYM = factory.createIRI(baseIri + "classes/Hypernym");
+        HYPONYM = factory.createIRI(baseIri + "classes/Hyponym");
+        MERONYM = factory.createIRI(baseIri + "classes/Meronym");
+        RELATION_TYPE_CLASS = factory.createIRI(baseIri + "classes/RelationType");
+        ID = factory.createIRI(baseIri + "properties/Id");
+        REMOVED_RELATION = factory.createIRI(baseIri + "properties/RemovedRelation");
+        RELATION_TYPE_PROPERTY = factory.createIRI(SemRes.baseIri + "properties/RelationType");
+        WEIGHT = factory.createIRI(baseIri + "properties/Weight");
+        SOURCE = factory.createIRI(baseIri + "properties/Source");
     }
 
     public static void main(String[] args) {

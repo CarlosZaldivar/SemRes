@@ -35,7 +35,7 @@ public class BabelNetEdgeSerializerTest {
         Model model = edgeSerializer.edgeToRdf(edge);
 
         assertTrue(model.filter(null, SemRes.ID, factory.createLiteral("124-123")).size() == 1);
-        assertTrue(model.filter(null, SemRes.RELATION_TYPE, SemRes.HOLONYM).size() == 1);
+        assertTrue(model.filter(null, SemRes.RELATION_TYPE_PROPERTY, SemRes.HOLONYM).size() == 1);
         assertTrue(model.filter(null, RDFS.COMMENT, null).size() == 0);
 
         // Check edge with a description

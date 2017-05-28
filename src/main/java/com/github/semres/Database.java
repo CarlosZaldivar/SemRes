@@ -3,6 +3,7 @@ package com.github.semres;
 import org.eclipse.rdf4j.model.IRI;
 import org.eclipse.rdf4j.model.Model;
 import org.eclipse.rdf4j.model.ValueFactory;
+import org.eclipse.rdf4j.model.impl.LinkedHashModel;
 import org.eclipse.rdf4j.model.vocabulary.RDF;
 import org.eclipse.rdf4j.model.vocabulary.RDFS;
 import org.eclipse.rdf4j.query.*;
@@ -12,18 +13,20 @@ import org.eclipse.rdf4j.repository.RepositoryConnection;
 import java.lang.reflect.InvocationTargetException;
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Random;
 
 public class Database {
-    private List<SynsetSerializer> synsetSerializers;
-    private List<EdgeSerializer> edgeSerializers;
-    private Repository repository;
+    private final List<SynsetSerializer> synsetSerializers;
+    private final List<EdgeSerializer> edgeSerializers;
+    private final Repository repository;
+    private final String baseIri;
 
-    Database(List<Class<? extends SynsetSerializer>> synsetSerializerClasses, List<Class<? extends EdgeSerializer>> edgeSerializerClasses,
+    Database(String baseIri, List<Class<? extends SynsetSerializer>> synsetSerializerClasses, List<Class<? extends EdgeSerializer>> edgeSerializerClasses,
              Repository repository) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
+        this.baseIri = baseIri;
         List<SynsetSerializer> synsetSerializers = new ArrayList<>();
-        String baseIri = "http://example.org/";
         for (Class<? extends SynsetSerializer> serializerClass: synsetSerializerClasses) {
             SynsetSerializer loadedSynsetSerializer = serializerClass.getConstructor(Repository.class, String.class).newInstance(repository, baseIri);
             synsetSerializers.add(loadedSynsetSerializer);
@@ -218,6 +221,34 @@ public class Database {
         return getEdges(queryString);
     }
 
+
+    void getRelationTypes(RelationType relationType) {
+        try (RepositoryConnection conn = repository.getConnection()) {
+            conn.add(relationTypeToRdf(relationType));
+        }
+    }
+
+    Collection<RelationType> getRelationTypes() {
+        Collection<RelationType> relationTypes = new ArrayList<>();
+        try (RepositoryConnection conn = repository.getConnection()) {
+            String queryString = String.format("SELECT ?relationTypeName ?relationTypeSource" +
+                    " WHERE { ?relationType <%s> <%s> . ?relationType <%s> ?relationTypeName . ?relationType <%s> ?relationTypeSource }",
+                    RDF.TYPE, SemRes.RELATION_TYPE_CLASS, RDFS.LABEL, SemRes.SOURCE);
+            TupleQuery tupleQuery = conn.prepareTupleQuery(QueryLanguage.SPARQL, queryString);
+
+            try (TupleQueryResult result = tupleQuery.evaluate()) {
+                while (result.hasNext()) {
+                    BindingSet bindingSet = result.next();
+
+                    String name = bindingSet.getValue("relationTypeName").stringValue();
+                    String source = bindingSet.getValue("relationTypeSource").stringValue();
+                    relationTypes.add(new RelationType(name, source));
+                }
+            }
+        }
+        return relationTypes;
+    }
+
     private List<Edge> getEdges(String queryString) {
         List<Edge> edges = new ArrayList<>();
         try (RepositoryConnection conn = repository.getConnection()) {
@@ -272,6 +303,18 @@ public class Database {
                 .filter(x -> x.getEdgeClassIri().stringValue().equals(type))
                 .findFirst().orElseThrow(IllegalArgumentException::new);
         return serializer;
+    }
+
+    private Model relationTypeToRdf(RelationType relationType) {
+        Model model = new LinkedHashModel();
+        ValueFactory factory = repository.getValueFactory();
+
+        IRI relationIri = factory.createIRI(baseIri + "relationTypes/" + relationType.getType());
+
+        model.add(relationIri, RDF.TYPE, SemRes.RELATION_TYPE_CLASS);
+        model.add(relationIri, RDFS.LABEL, factory.createLiteral(relationType.getType()));
+        model.add(relationIri, SemRes.SOURCE, factory.createLiteral(relationType.getSource()));
+        return model;
     }
 
     /**

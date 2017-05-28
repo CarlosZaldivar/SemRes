@@ -17,6 +17,7 @@ import org.mockito.Mockito;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import static org.junit.Assert.*;
@@ -309,6 +310,17 @@ public class DatabaseTest {
         assertTrue(id.length() == 26);
     }
 
+    @Test
+    public void addEdgeType() throws Exception {
+        Database database = createTestDatabase();
+        RelationType relationType = new RelationType("RelationX", "User");
+        database.getRelationTypes(relationType);
+        Collection<RelationType> relationTypes = database.getRelationTypes();
+        assertTrue(relationTypes.size() == 1);
+        assertTrue(relationTypes.stream().map(RelationType::getSource).anyMatch("User"::equals));
+        assertTrue(relationTypes.stream().map(RelationType::getType).anyMatch("RelationX"::equals));
+    }
+
     public static Database createTestDatabase() throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
         Repository repo = new SailRepository(new MemoryStore());
         List<Class<? extends SynsetSerializer>> synsetSerializers = new ArrayList<>();
@@ -318,7 +330,7 @@ public class DatabaseTest {
         edgeSerializers.add(UserEdgeSerializer.class);
         edgeSerializers.add(BabelNetEdgeSerializer.class);
 
-        Database database = new Database(synsetSerializers, edgeSerializers, repo);
+        Database database = new Database("http://example.org/", synsetSerializers, edgeSerializers, repo);
         try (RepositoryConnection conn = repo.getConnection()) {
             conn.add(new BabelNetManager().getMetadataStatements());
             conn.add(new UserManager().getMetadataStatements());

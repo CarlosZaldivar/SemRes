@@ -24,7 +24,7 @@ public class UserEdgeSerializer extends EdgeSerializer {
                 "WHERE { ?originSynset <%1$s> ?pointedSynset . <%1$s> <%2$s> ?weight . " +
                 "?originSynset <%5$s> ?originSynsetId . ?pointedSynset <%5$s> ?pointedSynsetId . " +
                 "OPTIONAL { <%1$s> <%3$s> ?description } . OPTIONAL { <%1$s> <%4$s> ?relationType} }",
-                edgeIri.stringValue(), SemRes.WEIGHT, RDFS.COMMENT, SemRes.RELATION_TYPE, SemRes.ID);
+                edgeIri.stringValue(), SemRes.WEIGHT, RDFS.COMMENT, SemRes.RELATION_TYPE_PROPERTY, SemRes.ID);
         List<BindingSet> results = Repositories.tupleQuery(repository, queryString, iter -> QueryResults.asList(iter));
 
         if (results.size() > 1) {

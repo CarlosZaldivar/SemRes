@@ -49,7 +49,7 @@ public class DatabasesManager {
 
     public Board getBoard(String repositoryId) throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
         Repository repository = repositoryManager.getRepository(repositoryId);
-        Database database = new Database(synsetSerializerClasses, edgeSerializerClasses, repository);
+        Database database = new Database("http://example.org/", synsetSerializerClasses, edgeSerializerClasses, repository);
         return new Board(database);
     }
 

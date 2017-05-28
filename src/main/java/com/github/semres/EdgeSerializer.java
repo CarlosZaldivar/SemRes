@@ -34,16 +34,16 @@ public abstract class EdgeSerializer {
 
         switch (edge.getRelationType()) {
             case HOLONYM:
-                model.add(edgeIri, SemRes.RELATION_TYPE, SemRes.HOLONYM);
+                model.add(edgeIri, SemRes.RELATION_TYPE_PROPERTY, SemRes.HOLONYM);
                 break;
             case HYPERNYM:
-                model.add(edgeIri, SemRes.RELATION_TYPE, SemRes.HYPERNYM);
+                model.add(edgeIri, SemRes.RELATION_TYPE_PROPERTY, SemRes.HYPERNYM);
                 break;
             case HYPONYM:
-                model.add(edgeIri, SemRes.RELATION_TYPE, SemRes.HYPONYM);
+                model.add(edgeIri, SemRes.RELATION_TYPE_PROPERTY, SemRes.HYPONYM);
                 break;
             case MERONYM:
-                model.add(edgeIri, SemRes.RELATION_TYPE, SemRes.MERONYM);
+                model.add(edgeIri, SemRes.RELATION_TYPE_PROPERTY, SemRes.MERONYM);
                 break;
         }
 

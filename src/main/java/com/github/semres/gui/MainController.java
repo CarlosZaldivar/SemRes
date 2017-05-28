@@ -40,7 +40,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class MainController extends Controller implements Initializable {
-
     static Logger log = Logger.getRootLogger();
     @FXML private MenuBar menuBar;
     @FXML private MenuItem turtleMenuItem;
