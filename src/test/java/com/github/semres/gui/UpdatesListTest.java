@@ -5,6 +5,7 @@ import javafx.scene.input.MouseButton;
 import javafx.stage.Stage;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.testfx.api.FxToolkit;
 import org.testfx.framework.junit.ApplicationTest;
@@ -29,6 +30,7 @@ public class UpdatesListTest extends ApplicationTest {
         release(new MouseButton[]{});
     }
 
+    @Ignore
     @Test
     public void updateTest() throws Exception {
         clickOn("#fileMenu");
