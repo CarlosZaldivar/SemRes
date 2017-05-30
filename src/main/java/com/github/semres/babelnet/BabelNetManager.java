@@ -80,6 +80,17 @@ public class BabelNetManager extends Source {
     }
 
     @Override
+    public List<RelationType> getRelationTypes() {
+        List<RelationType> relationTypes = new ArrayList<>();
+        relationTypes.add(new RelationType("HOLONYM", "BabelNet"));
+        relationTypes.add(new RelationType("HYPERNYM", "BabelNet"));
+        relationTypes.add(new RelationType("HYPONYM", "BabelNet"));
+        relationTypes.add(new RelationType("MERONYM", "BabelNet"));
+        relationTypes.add(new RelationType("OTHER", "BabelNet"));
+        return relationTypes;
+    }
+
+    @Override
     public Model getMetadataStatements() {
         Model model = new LinkedHashModel();
 

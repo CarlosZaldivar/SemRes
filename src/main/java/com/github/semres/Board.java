@@ -403,4 +403,8 @@ public class Board {
     public Map<String,Synset> getSynsets() {
         return synsets;
     }
+
+    public Collection<RelationType> getRelationTypes() {
+        return attachedDatabase.getRelationTypes();
+    }
 }

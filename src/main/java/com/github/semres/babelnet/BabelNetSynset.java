@@ -1,6 +1,7 @@
 package com.github.semres.babelnet;
 
 import com.github.semres.Edge;
+import com.github.semres.RelationType;
 import com.github.semres.Synset;
 import com.github.semres.gui.EdgesAlreadyLoadedException;
 import it.uniroma1.lcl.babelnet.*;
@@ -112,7 +113,7 @@ public class BabelNetSynset extends Synset {
     private void addBabelNetEdge(BabelSynsetIDRelation edge) throws IOException {
         BabelPointer babelPointer = edge.getPointer();
 
-        Edge.RelationType relationType = Edge.RelationType.valueOf(babelPointer.getRelationGroup().toString());
+        RelationType relationType = new RelationType(babelPointer.getRelationGroup().toString(), "BabelNet");
 
         Edge newEdge =
                 new BabelNetEdge(edge.getBabelSynsetIDTarget().getID(), getId(), babelPointer.getName(), relationType, edge.getWeight());

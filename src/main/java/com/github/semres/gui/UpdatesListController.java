@@ -1,6 +1,7 @@
 package com.github.semres.gui;
 
 import com.github.semres.Edge;
+import com.github.semres.RelationType;
 import com.github.semres.Synset;
 import com.github.semres.SynsetUpdate;
 import javafx.beans.property.SimpleDoubleProperty;
@@ -33,12 +34,12 @@ public class UpdatesListController extends ChildController implements Initializa
     @FXML private TableView<Synset> removedSynsetsTable;
     @FXML private TableColumn<EdgeData, String> addedEdgeFromColumn;
     @FXML private TableColumn<EdgeData, String> addedEdgeToColumn;
-    @FXML private TableColumn<EdgeData, Edge.RelationType> addedEdgeTypeColumn;
+    @FXML private TableColumn<EdgeData, RelationType> addedEdgeTypeColumn;
     @FXML private TableColumn<EdgeData, Double> addedEdgeWeightColumn;
     @FXML private TableColumn<EdgeData, String> addedEdgeCancelColumn;
     @FXML private TableColumn<EdgeData, String> removedEdgeFromColumn;
     @FXML private TableColumn<EdgeData, String> removedEdgeToColumn;
-    @FXML private TableColumn<EdgeData, Edge.RelationType> removedEdgeTypeColumn;
+    @FXML private TableColumn<EdgeData, RelationType> removedEdgeTypeColumn;
     @FXML private TableColumn<EdgeData, Double> removedEdgeWeightColumn;
     @FXML private TableColumn<EdgeData, String> removedEdgeCancelColumn;
     @FXML private TableColumn<Synset, String> removedSynsetIdColumn;

@@ -19,8 +19,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 public class UpdateWithSynsetRemovalTestApplication extends Main  {
-    String originSynsetId = "bn:00024922n";
-    String pointedSynsetId = "bn:00024923n";
+    private String originSynsetId = "bn:00024922n";
+    private String pointedSynsetId = "bn:00024923n";
 
     @Override
     public void start(Stage primaryStage) throws Exception {
@@ -52,14 +52,14 @@ public class UpdateWithSynsetRemovalTestApplication extends Main  {
     }
 
     private Database createTestDatabase() throws NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
-        Database database = DatabaseTest.createTestDatabase();
+        Database database = com.github.semres.Utils.createTestDatabase();
 
         BabelNetSynset originSynset = new BabelNetSynset("Origin");
         originSynset.setId(originSynsetId);
         BabelNetSynset pointedSynset = new BabelNetSynset("Pointed removed");
         pointedSynset.setId(pointedSynsetId);
 
-        BabelNetEdge edge = new BabelNetEdge(pointedSynset.getId(), originSynset.getId(), Edge.RelationType.OTHER, 1.0);
+        BabelNetEdge edge = new BabelNetEdge(pointedSynset.getId(), originSynset.getId(), new BabelNetManager().getRelationTypes().get(0), 1.0);
 
         database.addSynset(originSynset);
         database.addSynset(pointedSynset);

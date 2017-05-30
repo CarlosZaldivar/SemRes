@@ -8,18 +8,14 @@ import it.uniroma1.lcl.babelnet.BabelSynset;
 import it.uniroma1.lcl.babelnet.BabelSynsetID;
 import it.uniroma1.lcl.jlt.util.Language;
 import org.eclipse.rdf4j.model.Model;
-import org.eclipse.rdf4j.repository.Repository;
-import org.eclipse.rdf4j.repository.RepositoryConnection;
-import org.eclipse.rdf4j.repository.sail.SailRepository;
-import org.eclipse.rdf4j.sail.memory.MemoryStore;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import static com.github.semres.Utils.createTestDatabase;
 import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -112,8 +108,9 @@ public class DatabaseTest {
         UserSynset lastSynset = new UserSynset("Car");
         lastSynset.setId("125");
 
-        Edge firstEdge = new UserEdge(middleSynset.getId(), firstSynset.getId(), Edge.RelationType.HOLONYM, 1);
-        Edge secondEdge = new UserEdge(lastSynset.getId(), middleSynset.getId(), Edge.RelationType.HOLONYM, 1);
+        RelationType relationType = new BabelNetManager().getRelationTypes().get(0);
+        Edge firstEdge = new UserEdge(middleSynset.getId(), firstSynset.getId(), relationType, 1);
+        Edge secondEdge = new UserEdge(lastSynset.getId(), middleSynset.getId(), relationType, 1);
 
         database.addSynset(firstSynset);
         database.addSynset(middleSynset);
@@ -135,7 +132,7 @@ public class DatabaseTest {
         originSynset.setId("123");
         UserSynset pointedSynset = new UserSynset("Bar");
         pointedSynset.setId("124");
-        Edge edge = new UserEdge(pointedSynset.getId(), originSynset.getId(), Edge.RelationType.HOLONYM, 1);
+        Edge edge = new UserEdge(pointedSynset.getId(), originSynset.getId(), new BabelNetManager().getRelationTypes().get(0), 1);
 
         database.addSynset(originSynset);
         database.addSynset(pointedSynset);
@@ -174,7 +171,7 @@ public class DatabaseTest {
         originSynset.setId("bn:00024922n");
         BabelNetSynset pointedSynset = new BabelNetSynset("Bar");
         pointedSynset.setId("bn:00024923n");
-        Edge edge = new BabelNetEdge(pointedSynset.getId(), originSynset.getId(), Edge.RelationType.HOLONYM, 1);
+        Edge edge = new BabelNetEdge(pointedSynset.getId(), originSynset.getId(), new BabelNetManager().getRelationTypes().get(0), 1);
 
         database.addSynset(originSynset);
         database.addSynset(pointedSynset);
@@ -242,7 +239,7 @@ public class DatabaseTest {
 
         database.addSynset(originSynset);
         database.addSynset(pointedSynset);
-        database.addEdge(new UserEdge(pointedSynset.getId(), originSynset.getId(), Edge.RelationType.OTHER, 1));
+        database.addEdge(new UserEdge(pointedSynset.getId(), originSynset.getId(), new BabelNetManager().getRelationTypes().get(0), 1));
 
         Synset loadedSynset = database.searchSynsets("Foo1").get(0);
 
@@ -297,7 +294,7 @@ public class DatabaseTest {
         originSynset.setId("123");
         UserSynset pointedSynset = new UserSynset("Bar");
         pointedSynset.setId("124");
-        Edge edge = new UserEdge(pointedSynset.getId(), originSynset.getId(), Edge.RelationType.HOLONYM, 1);
+        Edge edge = new UserEdge(pointedSynset.getId(), originSynset.getId(), new BabelNetManager().getRelationTypes().get(0), 1);
         database.addEdge(edge);
 
         assertTrue(database.hasEdge(edge.getId()));
@@ -313,28 +310,12 @@ public class DatabaseTest {
     @Test
     public void addEdgeType() throws Exception {
         Database database = createTestDatabase();
+        int relationsNumber = database.getRelationTypes().size();
         RelationType relationType = new RelationType("RelationX", "User");
         database.getRelationTypes(relationType);
         Collection<RelationType> relationTypes = database.getRelationTypes();
-        assertTrue(relationTypes.size() == 1);
+        assertTrue(relationTypes.size() == relationsNumber + 1);
         assertTrue(relationTypes.stream().map(RelationType::getSource).anyMatch("User"::equals));
         assertTrue(relationTypes.stream().map(RelationType::getType).anyMatch("RelationX"::equals));
-    }
-
-    public static Database createTestDatabase() throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
-        Repository repo = new SailRepository(new MemoryStore());
-        List<Class<? extends SynsetSerializer>> synsetSerializers = new ArrayList<>();
-        synsetSerializers.add(UserSynsetSerializer.class);
-        synsetSerializers.add(BabelNetSynsetSerializer.class);
-        List<Class<? extends EdgeSerializer>> edgeSerializers = new ArrayList<>();
-        edgeSerializers.add(UserEdgeSerializer.class);
-        edgeSerializers.add(BabelNetEdgeSerializer.class);
-
-        Database database = new Database("http://example.org/", synsetSerializers, edgeSerializers, repo);
-        try (RepositoryConnection conn = repo.getConnection()) {
-            conn.add(new BabelNetManager().getMetadataStatements());
-            conn.add(new UserManager().getMetadataStatements());
-        }
-        return database;
     }
 }

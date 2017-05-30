@@ -1,6 +1,7 @@
 package com.github.semres.user;
 
 import com.github.semres.Edge;
+import com.github.semres.RelationType;
 
 public class UserEdge extends Edge {
     public UserEdge(String pointedSynset, String originSynset, RelationType relationType, double weight) {

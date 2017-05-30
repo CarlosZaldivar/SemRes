@@ -61,7 +61,7 @@ public class SimpleUpdateTestApplication extends Main {
     }
 
     private Database createTestDatabase() throws NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
-        Database database = DatabaseTest.createTestDatabase();
+        Database database = com.github.semres.Utils.createTestDatabase();
 
         BabelNetSynset originSynset = new BabelNetSynset("Origin");
         originSynset.setId(originSynsetId);
@@ -70,8 +70,9 @@ public class SimpleUpdateTestApplication extends Main {
         BabelNetSynset pointedEdited  = new BabelNetSynset("Pointed edited");
         pointedEdited.setId(pointedEditedSynsetId);
 
-        BabelNetEdge edgeToRemove = new BabelNetEdge(pointedRemoved.getId(), originSynset.getId(), Edge.RelationType.OTHER, 1.0);
-        BabelNetEdge edgeToEdit = new BabelNetEdge(pointedEdited.getId(), originSynset.getId(), Edge.RelationType.OTHER, 1.0);
+        RelationType relationType = new BabelNetManager().getRelationTypes().get(0);
+        BabelNetEdge edgeToRemove = new BabelNetEdge(pointedRemoved.getId(), originSynset.getId(), relationType, 1.0);
+        BabelNetEdge edgeToEdit = new BabelNetEdge(pointedEdited.getId(), originSynset.getId(), relationType, 1.0);
 
         database.addSynset(originSynset);
         database.addSynset(pointedRemoved);

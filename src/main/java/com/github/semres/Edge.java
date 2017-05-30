@@ -58,8 +58,6 @@ public abstract class Edge {
         return relationType;
     }
 
-    public enum RelationType {HOLONYM, HYPERNYM, HYPONYM, MERONYM, OTHER}
-
     public String getId() {
         return originSynset + "-" + pointedSynset;
     }

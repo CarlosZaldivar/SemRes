@@ -40,7 +40,8 @@ public class BabelNetSynsetSerializerTest {
         assertTrue(model.filter(null, RDFS.COMMENT, factory.createLiteral("Type of vehicle.")).size() == 1);
 
         // Testing BabelNetEdge removal.
-        BabelNetSynset synsetWithEdge = synset.addOutgoingEdge(new BabelNetEdge("124", "123", Edge.RelationType.HOLONYM, 1));
+        BabelNetSynset synsetWithEdge = synset.addOutgoingEdge(new BabelNetEdge("124", "123",
+                                                               new BabelNetManager().getRelationTypes().get(0), 1));
         BabelNetSynset synsetWithRemovedEdge = synsetWithEdge.removeOutgoingEdge("123-124");
 
         model = synsetSerializer.synsetToRdf(synsetWithRemovedEdge);

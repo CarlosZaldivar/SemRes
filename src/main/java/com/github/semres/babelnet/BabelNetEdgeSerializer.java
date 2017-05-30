@@ -1,7 +1,7 @@
 package com.github.semres.babelnet;
 
-import com.github.semres.Edge;
 import com.github.semres.EdgeSerializer;
+import com.github.semres.RelationType;
 import com.github.semres.SemRes;
 import org.eclipse.rdf4j.model.*;
 import org.eclipse.rdf4j.model.vocabulary.RDFS;
@@ -18,13 +18,12 @@ public class BabelNetEdgeSerializer extends EdgeSerializer {
 
     @Override
     public BabelNetEdge rdfToEdge(IRI edgeIri) {
-        ValueFactory factory = repository.getValueFactory();
-
-        String queryString = String.format("SELECT ?originSynsetId ?pointedSynsetId ?weight ?relationType ?description " +
+        String queryString = String.format("SELECT ?originSynsetId ?pointedSynsetId ?weight ?relationTypeName ?relationTypeSource ?description " +
                 "WHERE { ?originSynset <%1$s> ?pointedSynset . <%1$s> <%2$s> ?weight . " +
-                "?originSynset <%5$s> ?originSynsetId . ?pointedSynset <%5$s> ?pointedSynsetId . " +
-                "OPTIONAL { <%1$s> <%3$s> ?description } . OPTIONAL { <%1$s> <%4$s> ?relationType} }",
-                edgeIri.stringValue(), SemRes.WEIGHT, RDFS.COMMENT, SemRes.RELATION_TYPE_PROPERTY, SemRes.ID);
+                "?originSynset <%3$s> ?originSynsetId . ?pointedSynset <%3$s> ?pointedSynsetId . " +
+                "<%1$s> <%4$s> ?relationType . ?relationType <%5$s> ?relationTypeName . ?relationType <%6$s> ?relationTypeSource . " +
+                "OPTIONAL { <%1$s> <%7$s> ?description }}",
+                edgeIri.stringValue(), SemRes.WEIGHT, SemRes.ID, SemRes.RELATION_TYPE_PROPERTY, RDFS.LABEL, SemRes.SOURCE, RDFS.COMMENT);
         List<BindingSet> results = Repositories.tupleQuery(repository, queryString, iter -> QueryResults.asList(iter));
 
         if (results.size() > 1) {
@@ -39,12 +38,9 @@ public class BabelNetEdgeSerializer extends EdgeSerializer {
         String originSynset = result.getValue("originSynsetId").stringValue();
         String pointedSynset = result.getValue("pointedSynsetId").stringValue();
 
-        Edge.RelationType relationType;
-        if (result.hasBinding("relationType")) {
-            relationType = relationIriToEnum(factory.createIRI(result.getValue("relationType").stringValue()));
-        } else {
-            relationType = Edge.RelationType.OTHER;
-        }
+        RelationType relationType = new RelationType(result.getValue("relationTypeName").stringValue(),
+                                                     result.getValue("relationTypeSource").stringValue());
+
 
         String description = null;
         if (result.hasBinding("description")) {
@@ -52,10 +48,6 @@ public class BabelNetEdgeSerializer extends EdgeSerializer {
         }
 
         double weight = Double.parseDouble(result.getValue("weight").stringValue());
-
-        if (relationType == null) {
-            relationType = Edge.RelationType.OTHER;
-        }
 
         return new BabelNetEdge(pointedSynset, originSynset, description, relationType, weight);
     }

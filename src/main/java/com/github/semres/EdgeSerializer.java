@@ -32,20 +32,7 @@ public abstract class EdgeSerializer {
         model.add(edgeIri, RDF.TYPE, getEdgeClassIri());
         model.add(edgeIri, SemRes.ID, factory.createLiteral(edge.getId()));
 
-        switch (edge.getRelationType()) {
-            case HOLONYM:
-                model.add(edgeIri, SemRes.RELATION_TYPE_PROPERTY, SemRes.HOLONYM);
-                break;
-            case HYPERNYM:
-                model.add(edgeIri, SemRes.RELATION_TYPE_PROPERTY, SemRes.HYPERNYM);
-                break;
-            case HYPONYM:
-                model.add(edgeIri, SemRes.RELATION_TYPE_PROPERTY, SemRes.HYPONYM);
-                break;
-            case MERONYM:
-                model.add(edgeIri, SemRes.RELATION_TYPE_PROPERTY, SemRes.MERONYM);
-                break;
-        }
+        model.add(edgeIri, SemRes.RELATION_TYPE_PROPERTY, factory.createIRI(baseIri + "relationTypes/" + edge.getRelationType().getType()));
 
         model.add(factory.createIRI(baseIri + "synsets/" + edge.getOriginSynset()), edgeIri, factory.createIRI(baseIri + "synsets/" + edge.getPointedSynset()));
         model.add(edgeIri, SemRes.WEIGHT, factory.createLiteral(edge.getWeight()));
@@ -57,18 +44,4 @@ public abstract class EdgeSerializer {
     abstract public Edge rdfToEdge(IRI edge);
     abstract public String getEdgeClass();
     abstract public IRI getEdgeClassIri();
-
-    protected Edge.RelationType relationIriToEnum(IRI relationIri) {
-        if (relationIri.stringValue().equals(SemRes.HOLONYM.stringValue())) {
-            return Edge.RelationType.HOLONYM;
-        } if (relationIri.stringValue().equals(SemRes.HYPERNYM.stringValue())) {
-            return Edge.RelationType.HYPERNYM;
-        } if (relationIri.stringValue().equals(SemRes.HYPONYM.stringValue())) {
-            return Edge.RelationType.HYPONYM;
-        } else if (relationIri.stringValue().equals(SemRes.MERONYM.stringValue())) {
-            return Edge.RelationType.MERONYM;
-        } else {
-            return Edge.RelationType.OTHER;
-        }
-    }
 }

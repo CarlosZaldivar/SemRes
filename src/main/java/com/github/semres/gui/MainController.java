@@ -359,6 +359,10 @@ public class MainController extends Controller implements Initializable {
         stage.close();
     }
 
+    public Collection<RelationType> getRelationTypes() {
+        return board.getRelationTypes();
+    }
+
     public class JavaApp {
         public void openNewSynsetWindow() {
             Platform.runLater(() -> {

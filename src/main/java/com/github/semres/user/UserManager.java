@@ -1,13 +1,13 @@
 package com.github.semres.user;
 
-import com.github.semres.EdgeSerializer;
-import com.github.semres.SemRes;
-import com.github.semres.Source;
-import com.github.semres.SynsetSerializer;
+import com.github.semres.*;
 import org.eclipse.rdf4j.model.Model;
 import org.eclipse.rdf4j.model.impl.LinkedHashModel;
 import org.eclipse.rdf4j.model.vocabulary.RDF;
 import org.eclipse.rdf4j.model.vocabulary.RDFS;
+
+import java.util.ArrayList;
+import java.util.Collection;
 
 public class UserManager extends Source {
     @Override
@@ -31,5 +31,10 @@ public class UserManager extends Source {
         model.add(CommonIRI.USER_EDGE, RDFS.SUBCLASSOF, SemRes.EDGE);
 
         return model;
+    }
+
+    @Override
+    public Collection<RelationType> getRelationTypes() {
+        return new ArrayList<>();
     }
 }

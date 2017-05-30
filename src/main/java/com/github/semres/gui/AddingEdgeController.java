@@ -1,6 +1,6 @@
 package com.github.semres.gui;
 
-import com.github.semres.Edge;
+import com.github.semres.RelationType;
 import com.github.semres.Synset;
 import com.github.semres.user.UserEdge;
 import javafx.beans.binding.Bindings;
@@ -17,7 +17,7 @@ import java.net.URL;
 import java.util.ResourceBundle;
 
 public class AddingEdgeController extends ChildController implements Initializable {
-    @FXML private ComboBox<Edge.RelationType> relationTypeCB;
+    @FXML private ComboBox<RelationType> relationTypeCB;
     @FXML private TextField weightTF;
     @FXML private TextArea descriptionTA;
     @FXML private Button addButton;
@@ -34,10 +34,14 @@ public class AddingEdgeController extends ChildController implements Initializab
     }
 
     @Override
-    public void initialize(URL location, ResourceBundle resources) {
-        relationTypeCB.getItems().setAll(Edge.RelationType.values());
+    public void setParent(Controller parent) {
+        super.setParent(parent);
+        relationTypeCB.getItems().setAll(((MainController) parent).getRelationTypes());
         relationTypeCB.getSelectionModel().select(0);
+    }
 
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
         BooleanBinding weightValid = Bindings.createBooleanBinding(() -> {
             String weightText = weightTF.getText().replace(',', '.');
             double weight;
@@ -53,7 +57,7 @@ public class AddingEdgeController extends ChildController implements Initializab
 
     public void addEdge() {
         double weight = Double.parseDouble(weightTF.getText().replace(',', '.'));
-        Edge.RelationType relationType = Edge.RelationType.valueOf(relationTypeCB.getSelectionModel().getSelectedItem().toString());
+        RelationType relationType = relationTypeCB.getSelectionModel().getSelectedItem();
         UserEdge newEdge = new UserEdge(destinationSynset.getId(), originSynset.getId(), descriptionTA.getText(), relationType, weight);
 
         ((MainController) parent).addEdge(newEdge);

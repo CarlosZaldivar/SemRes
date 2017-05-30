@@ -16,15 +16,18 @@ import org.mockito.Mockito;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import static com.github.semres.Utils.createTestDatabase;
 import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 public class BoardTest {
+    private RelationType holonym = new BabelNetManager().getRelationTypes().stream().filter(r -> r.getType().equals("HOLONYM")).findFirst().get();
+    private RelationType meronym = new BabelNetManager().getRelationTypes().stream().filter(r -> r.getType().equals("MERONYM")).findFirst().get();
 
     @Test
     public void addSynset() throws Exception {
-        Database database = DatabaseTest.createTestDatabase();
+        Database database = createTestDatabase();
         Board board = new Board(database);
 
         Synset synset = new UserSynset("Foo");
@@ -36,7 +39,7 @@ public class BoardTest {
 
     @Test
     public void removeSynset() throws Exception {
-        Database database = DatabaseTest.createTestDatabase();
+        Database database = createTestDatabase();
         Board board = new Board(database);
 
         Synset synset = new UserSynset("Foo");
@@ -50,7 +53,7 @@ public class BoardTest {
 
     @Test
     public void removeEdge() throws Exception {
-        Database database = DatabaseTest.createTestDatabase();
+        Database database = createTestDatabase();
         Board board = new Board(database);
 
         Synset originSynset = new UserSynset("Foo");
@@ -58,7 +61,7 @@ public class BoardTest {
         Synset pointedSynset = new UserSynset("Bar");
         pointedSynset.setId("124");
 
-        Edge edge = new UserEdge(pointedSynset.getId(), originSynset.getId(), Edge.RelationType.HOLONYM, 0);
+        Edge edge = new UserEdge(pointedSynset.getId(), originSynset.getId(), holonym, 0);
         board.addSynset(originSynset);
         board.addSynset(pointedSynset);
         board.addEdge(edge);
@@ -74,7 +77,7 @@ public class BoardTest {
 
     @Test
     public void addRemovedBabelnetEdge() throws Exception {
-        Database database = DatabaseTest.createTestDatabase();
+        Database database = createTestDatabase();
         Board board = new Board(database);
 
         Synset originSynset = new BabelNetSynset("Foo");
@@ -82,7 +85,7 @@ public class BoardTest {
         Synset pointedSynset = new BabelNetSynset("Bar");
         pointedSynset.setId("bn:00024923n");
 
-        Edge edge = new BabelNetEdge(pointedSynset.getId(), originSynset.getId(), Edge.RelationType.HOLONYM, 0);
+        Edge edge = new BabelNetEdge(pointedSynset.getId(), originSynset.getId(), holonym, 0);
 
         board.addSynset(originSynset);
         board.addSynset(pointedSynset);
@@ -102,7 +105,7 @@ public class BoardTest {
 
     @Test
     public void addSameSynsetMultipleTimes() throws Exception {
-        Database database = DatabaseTest.createTestDatabase();
+        Database database = createTestDatabase();
         Board board = new Board(database);
 
         Synset synset = new BabelNetSynset("Foo");
@@ -127,7 +130,7 @@ public class BoardTest {
 
     @Test
     public void addSameEdgeMultipleTimes() throws Exception {
-        Database database = DatabaseTest.createTestDatabase();
+        Database database = createTestDatabase();
         Board board = new Board(database);
 
 
@@ -136,7 +139,7 @@ public class BoardTest {
         Synset pointedSynset = new BabelNetSynset("Bar");
         pointedSynset.setId("bn:00024923n");
 
-        Edge edge = new UserEdge(pointedSynset.getId(), originSynset.getId(), Edge.RelationType.HOLONYM, 1);
+        Edge edge = new UserEdge(pointedSynset.getId(), originSynset.getId(), holonym, 1);
 
         board.addSynset(originSynset);
         board.addSynset(pointedSynset);
@@ -157,7 +160,7 @@ public class BoardTest {
 
     @Test
     public void editSynset() throws Exception {
-        Database database = DatabaseTest.createTestDatabase();
+        Database database = createTestDatabase();
         Board board = new Board(database);
 
         UserSynset synset = new UserSynset("Foo", "Bar");
@@ -174,7 +177,7 @@ public class BoardTest {
 
     @Test
     public void editEdge() throws Exception {
-        Database database = DatabaseTest.createTestDatabase();
+        Database database = createTestDatabase();
         Board board = new Board(database);
 
         UserSynset originSynset = new UserSynset("Foo");
@@ -182,23 +185,23 @@ public class BoardTest {
         board.addSynset(originSynset);
         board.addSynset(pointedSynset);
 
-        UserEdge edge = new UserEdge(pointedSynset.getId(), originSynset.getId(), "Description 1", Edge.RelationType.HOLONYM, 0);
+        UserEdge edge = new UserEdge(pointedSynset.getId(), originSynset.getId(), "Description 1", holonym, 0);
         board.addEdge(edge);
         board.save();
 
         UserEdge savedEdge = (UserEdge) database.getOutgoingEdges(originSynset).get(0);
-        assertTrue(savedEdge.getRelationType() == Edge.RelationType.HOLONYM);
+        assertTrue(savedEdge.getRelationType().equals(holonym));
         assertTrue(savedEdge.getDescription().equals("Description 1"));
         assertTrue(savedEdge.getWeight() == 0);
 
-        UserEdge editedEdge = edge.changeRelationType(Edge.RelationType.MERONYM).changeWeight(1).changeDescription("Description 2");
+        UserEdge editedEdge = edge.changeRelationType(meronym).changeWeight(1).changeDescription("Description 2");
         board.editEdge(edge, editedEdge);
         assertTrue(board.getEdge(editedEdge.getId()) == editedEdge);
         board.save();
         assertTrue(database.getOutgoingEdges(originSynset).size() == 1);
 
         savedEdge = (UserEdge) database.getOutgoingEdges(originSynset).get(0);
-        assertTrue(savedEdge.relationType == Edge.RelationType.MERONYM);
+        assertTrue(savedEdge.relationType.equals(meronym));
         assertTrue(savedEdge.getDescription().equals("Description 2"));
         assertTrue(savedEdge.getWeight() == 1);
     }
@@ -225,7 +228,7 @@ public class BoardTest {
         BabelNetManager mockManager = Mockito.mock(BabelNetManager.class);
         when(mockManager.getSynset("bn:00024922n")).thenReturn(updatedSynset);
 
-        Database database = DatabaseTest.createTestDatabase();
+        Database database = createTestDatabase();
         Board board = new Board(database, mockManager);
 
         board.addSynset(originalSynset);
@@ -256,7 +259,7 @@ public class BoardTest {
         when(mockManager.getSynset(originSynsetId)).thenReturn(updatedOriginSynset);
         when(mockManager.getSynset(pointedSynsetId)).thenReturn(updatedPointedSynset);
 
-        Database database = DatabaseTest.createTestDatabase();
+        Database database = createTestDatabase();
         Board board = new Board(database, mockManager);
 
         board.addSynset(originSynset);
@@ -284,7 +287,7 @@ public class BoardTest {
         when(mockManager.getSynset(originSynsetId)).thenReturn(updatedOriginSynset);
         when(mockManager.getSynset(pointedSynsetId)).thenReturn(updatedPointedSynset);
 
-        Database database = DatabaseTest.createTestDatabase();
+        Database database = createTestDatabase();
         Board board = new Board(database, mockManager);
 
         board.addSynset(originSynset);
@@ -308,7 +311,7 @@ public class BoardTest {
         String pointedSynsetId = "bn:00024923n";
         pointedSynset.setId(pointedSynsetId);
 
-        BabelNetEdge edge = new BabelNetEdge(pointedSynset.getId(), originSynset.getId(), Edge.RelationType.HOLONYM, 0.0);
+        BabelNetEdge edge = new BabelNetEdge(pointedSynset.getId(), originSynset.getId(), holonym, 0.0);
 
         BabelNetSynset updatedOriginSynset = getMockOriginBabelNetSynsetWithoutEdges(originSynsetId);
         BabelNetSynset updatedPointedSynset = getMockPointedBabelNetSynset(pointedSynsetId);
@@ -317,7 +320,7 @@ public class BoardTest {
         when(mockManager.getSynset(originSynsetId)).thenReturn(updatedOriginSynset);
         when(mockManager.getSynset(pointedSynsetId)).thenReturn(updatedPointedSynset);
 
-        Database database = DatabaseTest.createTestDatabase();
+        Database database = createTestDatabase();
         Board board = new Board(database, mockManager);
 
         board.addSynset(originSynset);
@@ -342,7 +345,7 @@ public class BoardTest {
         String pointedSynsetId = "bn:00024923n";
         pointedSynset.setId(pointedSynsetId);
 
-        BabelNetEdge edge = new BabelNetEdge(pointedSynset.getId(), originalSynset.getId(), Edge.RelationType.HOLONYM, 0.0);
+        BabelNetEdge edge = new BabelNetEdge(pointedSynset.getId(), originalSynset.getId(), holonym, 0.0);
 
         BabelNetSynset updatedOriginSynset = getMockOriginBabelNetSynsetWithoutEdges(originSynsetId);
         BabelNetSynset updatedPointedSynset = getMockPointedBabelNetSynset(pointedSynsetId);
@@ -351,7 +354,7 @@ public class BoardTest {
         when(mockManager.getSynset(originSynsetId)).thenReturn(updatedOriginSynset);
         when(mockManager.getSynset(pointedSynsetId)).thenReturn(updatedPointedSynset);
 
-        Database database = DatabaseTest.createTestDatabase();
+        Database database = createTestDatabase();
         Board board = new Board(database, mockManager);
 
         board.addSynset(originalSynset);
@@ -378,14 +381,14 @@ public class BoardTest {
         String pointedSynsetId = "bn:00024923n";
         pointedSynset.setId(pointedSynsetId);
 
-        BabelNetEdge edge = new BabelNetEdge(pointedSynset.getId(), originalSynset.getId(), Edge.RelationType.HOLONYM, 0.0);
+        BabelNetEdge edge = new BabelNetEdge(pointedSynset.getId(), originalSynset.getId(), holonym, 0.0);
 
         BabelNetSynset updatedOriginSynset = getMockOriginBabelNetSynsetWithoutEdges(originSynsetId);
 
         BabelNetManager mockManager = Mockito.mock(BabelNetManager.class);
         when(mockManager.getSynset(originSynsetId)).thenReturn(updatedOriginSynset);
 
-        Database database = DatabaseTest.createTestDatabase();
+        Database database = createTestDatabase();
         Board board = new Board(database, mockManager);
 
         board.addSynset(originalSynset);

@@ -1,6 +1,7 @@
 package com.github.semres.gui;
 
 import com.github.semres.Edge;
+import com.github.semres.RelationType;
 import com.github.semres.babelnet.BabelNetEdge;
 import com.github.semres.user.UserEdge;
 import javafx.application.Platform;
@@ -16,7 +17,7 @@ import java.net.URL;
 import java.util.ResourceBundle;
 
 public class EdgeDetailsController extends ChildController implements Initializable {
-    @FXML private ComboBox<Edge.RelationType> relationTypeCB;
+    @FXML private ComboBox<RelationType> relationTypeCB;
     @FXML private TextField weightTF;
     @FXML private TextArea descriptionTA;
     @FXML private Button editButton;
@@ -27,9 +28,13 @@ public class EdgeDetailsController extends ChildController implements Initializa
     private Edge edge;
 
     @Override
-    public void initialize(URL location, ResourceBundle resources) {
-        relationTypeCB.getItems().setAll(Edge.RelationType.values());
+    public void setParent(Controller parent) {
+        super.setParent(parent);
+        relationTypeCB.getItems().setAll(((MainController) parent).getRelationTypes());
+    }
 
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
         BooleanBinding weightValid = Bindings.createBooleanBinding(() -> {
             String weightText = weightTF.getText().replace(',', '.');
             double weight;

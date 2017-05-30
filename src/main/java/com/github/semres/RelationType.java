@@ -16,4 +16,21 @@ public class RelationType {
     public String getSource() {
         return source;
     }
+
+    @Override
+    public String toString() {
+        return getType();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (!RelationType.class.isAssignableFrom(obj.getClass())) {
+            return false;
+        }
+        final RelationType other = (RelationType) obj;
+        return this.type.equals(other.type) && this.source.equals(other.source);
+    }
 }

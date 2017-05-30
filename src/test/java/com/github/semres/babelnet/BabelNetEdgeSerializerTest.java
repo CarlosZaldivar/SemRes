@@ -1,9 +1,6 @@
 package com.github.semres.babelnet;
 
-import com.github.semres.Edge;
-import com.github.semres.EdgeSerializer;
-import com.github.semres.SemRes;
-import com.github.semres.Synset;
+import com.github.semres.*;
 import com.github.semres.user.UserSynset;
 import com.github.semres.user.UserSynsetSerializer;
 import org.eclipse.rdf4j.model.Model;
@@ -11,19 +8,19 @@ import org.eclipse.rdf4j.model.ValueFactory;
 import org.eclipse.rdf4j.model.vocabulary.RDFS;
 import org.eclipse.rdf4j.repository.Repository;
 import org.eclipse.rdf4j.repository.RepositoryConnection;
-import org.eclipse.rdf4j.repository.sail.SailRepository;
-import org.eclipse.rdf4j.sail.memory.MemoryStore;
 import org.junit.Test;
 
+import static com.github.semres.Utils.createTestRepository;
 import static org.junit.Assert.assertTrue;
 
 public class BabelNetEdgeSerializerTest {
     @Test
     public void edgeToRdf() throws Exception {
-        Repository repo = new SailRepository(new MemoryStore());
+        String baseIri = "http://example.org/";
+        Repository repo = createTestRepository(baseIri);
         repo.initialize();
         ValueFactory factory = repo.getValueFactory();
-        EdgeSerializer edgeSerializer = new BabelNetEdgeSerializer(repo, "http://example.org/");
+        EdgeSerializer edgeSerializer = new BabelNetEdgeSerializer(repo, baseIri);
 
         Synset pointedSynset = new UserSynset("Foo1");
         Synset originSynset = new UserSynset("Foo2");
@@ -31,15 +28,16 @@ public class BabelNetEdgeSerializerTest {
         pointedSynset.setId("123");
         originSynset.setId("124");
 
-        BabelNetEdge edge = new BabelNetEdge(pointedSynset.getId(), originSynset.getId(), Edge.RelationType.HOLONYM, 0.4);
+        RelationType relationType = new BabelNetManager().getRelationTypes().get(0);
+        BabelNetEdge edge = new BabelNetEdge(pointedSynset.getId(), originSynset.getId(), relationType, 0.4);
         Model model = edgeSerializer.edgeToRdf(edge);
 
         assertTrue(model.filter(null, SemRes.ID, factory.createLiteral("124-123")).size() == 1);
-        assertTrue(model.filter(null, SemRes.RELATION_TYPE_PROPERTY, SemRes.HOLONYM).size() == 1);
+        assertTrue(model.filter(null, SemRes.RELATION_TYPE_PROPERTY, factory.createIRI(baseIri + "relationTypes/HOLONYM")).size() == 1);
         assertTrue(model.filter(null, RDFS.COMMENT, null).size() == 0);
 
         // Check edge with a description
-        edge = new BabelNetEdge(pointedSynset.getId(), originSynset.getId(), "Description", Edge.RelationType.HOLONYM, 0.4);
+        edge = new BabelNetEdge(pointedSynset.getId(), originSynset.getId(), "Description", relationType, 0.4);
         model = edgeSerializer.edgeToRdf(edge);
 
         assertTrue(model.filter(null, RDFS.COMMENT, factory.createLiteral("Description")).size() == 1);
@@ -47,11 +45,10 @@ public class BabelNetEdgeSerializerTest {
 
     @Test
     public void rdfToEdge() throws Exception {
-        Repository repo = new SailRepository(new MemoryStore());
-        repo.initialize();
-        BabelNetEdgeSerializer edgeSerializer = new BabelNetEdgeSerializer(repo, "http://example.org/");
-        UserSynsetSerializer synsetSerializer = new UserSynsetSerializer(repo, "http://example.org/");
-
+        String baseIri = "http://example.org/";
+        Repository repo = createTestRepository(baseIri);
+        BabelNetEdgeSerializer edgeSerializer = new BabelNetEdgeSerializer(repo, baseIri);
+        UserSynsetSerializer synsetSerializer = new UserSynsetSerializer(repo, baseIri);
 
         UserSynset pointedSynset = new UserSynset("Foo1");
         UserSynset originSynset = new UserSynset("Foo2");
@@ -59,7 +56,8 @@ public class BabelNetEdgeSerializerTest {
         pointedSynset.setId("123");
         originSynset.setId("124");
 
-        BabelNetEdge edge = new BabelNetEdge(pointedSynset.getId(), originSynset.getId(), Edge.RelationType.HOLONYM, 0.5);
+        RelationType holonym = new BabelNetManager().getRelationTypes().stream().filter(r -> r.getType().equals("HOLONYM")).findFirst().get();
+        BabelNetEdge edge = new BabelNetEdge(pointedSynset.getId(), originSynset.getId(), holonym, 0.5);
 
         Model model = edgeSerializer.edgeToRdf(edge);
         model.addAll(synsetSerializer.synsetToRdf(originSynset));
@@ -75,7 +73,7 @@ public class BabelNetEdgeSerializerTest {
         assertTrue(edge.getOriginSynset().equals("124"));
         assertTrue(edge.getPointedSynset().equals("123"));
         assertTrue(edge.getDescription() == null);
-        assertTrue(edge.getRelationType() == Edge.RelationType.HOLONYM);
+        assertTrue(edge.getRelationType().equals(holonym));
         assertTrue(edge.getWeight() == 0.5);
     }
 }

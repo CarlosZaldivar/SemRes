@@ -1,8 +1,14 @@
 package com.github.semres;
 
 import com.esotericsoftware.yamlbeans.YamlException;
+import com.github.semres.babelnet.CommonIRI;
+import org.eclipse.rdf4j.model.IRI;
 import org.eclipse.rdf4j.model.Model;
+import org.eclipse.rdf4j.model.ValueFactory;
 import org.eclipse.rdf4j.model.impl.LinkedHashModel;
+import org.eclipse.rdf4j.model.impl.SimpleValueFactory;
+import org.eclipse.rdf4j.model.vocabulary.RDF;
+import org.eclipse.rdf4j.model.vocabulary.RDFS;
 import org.eclipse.rdf4j.repository.Repository;
 import org.eclipse.rdf4j.repository.RepositoryConnection;
 import org.eclipse.rdf4j.repository.config.RepositoryConfig;
@@ -14,22 +20,26 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
 public class DatabasesManager {
     private final List<Class<? extends SynsetSerializer>> synsetSerializerClasses = new ArrayList<>();
     private final List<Class<? extends EdgeSerializer>> edgeSerializerClasses = new ArrayList<>();
-
+    private final Collection<RelationType> relationTypes;
+    private final String baseIri = "http://example.org/";
     private final Model metadataStatements;
     private final LocalRepositoryManager repositoryManager;
 
     DatabasesManager(Settings settings) {
         metadataStatements = new LinkedHashModel();
+        relationTypes = new ArrayList<>();
         for (Source source: settings.getSources()) {
             synsetSerializerClasses.add(source.getSynsetSerializerClass());
             edgeSerializerClasses.add(source.getEdgeSerializerClass());
             metadataStatements.addAll(source.getMetadataStatements());
+            relationTypes.addAll(source.getRelationTypes());
         }
         repositoryManager = new LocalRepositoryManager(new File(settings.getDatabasesDirectory()));
         repositoryManager.initialize();
@@ -49,7 +59,7 @@ public class DatabasesManager {
 
     public Board getBoard(String repositoryId) throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
         Repository repository = repositoryManager.getRepository(repositoryId);
-        Database database = new Database("http://example.org/", synsetSerializerClasses, edgeSerializerClasses, repository);
+        Database database = new Database(baseIri, synsetSerializerClasses, edgeSerializerClasses, repository);
         return new Board(database);
     }
 
@@ -79,10 +89,6 @@ public class DatabasesManager {
         repositoryManager.removeRepository(repositoryId);
     }
 
-    public Repository getRepository(String repositoryId) {
-        return repositoryManager.getRepository(repositoryId);
-    }
-
     public void save() {
         repositoryManager.shutDown();
     }
@@ -90,6 +96,17 @@ public class DatabasesManager {
     private void initializeRepository(Repository repository) {
         try (RepositoryConnection conn = repository.getConnection()) {
             conn.add(metadataStatements);
+
+            // Add relation types
+            Model model = new LinkedHashModel();
+            for (RelationType relationType : relationTypes) {
+                ValueFactory factory = SimpleValueFactory.getInstance();
+                IRI relationTypeIri = factory.createIRI(baseIri + "relationTypes/" + relationType.getType());
+                model.add(relationTypeIri, RDF.TYPE, SemRes.RELATION_TYPE_CLASS);
+                model.add(relationTypeIri, RDFS.LABEL, factory.createLiteral(relationType.getType()));
+                model.add(relationTypeIri, SemRes.SOURCE, factory.createLiteral(relationType.getSource()));
+            }
+            conn.add(model);
         }
     }
 }
