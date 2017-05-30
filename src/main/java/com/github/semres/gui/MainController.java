@@ -6,10 +6,7 @@ import com.github.semres.*;
 import com.github.semres.babelnet.BabelNetManager;
 import com.github.semres.babelnet.BabelNetSynset;
 import com.github.semres.user.UserEdge;
-import com.teamdev.jxbrowser.chromium.Browser;
-import com.teamdev.jxbrowser.chromium.BrowserPreferences;
-import com.teamdev.jxbrowser.chromium.JSArray;
-import com.teamdev.jxbrowser.chromium.JSValue;
+import com.teamdev.jxbrowser.chromium.*;
 import com.teamdev.jxbrowser.chromium.events.ScriptContextAdapter;
 import com.teamdev.jxbrowser.chromium.events.ScriptContextEvent;
 import com.teamdev.jxbrowser.chromium.javafx.BrowserView;
@@ -80,6 +77,11 @@ public class MainController extends Controller implements Initializable {
                 window.asObject().setProperty("javaApp", new JavaApp());
             }
         });
+
+        // Enable loading resources from inside jar file.
+        BrowserContext browserContext = browser.getContext();
+        ProtocolService protocolService = browserContext.getProtocolService();
+        protocolService.setProtocolHandler("jar", new JarProtocolHandler());
 
         // updateMenuItem should be disabled if there are unsaved changes on the board.
         babelNetMenu.setOnShowing(e -> updateMenuItem.setDisable(board.isBoardEdited()));
