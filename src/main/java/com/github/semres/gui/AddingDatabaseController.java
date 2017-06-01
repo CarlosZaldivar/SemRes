@@ -6,15 +6,13 @@ import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
 public class AddingDatabaseController extends ChildController {
-    @FXML
-    private TextField newDatabaseNameTF;
-    @FXML
-    private Button createButton;
+    @FXML private TextField newDatabaseNameTF;
+    @FXML private Button createButton;
 
     public void createNewDatabase() {
         try {
             String newDatabaseName = newDatabaseNameTF.getText();
-            ((DatabasesController)parent).addDatabase(newDatabaseName);
+            ((DatabasesController) parent).addDatabase(newDatabaseName);
             Stage stage = (Stage) createButton.getScene().getWindow();
             stage.close();
         } catch (IllegalArgumentException e) {
