@@ -24,16 +24,12 @@ import java.util.Collection;
 import java.util.ResourceBundle;
 
 public class LoadSynsetController extends ChildController implements Initializable {
-    @FXML
-    private
-    ListView<SynsetMedia> synsetsListView;
+    @FXML private ListView<SynsetMedia> synsetsListView;
+    @FXML private TextField searchBox;
 
     private final ObservableList<SynsetMedia> synsetsObservableList = FXCollections.observableArrayList();
 
-
-    @FXML
-    private
-    TextField searchBox;
+    private MainController mainController;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -41,10 +37,15 @@ public class LoadSynsetController extends ChildController implements Initializab
         synsetsListView.setItems(synsetsObservableList);
     }
 
+    @Override
+    public void setParent(Controller parent) {
+        mainController = (MainController) parent;
+    }
+
     void addSynsetToView(MouseEvent click) {
         if (click.getClickCount() == 2 && synsetsListView.getSelectionModel().getSelectedItem() != null) {
             Synset synset = synsetsListView.getSelectionModel().getSelectedItem().getSynset();
-            ((MainController) parent).addSynsetToView(synset);
+            mainController.addSynsetToView(synset);
             Stage stage = (Stage) synsetsListView.getScene().getWindow();
             stage.close();
         }
@@ -57,7 +58,7 @@ public class LoadSynsetController extends ChildController implements Initializab
             return;
         }
 
-        Collection<Synset> synsetsFound = ((MainController) parent).loadSynsets(searchPhrase);
+        Collection<Synset> synsetsFound = mainController.loadSynsets(searchPhrase);
 
         for (Synset synset : synsetsFound) {
             synsetsObservableList.add(new SynsetMedia(synset));

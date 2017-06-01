@@ -25,6 +25,8 @@ public class AddingEdgeController extends ChildController implements Initializab
     private Synset originSynset;
     private Synset destinationSynset;
 
+    private MainController mainController;
+
     public void setOriginSynset(Synset originSynset) {
         this.originSynset = originSynset;
     }
@@ -35,7 +37,7 @@ public class AddingEdgeController extends ChildController implements Initializab
 
     @Override
     public void setParent(Controller parent) {
-        super.setParent(parent);
+        mainController = (MainController) parent;
         relationTypeCB.getItems().setAll(((MainController) parent).getRelationTypes());
         relationTypeCB.getSelectionModel().select(0);
     }
@@ -60,7 +62,7 @@ public class AddingEdgeController extends ChildController implements Initializab
         RelationType relationType = relationTypeCB.getSelectionModel().getSelectedItem();
         UserEdge newEdge = new UserEdge(destinationSynset.getId(), originSynset.getId(), descriptionTA.getText(), relationType, weight);
 
-        ((MainController) parent).addEdge(newEdge);
+        mainController.addEdge(newEdge);
 
         Stage stage = (Stage) addButton.getScene().getWindow();
         stage.close();

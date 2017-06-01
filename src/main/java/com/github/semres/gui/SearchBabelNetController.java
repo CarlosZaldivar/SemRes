@@ -32,6 +32,8 @@ public class SearchBabelNetController extends ChildController implements Initial
     private Service<Collection<Edge>> downloadEdgesService;
 
     private BabelNetSynset clickedSynset;
+    
+    private MainController mainController;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -44,7 +46,7 @@ public class SearchBabelNetController extends ChildController implements Initial
                 return new Task<List<BabelNetSynset>>() {
                     @Override
                     protected List<BabelNetSynset> call() throws Exception {
-                        return ((MainController) parent).searchBabelNet(searchBox.getText());
+                        return mainController.searchBabelNet(searchBox.getText());
                     }
                 };
             }
@@ -65,7 +67,7 @@ public class SearchBabelNetController extends ChildController implements Initial
                 return new Task() {
                     @Override
                     protected Collection<Edge> call() throws Exception {
-                        return ((MainController) parent).downloadBabelNetEdges(clickedSynset.getId());
+                        return mainController.downloadBabelNetEdges(clickedSynset.getId());
                     }
                 };
             }
@@ -84,6 +86,11 @@ public class SearchBabelNetController extends ChildController implements Initial
         progressIndicatorVB.visibleProperty().bind(searchService.runningProperty().or(downloadEdgesService.runningProperty()));
     }
 
+    @Override
+    public void setParent(Controller parent) {
+        mainController = (MainController) parent;
+    }
+
     private void showResults() {
         List<BabelNetSynset> synsetsFound = searchService.getValue();
 
@@ -94,7 +101,7 @@ public class SearchBabelNetController extends ChildController implements Initial
 
 
     private void addDownloadedEdges() {
-        ((MainController) parent).addSynsetToView(((MainController) parent).getSynset(clickedSynset.getId()));
+        mainController.addSynsetToView(mainController.getSynset(clickedSynset.getId()));
         Stage stage = (Stage) synsetsListView.getScene().getWindow();
         stage.close();
     }
@@ -103,11 +110,11 @@ public class SearchBabelNetController extends ChildController implements Initial
         if (click.getClickCount() == 2 && synsetsListView.getSelectionModel().getSelectedItem() != null) {
             clickedSynset = (BabelNetSynset) synsetsListView.getSelectionModel().getSelectedItem().getSynset();
 
-            if (((MainController) parent).synsetExists(clickedSynset.getId())) {
-                ((MainController) parent).loadSynset(clickedSynset.getId());
-                ((MainController) parent).addSynsetToView(((MainController) parent).getSynset(clickedSynset.getId()));
+            if (mainController.synsetExists(clickedSynset.getId())) {
+                mainController.loadSynset(clickedSynset.getId());
+                mainController.addSynsetToView(mainController.getSynset(clickedSynset.getId()));
             } else {
-                ((MainController) parent).addSynsetToBoard(clickedSynset);
+                mainController.addSynsetToBoard(clickedSynset);
             }
 
             downloadEdgesService.restart();

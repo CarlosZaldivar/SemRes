@@ -14,15 +14,10 @@ import java.net.URL;
 import java.util.ResourceBundle;
 
 public class AddingSynsetController extends ChildController implements Initializable {
-    @FXML
-    private
-    TextField representationTF;
-    @FXML
-    private
-    TextArea descriptionTA;
-    @FXML
-    private
-    Button addButton;
+    @FXML private TextField representationTF;
+    @FXML private TextArea descriptionTA;
+    @FXML private Button addButton;
+    private MainController mainController;
 
     public void addSynset() {
         String representation = representationTF.getText();
@@ -33,9 +28,14 @@ public class AddingSynsetController extends ChildController implements Initializ
         if (!description.isEmpty()) {
             newSynset = newSynset.changeDescription(description);
         }
-        ((MainController) parent).addSynset(newSynset);
+        mainController.addSynset(newSynset);
         Stage stage = (Stage) addButton.getScene().getWindow();
         stage.close();
+    }
+    
+    @Override
+    public void setParent(Controller parent) {
+        mainController = (MainController) parent;
     }
 
     @Override

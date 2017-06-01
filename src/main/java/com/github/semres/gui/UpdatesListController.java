@@ -53,9 +53,11 @@ public class UpdatesListController extends ChildController implements Initializa
     private ObservableList<Synset> removedSynsets;
     private Task<List<SynsetUpdate>> updateTask;
 
+    private MainController mainController;
+
     @Override
     public void setParent(Controller parent) {
-        super.setParent(parent);
+        mainController = (MainController) parent;
 
         // Update task should be run only when MainController is set up.
         Thread updatesThread = new Thread(updateTask);
@@ -68,7 +70,7 @@ public class UpdatesListController extends ChildController implements Initializa
         updateTask = new Task<List<SynsetUpdate>>() {
             @Override
             protected List<SynsetUpdate> call() throws IOException, InterruptedException {
-                return ((MainController) parent).checkForUpdates();
+                return mainController.checkForUpdates();
             }
         };
         mainPane.visibleProperty().bind(updateTask.runningProperty().not());
@@ -109,7 +111,7 @@ public class UpdatesListController extends ChildController implements Initializa
     }
 
     public void applyUpdates() {
-        ((MainController) parent).update(updates);
+        mainController.update(updates);
         Stage stage = (Stage) applyButton.getScene().getWindow();
         stage.close();
     }

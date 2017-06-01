@@ -18,14 +18,13 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Set;
 
 public class DatabasesController extends ChildController {
-    @FXML
-    private ListView<String> listView;
-    @FXML
-    private Button addButton;
-    @FXML
-    private Button deleteButton;
+    @FXML private ListView<String> listView;
+    @FXML private Button addButton;
+    @FXML private Button deleteButton;
 
     private final ObservableList<String> observableList = FXCollections.observableArrayList();
+    
+    private MainController mainController;
 
     public void openNewDatabaseDialog() throws IOException {
         FXMLLoader loader = new FXMLLoader((getClass().getResource("/fxml/add-database.fxml")));
@@ -43,14 +42,14 @@ public class DatabasesController extends ChildController {
     }
 
     void addDatabase(String name) {
-        ((MainController) parent).getDatabasesManager().addRepository(name);
+        mainController.getDatabasesManager().addRepository(name);
         observableList.add(name);
     }
 
     public void deleteDatabase() {
         String name = listView.getSelectionModel().getSelectedItem();
         if (name != null && !name.equals("SYSTEM")) {
-            ((MainController) parent).getDatabasesManager().deleteRepository(name);
+            mainController.getDatabasesManager().deleteRepository(name);
             observableList.remove(name);
         }
     }
@@ -58,8 +57,8 @@ public class DatabasesController extends ChildController {
     public void clickedListView(MouseEvent click) throws NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
         if (click.getClickCount() == 2 && listView.getSelectionModel().getSelectedItem() != null) {
             String repositoryName = listView.getSelectionModel().getSelectedItem();
-            Board loadedBoard =  ((MainController) parent).getDatabasesManager().getBoard(repositoryName);
-            ((MainController) parent).setBoard(loadedBoard);
+            Board loadedBoard =  mainController.getDatabasesManager().getBoard(repositoryName);
+            mainController.setBoard(loadedBoard);
             Stage stage = (Stage) listView.getScene().getWindow();
             stage.close();
         }
@@ -67,8 +66,8 @@ public class DatabasesController extends ChildController {
 
     @Override
     public void setParent(Controller parent) {
-        super.setParent(parent);
-        Set<String> databasesNames = ((MainController) parent).getDatabasesManager().getRepositoryIDs();
+        mainController = (MainController) parent;
+        Set<String> databasesNames = mainController.getDatabasesManager().getRepositoryIDs();
         databasesNames.remove("SYSTEM");
 
         observableList.setAll(databasesNames);

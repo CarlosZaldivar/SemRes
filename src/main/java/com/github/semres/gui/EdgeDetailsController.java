@@ -26,11 +26,12 @@ public class EdgeDetailsController extends ChildController implements Initializa
     @FXML private ButtonBar buttonBar;
     private BooleanProperty editing = new SimpleBooleanProperty(false);
     private Edge edge;
+    private MainController mainController;
 
     @Override
     public void setParent(Controller parent) {
-        super.setParent(parent);
-        relationTypeCB.getItems().setAll(((MainController) parent).getRelationTypes());
+        mainController = (MainController) parent; 
+        relationTypeCB.getItems().setAll(mainController.getRelationTypes());
     }
 
     @Override
@@ -89,7 +90,7 @@ public class EdgeDetailsController extends ChildController implements Initializa
         editedEdge = editedEdge.changeWeight(Double.parseDouble(weightTF.getText()));
         editedEdge = editedEdge.changeRelationType(relationTypeCB.getSelectionModel().getSelectedItem());
 
-        ((MainController) parent).editEdge(originalEdge, editedEdge);
+        mainController.editEdge(originalEdge, editedEdge);
         editing.set(false);
     }
 }

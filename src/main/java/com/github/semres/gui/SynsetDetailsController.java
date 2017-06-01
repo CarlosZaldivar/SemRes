@@ -29,6 +29,7 @@ public class SynsetDetailsController extends ChildController implements Initiali
 
     private BooleanProperty editing = new SimpleBooleanProperty(false);
     private Synset synset;
+    private MainController mainController;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -46,6 +47,11 @@ public class SynsetDetailsController extends ChildController implements Initiali
         okButton.disableProperty().bind(representationValid.not());
 
         Platform.runLater(() -> idTF.getParent().requestFocus());
+    }
+    
+    @Override
+    public void setParent(Controller parent) {
+        mainController = (MainController) parent;
     }
 
     public void setSynset(Synset synset) {
@@ -74,7 +80,7 @@ public class SynsetDetailsController extends ChildController implements Initiali
         UserSynset originalSynset = (UserSynset) synset;
         UserSynset editedSynset = originalSynset.changeRepresentation(representationTF.getText());
         editedSynset = editedSynset.changeDescription(descriptionTA.getText());
-        ((MainController) parent).editSynset(originalSynset, editedSynset);
+        mainController.editSynset(originalSynset, editedSynset);
         editing.set(false);
     }
 }
