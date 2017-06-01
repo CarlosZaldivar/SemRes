@@ -365,6 +365,14 @@ public class MainController extends Controller implements Initializable {
         return board.getRelationTypes();
     }
 
+    public void addRelationType(RelationType relationType) {
+        board.addRelationType(relationType);
+    }
+
+    public void removeRelationType(RelationType relationType) {
+        board.removeRelationType(relationType);
+    }
+
     public class JavaApp {
         public void openNewSynsetWindow() {
             Platform.runLater(() -> {

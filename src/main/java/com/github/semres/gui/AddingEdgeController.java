@@ -5,15 +5,23 @@ import com.github.semres.Synset;
 import com.github.semres.user.UserEdge;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 
+import java.io.IOException;
 import java.net.URL;
+import java.util.Collection;
 import java.util.ResourceBundle;
 
 public class AddingEdgeController extends ChildController implements Initializable {
@@ -24,6 +32,7 @@ public class AddingEdgeController extends ChildController implements Initializab
 
     private Synset originSynset;
     private Synset destinationSynset;
+    private ObservableList<RelationType> relationTypes = FXCollections.observableArrayList();
 
     private MainController mainController;
 
@@ -38,7 +47,8 @@ public class AddingEdgeController extends ChildController implements Initializab
     @Override
     public void setParent(Controller parent) {
         mainController = (MainController) parent;
-        relationTypeCB.getItems().setAll(((MainController) parent).getRelationTypes());
+        relationTypes.addAll(mainController.getRelationTypes());
+        relationTypeCB.setItems((relationTypes));
         relationTypeCB.getSelectionModel().select(0);
     }
 
@@ -66,5 +76,32 @@ public class AddingEdgeController extends ChildController implements Initializab
 
         Stage stage = (Stage) addButton.getScene().getWindow();
         stage.close();
+    }
+
+    public Collection<RelationType> getRelationTypes() {
+        return relationTypes;
+    }
+
+    public void addRelationType(RelationType relationType) {
+        mainController.addRelationType(relationType);
+        relationTypes.add(relationType);
+    }
+
+    public void removeRelationType(RelationType relationType) {
+        mainController.removeRelationType(relationType);
+        relationTypes.remove(relationType);
+    }
+
+    public void openRelationTypesListWindow() throws IOException {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/relation-types-list.fxml"));
+        Parent root = loader.load();
+        Stage newStage = new Stage();
+        newStage.setTitle("Relation types list");
+        newStage.setScene(new Scene(root, 300, 275));
+        newStage.initOwner(relationTypeCB.getScene().getWindow());
+        newStage.initModality(Modality.WINDOW_MODAL);
+        RelationTypesController controller = loader.getController();
+        controller.setParent(this);
+        newStage.show();
     }
 }

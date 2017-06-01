@@ -407,4 +407,12 @@ public class Board {
     public Collection<RelationType> getRelationTypes() {
         return attachedDatabase.getRelationTypes();
     }
+
+    public void addRelationType(RelationType relationType) {
+        attachedDatabase.addRelationType(relationType);
+    }
+
+    public void removeRelationType(RelationType relationType) {
+        attachedDatabase.removeRelationType(relationType);
+    }
 }
