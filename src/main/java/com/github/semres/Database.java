@@ -222,9 +222,16 @@ public class Database {
     }
 
 
-    void getRelationTypes(RelationType relationType) {
+    void addRelationType(RelationType relationType) {
         try (RepositoryConnection conn = repository.getConnection()) {
             conn.add(relationTypeToRdf(relationType));
+        }
+    }
+
+
+    public void removeRelationType(RelationType relationType) {
+        try (RepositoryConnection conn = repository.getConnection()) {
+            conn.remove(relationTypeToRdf(relationType));
         }
     }
 

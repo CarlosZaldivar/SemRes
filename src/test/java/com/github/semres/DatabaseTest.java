@@ -308,14 +308,25 @@ public class DatabaseTest {
     }
 
     @Test
-    public void addEdgeType() throws Exception {
+    public void addRelationType() throws Exception {
         Database database = createTestDatabase();
         int relationsNumber = database.getRelationTypes().size();
         RelationType relationType = new RelationType("RelationX", "User");
-        database.getRelationTypes(relationType);
+        database.addRelationType(relationType);
         Collection<RelationType> relationTypes = database.getRelationTypes();
         assertTrue(relationTypes.size() == relationsNumber + 1);
         assertTrue(relationTypes.stream().map(RelationType::getSource).anyMatch("User"::equals));
         assertTrue(relationTypes.stream().map(RelationType::getType).anyMatch("RelationX"::equals));
+    }
+
+    @Test
+    public void removeRelationType() throws Exception {
+        Database database = createTestDatabase();
+        int relationsNumber = database.getRelationTypes().size();
+        RelationType relationType = new RelationType("RelationX", "User");
+        database.addRelationType(relationType);
+        database.removeRelationType(relationType);
+        Collection<RelationType> relationTypes = database.getRelationTypes();
+        assertTrue(relationTypes.size() == relationsNumber);
     }
 }
