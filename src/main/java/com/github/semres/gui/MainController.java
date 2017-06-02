@@ -223,27 +223,28 @@ public class MainController extends Controller implements Initializable {
     }
 
     public void openDatabasesWindow() throws IOException {
-        openNewWindow("/fxml/databases-list.fxml", "Databases", 300, 275);
+        openNewWindow("/fxml/databases-list.fxml", "Databases");
     }
 
     public void openLoadSynsetWindow() throws IOException {
-        openNewWindow("/fxml/load-synset.fxml", "Load synset", 500, 350);
+        openNewWindow("/fxml/load-synset.fxml", "Load synset");
     }
 
     public void openSearchBabelNetWindow() throws IOException {
-        openNewWindow("/fxml/search-babelnet.fxml", "Search BabelNet", 500, 350);
+        openNewWindow("/fxml/search-babelnet.fxml", "Search BabelNet");
     }
 
     public void openUpdatesWindow() throws IOException {
-        openNewWindow("/fxml/updates-list.fxml", "BabelNet updates", 500, 350);
+        openNewWindow("/fxml/updates-list.fxml", "BabelNet updates");
     }
 
-    private Controller openNewWindow(String fxmlPath, String title, int width, int height) throws IOException {
+    private Controller openNewWindow(String fxmlPath, String title) throws IOException {
         FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
         Parent root = loader.load();
         Stage newStage = new Stage();
         newStage.setTitle(title);
-        newStage.setScene(new Scene(root, width, height));
+        newStage.setScene(new Scene(root));
+        newStage.sizeToScene();
         newStage.initOwner(menuBar.getScene().getWindow());
         newStage.initModality(Modality.WINDOW_MODAL);
 
@@ -377,7 +378,7 @@ public class MainController extends Controller implements Initializable {
         public void openNewSynsetWindow() {
             Platform.runLater(() -> {
                 try {
-                    openNewWindow("/fxml/add-synset.fxml","Add synset",500,350);
+                    openNewWindow("/fxml/add-synset.fxml","Add synset");
                 } catch (IOException e) {
                     Utils.showAlert(e.getMessage());
                 }
@@ -387,7 +388,7 @@ public class MainController extends Controller implements Initializable {
         public void openNewEdgeWindow(String originSynsetId, String destinationSynsetId) {
             Platform.runLater(() -> {
                 try {
-                    AddingEdgeController childController = (AddingEdgeController) openNewWindow("/fxml/add-edge.fxml", "Edge details", 500, 350);
+                    AddingEdgeController childController = (AddingEdgeController) openNewWindow("/fxml/add-edge.fxml", "Edge details");
                     childController.setOriginSynset(board.getSynset(originSynsetId));
                     childController.setDestinationSynset(board.getSynset(destinationSynsetId));
                 } catch (IOException e) {
@@ -400,7 +401,7 @@ public class MainController extends Controller implements Initializable {
             Platform.runLater(() -> {
                 try {
                     SynsetDetailsController childController =
-                            (SynsetDetailsController) openNewWindow("/fxml/synset-details.fxml", "Synset details", 500, 350);
+                            (SynsetDetailsController) openNewWindow("/fxml/synset-details.fxml", "Synset details");
                     childController.setSynset(board.getSynset(synsetId));
                 } catch (IOException e) {
                     Utils.showAlert(e.getMessage());
@@ -412,7 +413,7 @@ public class MainController extends Controller implements Initializable {
             Platform.runLater(() -> {
                 try {
                     EdgeDetailsController childController =
-                            (EdgeDetailsController) openNewWindow("/fxml/edge-details.fxml", "Edge details", 500, 350);
+                            (EdgeDetailsController) openNewWindow("/fxml/edge-details.fxml", "Edge details");
                     childController.setEdge(board.getEdge(edgeId));
                 } catch (IOException e) {
                     Utils.showAlert(e.getMessage());

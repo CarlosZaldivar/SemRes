@@ -31,7 +31,8 @@ public class DatabasesController extends ChildController {
         Parent root = loader.load();
         Stage databasesStage = new Stage();
         databasesStage.setTitle("Add database");
-        databasesStage.setScene(new Scene(root, 200, 150));
+        databasesStage.setScene(new Scene(root));
+        databasesStage.sizeToScene();
         databasesStage.initOwner(addButton.getScene().getWindow());
         databasesStage.initModality(Modality.WINDOW_MODAL);
 

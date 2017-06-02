@@ -34,7 +34,8 @@ public class Main extends Application {
         mainController.setBabelNetManager(babelNetManager);
         mainController.setDatabasesManager(databasesManager);
         primaryStage.setTitle("SemRes");
-        primaryStage.setScene(new Scene(root, 600, 550));
+        primaryStage.setScene(new Scene(root));
+        primaryStage.sizeToScene();
         primaryStage.show();
     }
 

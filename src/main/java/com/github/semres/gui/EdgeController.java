@@ -44,7 +44,8 @@ public class EdgeController extends ChildController {
         Parent root = loader.load();
         Stage newStage = new Stage();
         newStage.setTitle("Relation types list");
-        newStage.setScene(new Scene(root, 300, 275));
+        newStage.setScene(new Scene(root));
+        newStage.sizeToScene();
         newStage.initOwner(stage);
         newStage.initModality(Modality.WINDOW_MODAL);
         RelationTypesController controller = loader.getController();
