@@ -224,6 +224,13 @@ public class Database {
 
     void addRelationType(RelationType relationType) {
         try (RepositoryConnection conn = repository.getConnection()) {
+            // Check if relation type with this name exists
+            ValueFactory factory = conn.getValueFactory();
+            String queryString = String.format("ASK { ?relationType <%s> <%s> . ?relationType <%s> %s }",
+                    RDF.TYPE, SemRes.RELATION_TYPE_CLASS, RDFS.LABEL, factory.createLiteral(relationType.getType()));
+            if (conn.prepareBooleanQuery(queryString).evaluate()) {
+                throw new RuntimeException("Relation type already exists.");
+            }
             conn.add(relationTypeToRdf(relationType));
         }
     }
@@ -231,6 +238,13 @@ public class Database {
 
     public void removeRelationType(RelationType relationType) {
         try (RepositoryConnection conn = repository.getConnection()) {
+            // Check if RelationType is in use
+            ValueFactory factory = conn.getValueFactory();
+            String queryString = String.format("ASK { ?relationType <%s> <%s> . ?relationType <%s> %s . ?edge <%s> ?relationType }",
+                    RDF.TYPE, SemRes.RELATION_TYPE_CLASS, RDFS.LABEL, factory.createLiteral(relationType.getType()), SemRes.RELATION_TYPE_PROPERTY);
+            if (conn.prepareBooleanQuery(queryString).evaluate()) {
+                throw new RuntimeException("Relation type already exists.");
+            }
             conn.remove(relationTypeToRdf(relationType));
         }
     }

@@ -319,6 +319,14 @@ public class DatabaseTest {
         assertTrue(relationTypes.stream().map(RelationType::getType).anyMatch("RelationX"::equals));
     }
 
+    @Test(expected = RuntimeException.class)
+    public void addRelationTypesWithSameName() throws Exception {
+        Database database = createTestDatabase();
+        RelationType relationType = new RelationType("RelationX", "User");
+        database.addRelationType(relationType);
+        database.addRelationType(relationType);
+    }
+
     @Test
     public void removeRelationType() throws Exception {
         Database database = createTestDatabase();
@@ -328,5 +336,24 @@ public class DatabaseTest {
         database.removeRelationType(relationType);
         Collection<RelationType> relationTypes = database.getRelationTypes();
         assertTrue(relationTypes.size() == relationsNumber);
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void removeUsedRelationType() throws Exception {
+        Database database = createTestDatabase();
+        RelationType relationType = new RelationType("RelationX", "User");
+        database.addRelationType(relationType);
+
+        UserSynset originSynset = new UserSynset("Foo");
+        originSynset.setId("123");
+        UserSynset pointedSynset = new UserSynset("Bar");
+        pointedSynset.setId("124");
+        Edge edge = new UserEdge(pointedSynset.getId(), originSynset.getId(), relationType, 1);
+
+        database.addSynset(originSynset);
+        database.addSynset(pointedSynset);
+        database.addEdge(edge);
+
+        database.removeRelationType(relationType);
     }
 }
