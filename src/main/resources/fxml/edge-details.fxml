@@ -12,6 +12,7 @@
 <?import javafx.scene.layout.RowConstraints?>
 
 <?import javafx.scene.control.TextArea?>
+<?import javafx.scene.layout.HBox?>
 <BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="130.0" prefWidth="500.0"
             xmlns="http://javafx.com/javafx/8.0.102" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="com.github.semres.gui.EdgeDetailsController" stylesheets="@../css/details-windows.css">
@@ -32,8 +33,10 @@
             <Label text="Relation type"/>
             <Label text="Weight" GridPane.rowIndex="1"/>
             <Label text="Description" GridPane.rowIndex="2"/>
-            <ComboBox fx:id="relationTypeCB" prefHeight="29.0" prefWidth="417.0" GridPane.columnIndex="1"
-                      GridPane.vgrow="ALWAYS"/>
+            <HBox spacing="20.0" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS">
+                <ComboBox HBox.hgrow="ALWAYS" maxWidth="Infinity" fx:id="relationTypeCB"/>
+                <Button text="List" onAction="#openRelationTypesListWindow"/>
+            </HBox>
             <TextField fx:id="weightTF" GridPane.columnIndex="1" GridPane.rowIndex="1" GridPane.vgrow="ALWAYS"/>
             <TextArea fx:id="descriptionTA" GridPane.columnIndex="1" GridPane.rowIndex="2" GridPane.vgrow="ALWAYS"
                       wrapText="true"/>

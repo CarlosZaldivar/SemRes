@@ -24,11 +24,11 @@ public class RelationTypesController extends ChildController {
 
     private final ObservableList<RelationType> observableList = FXCollections.observableArrayList();
 
-    private AddingEdgeController addingEdgeController;
+    private EdgeController addingEdgeController;
 
     @Override
     public void setParent(Controller parent) {
-        addingEdgeController = (AddingEdgeController) parent;
+        addingEdgeController = (EdgeController) parent;
 
         observableList.setAll(addingEdgeController.getRelationTypes());
         listView.setItems(observableList);

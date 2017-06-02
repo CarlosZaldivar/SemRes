@@ -5,18 +5,18 @@ import com.github.semres.RelationType;
 import com.github.semres.babelnet.BabelNetEdge;
 import com.github.semres.user.UserEdge;
 import javafx.application.Platform;
-import javafx.beans.binding.Bindings;
-import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
+import javafx.stage.Stage;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-public class EdgeDetailsController extends ChildController implements Initializable {
+public class EdgeDetailsController extends EdgeController implements Initializable {
     @FXML private ComboBox<RelationType> relationTypeCB;
     @FXML private TextField weightTF;
     @FXML private TextArea descriptionTA;
@@ -26,27 +26,16 @@ public class EdgeDetailsController extends ChildController implements Initializa
     @FXML private ButtonBar buttonBar;
     private BooleanProperty editing = new SimpleBooleanProperty(false);
     private Edge edge;
-    private MainController mainController;
 
     @Override
     public void setParent(Controller parent) {
-        mainController = (MainController) parent; 
-        relationTypeCB.getItems().setAll(mainController.getRelationTypes());
+        super.setParent(parent);
+        relationTypeCB.setItems(relationTypes);
     }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        BooleanBinding weightValid = Bindings.createBooleanBinding(() -> {
-            String weightText = weightTF.getText().replace(',', '.');
-            double weight;
-            try {
-                weight = Double.parseDouble(weightText);
-            } catch (NumberFormatException e) {
-                return false;
-            }
-            return weight >=0 && weight <= 1;
-        }, weightTF.textProperty());
-        okButton.disableProperty().bind(weightValid.not());
+        okButton.disableProperty().bind(getWeightInvalidProperty(weightTF));
 
         okButton.visibleProperty().bind(editing);
         okButton.managedProperty().bind(okButton.visibleProperty());
@@ -92,5 +81,9 @@ public class EdgeDetailsController extends ChildController implements Initializa
 
         mainController.editEdge(originalEdge, editedEdge);
         editing.set(false);
+    }
+
+    public void openRelationTypesListWindow() throws IOException {
+        openRelationTypesListWindow((Stage) relationTypeCB.getScene().getWindow());
     }
 }
