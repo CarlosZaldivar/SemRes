@@ -229,7 +229,7 @@ public class Database {
             String queryString = String.format("ASK { ?relationType <%s> <%s> . ?relationType <%s> %s }",
                     RDF.TYPE, SemRes.RELATION_TYPE_CLASS, RDFS.LABEL, factory.createLiteral(relationType.getType()));
             if (conn.prepareBooleanQuery(queryString).evaluate()) {
-                throw new RuntimeException("Relation type already exists.");
+                throw new RelationTypeAlreadyExists();
             }
             conn.add(relationTypeToRdf(relationType));
         }
@@ -237,15 +237,20 @@ public class Database {
 
 
     public void removeRelationType(RelationType relationType) {
+        if (relationTypeInUse(relationType)) {
+            throw new RelationTypeInUseException();
+        }
         try (RepositoryConnection conn = repository.getConnection()) {
-            // Check if RelationType is in use
+            conn.remove(relationTypeToRdf(relationType));
+        }
+    }
+
+    boolean relationTypeInUse(RelationType relationType) {
+        try (RepositoryConnection conn = repository.getConnection()) {
             ValueFactory factory = conn.getValueFactory();
             String queryString = String.format("ASK { ?relationType <%s> <%s> . ?relationType <%s> %s . ?edge <%s> ?relationType }",
                     RDF.TYPE, SemRes.RELATION_TYPE_CLASS, RDFS.LABEL, factory.createLiteral(relationType.getType()), SemRes.RELATION_TYPE_PROPERTY);
-            if (conn.prepareBooleanQuery(queryString).evaluate()) {
-                throw new RuntimeException("Relation type already exists.");
-            }
-            conn.remove(relationTypeToRdf(relationType));
+            return conn.prepareBooleanQuery(queryString).evaluate();
         }
     }
 

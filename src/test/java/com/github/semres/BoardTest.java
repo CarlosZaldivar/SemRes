@@ -406,6 +406,35 @@ public class BoardTest {
         assertTrue(database.getSynset(pointedSynsetId) == null);
     }
 
+    @Test(expected = RelationTypeInUseException.class)
+    public void removeUsedRelationType() throws Exception {
+        Database database = createTestDatabase();
+        Board board = new Board(database);
+
+        Synset originSynset = new UserSynset("Foo");
+        originSynset.setId("123");
+        Synset pointedSynset = new UserSynset("Bar");
+        pointedSynset.setId("124");
+
+        RelationType oldRelationType = new RelationType("RelationX", "User");
+        UserEdge edge = new UserEdge(pointedSynset.getId(), originSynset.getId(), oldRelationType, 0);
+        board.addSynset(originSynset);
+        board.addSynset(pointedSynset);
+        board.addEdge(edge);
+
+        try {
+            board.removeRelationType(oldRelationType);
+            throw new RuntimeException("RelationTypeInUseException not thrown.");
+        } catch (RelationTypeInUseException e) {}
+
+        board.save();
+
+        RelationType newRelationType = new RelationType("RelationY", "User");
+        UserEdge editedEdge = edge.changeRelationType(newRelationType);
+        board.editEdge(edge, editedEdge);
+        board.removeRelationType(newRelationType);
+    }
+
     private BabelSense getMockOriginBabelSense() {
         BabelSense mockBabelSense = Mockito.mock(BabelSense.class);
         when(mockBabelSense.getSenseString()).thenReturn("Foo");

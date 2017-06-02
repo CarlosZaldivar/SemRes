@@ -1,6 +1,7 @@
 package com.github.semres.gui;
 
 import com.github.semres.RelationType;
+import com.github.semres.RelationTypeInUseException;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.collections.FXCollections;
@@ -63,8 +64,12 @@ public class RelationTypesController extends ChildController {
     public void removeRelationType() {
         RelationType relationType = listView.getSelectionModel().getSelectedItem();
         if (relationType != null) {
-            addingEdgeController.removeRelationType(relationType);
-            observableList.remove(relationType);
+            try {
+                addingEdgeController.removeRelationType(relationType);
+                observableList.remove(relationType);
+            } catch (RelationTypeInUseException e) {
+                Utils.showAlert("This relation type is in use, it cannot be removed.");
+            }
         }
     }
 

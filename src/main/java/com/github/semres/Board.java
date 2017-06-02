@@ -413,6 +413,31 @@ public class Board {
     }
 
     public void removeRelationType(RelationType relationType) {
+        if (relationTypeInUse(relationType)) {
+            throw new RelationTypeInUseException();
+        }
         attachedDatabase.removeRelationType(relationType);
+    }
+
+    private boolean relationTypeInUse(RelationType relationType) {
+        if (attachedDatabase.relationTypeInUse(relationType)) {
+            return true;
+        }
+
+        // Check if a new or edited edge was added with the specified type
+        for (SynsetEdit synsetEdit : synsetEdits.values()) {
+            for (Edge edge : synsetEdit.getAddedEdges().values()) {
+                if (edge.getRelationType().equals(relationType)) {
+                    return true;
+                }
+            }
+
+            for (EdgeEdit edgeEdit : synsetEdit.getEdgeEdits().values()) {
+                if (edgeEdit.getEdited().getRelationType().equals(relationType)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }

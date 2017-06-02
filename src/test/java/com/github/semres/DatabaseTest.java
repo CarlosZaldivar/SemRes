@@ -319,7 +319,7 @@ public class DatabaseTest {
         assertTrue(relationTypes.stream().map(RelationType::getType).anyMatch("RelationX"::equals));
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test(expected = RelationTypeAlreadyExists.class)
     public void addRelationTypesWithSameName() throws Exception {
         Database database = createTestDatabase();
         RelationType relationType = new RelationType("RelationX", "User");
@@ -338,7 +338,7 @@ public class DatabaseTest {
         assertTrue(relationTypes.size() == relationsNumber);
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test(expected = RelationTypeInUseException.class)
     public void removeUsedRelationType() throws Exception {
         Database database = createTestDatabase();
         RelationType relationType = new RelationType("RelationX", "User");
