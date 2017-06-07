@@ -5,6 +5,9 @@ class EdgeEdit {
     private Edge edited;
 
     EdgeEdit(Edge original, Edge edited) {
+        if (!original.getId().equals(edited.getId())) {
+            throw new IllegalArgumentException("Edges between different synsets.");
+        }
         this.original = original;
         this.edited = edited;
     }
@@ -19,5 +22,13 @@ class EdgeEdit {
 
     Edge getEdited() {
         return edited;
+    }
+
+    String getOriginSynset() {
+        return original.getOriginSynset();
+    }
+
+    String getPointedSynset() {
+        return original.getPointedSynset();
     }
 }

@@ -51,7 +51,7 @@ public abstract class Synset {
         isExpanded = true;
     }
 
-    void setOutgoingEdges(Map<String, Edge> newEdges) {
+    protected void setOutgoingEdges(Map<String, Edge> newEdges) {
         if (newEdges == null) {
             outgoingEdges.clear();
         } else {

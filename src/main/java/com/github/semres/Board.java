@@ -354,6 +354,10 @@ public class Board {
                 attachedDatabase.editEdge(edgeEdit.getEdited(), edgeEdit.getOriginal());
             }
 
+            for (EdgeEdit edgeEdit : update.getEdgesToMerge().values()) {
+                attachedDatabase.editEdge(edgeEdit.getOriginal(), edgeEdit.getEdited());
+            }
+
             // If synset is already loaded on board replace it with the updated version.
             if (synsets.containsKey(update.getOriginalSynset().getId())) {
                 synsets.put(update.getOriginalSynset().getId(), update.getUpdatedSynset());

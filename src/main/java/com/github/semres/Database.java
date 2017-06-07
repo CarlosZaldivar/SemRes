@@ -51,6 +51,10 @@ public class Database {
     }
 
     public void addEdge(Edge edge) {
+        if (hasEdge(edge.getId())) {
+            throw new RuntimeException("Edge already exists");
+        }
+
         try (RepositoryConnection conn = repository.getConnection()) {
             conn.add(getSerializerForEdge(edge).edgeToRdf(edge));
         }

@@ -2,6 +2,7 @@ package com.github.semres;
 
 import com.github.semres.babelnet.BabelNetEdge;
 import com.github.semres.babelnet.BabelNetSynset;
+import com.github.semres.user.UserEdge;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -14,6 +15,7 @@ public class SynsetUpdate {
     private final Map<String, Edge> addedEdges = new HashMap<>();
     private final Map<String, Edge> removedEdges = new HashMap<>();
     private final Map<String, EdgeEdit> edgeEdits = new HashMap<>();
+    private final Map<String, EdgeEdit> edgesToMerge = new HashMap<>();
     private final Map<String, BabelNetSynset> relatedSynsets;
     private boolean isSynsetDataUpdated = false;
 
@@ -40,7 +42,7 @@ public class SynsetUpdate {
                 }
             }
 
-            for (Edge edge : originalEdges.values().stream().filter((e) -> e instanceof BabelNetEdge).collect(Collectors.toList())) {
+            for (Edge edge : originalEdges.values().stream().filter(e -> e instanceof BabelNetEdge).collect(Collectors.toList())) {
                 if (!updatedEdges.containsKey(edge.getId())) {
                     removedEdges.put(edge.getId(), edge);
                 } else if (edgesAreDifferent(edge, updatedEdges.get(edge.getId()))) {
@@ -49,6 +51,13 @@ public class SynsetUpdate {
 
                 // Remove corresponding edge from the other map to avoid iterating over it in the next step.
                 updatedEdges.remove(edge.getId());
+            }
+
+            // Check if BabelNet edge appeared in place of existing UserEdge
+            for (Edge edge : originalEdges.values().stream().filter(e -> e instanceof UserEdge).collect(Collectors.toList())) {
+                if (updatedEdges.containsKey(edge.getId())) {
+                    edgesToMerge.put(edge.getId(), new EdgeEdit(edge, updatedEdges.get(edge.getId())));
+                }
             }
 
             for (Edge edge : updatedEdges.values()) {
@@ -83,7 +92,7 @@ public class SynsetUpdate {
     }
 
     public boolean isSynsetUpdated() {
-        return isSynsetDataUpdated || !addedEdges.isEmpty() || !removedEdges.isEmpty() || !edgeEdits.isEmpty();
+        return isSynsetDataUpdated || !addedEdges.isEmpty() || !removedEdges.isEmpty() || !edgeEdits.isEmpty() || !edgesToMerge.isEmpty();
     }
 
     public Map<String, Edge> getAddedEdges() {
@@ -96,6 +105,10 @@ public class SynsetUpdate {
 
     public Map<String, EdgeEdit> getEdgeEdits() {
         return new HashMap<>(edgeEdits);
+    }
+
+    public Map<String, EdgeEdit> getEdgesToMerge() {
+        return edgesToMerge;
     }
 
     public BabelNetSynset getPointedSynset(Edge edge) {
@@ -114,11 +127,55 @@ public class SynsetUpdate {
         addedEdges.remove(id);
     }
 
-    public void cancelEdgeEdition(String id) {
-        edgeEdits.remove(id);
+    public void cancelRelationTypeChange(String edgeId) {
+        EdgeEdit edgeEdit = edgesToMerge.get(edgeId);
+        Edge editedEdge = new UserEdge(edgeEdit.getPointedSynset(), edgeEdit.getOriginSynset(),
+                edgeEdit.getEdited().getDescription(), edgeEdit.getOriginal().getRelationType(), edgeEdit.getEdited().getWeight());
+        edgeEdit.setEdited(editedEdge);
+        replaceEdgeInUpdatedSynset(editedEdge);
+    }
+
+    private void replaceEdgeInUpdatedSynset(Edge edge) {
+        Map<String, Edge> edges = updatedSynset.getOutgoingEdges();
+        edges.put(edge.getId(), edge);
+        updatedSynset.setOutgoingEdges(edges);
+    }
+
+    public void cancelWeightChange(String edgeId) {
+        EdgeEdit edgeEdit = edgesToMerge.get(edgeId);
+        Edge editedEdge = new UserEdge(edgeEdit.getPointedSynset(), edgeEdit.getOriginSynset(),
+                edgeEdit.getEdited().getDescription(), edgeEdit.getEdited().getRelationType(), edgeEdit.getOriginal().getWeight());
+        edgeEdit.setEdited(editedEdge);
+        replaceEdgeInUpdatedSynset(editedEdge);
+    }
+
+    public void cancelDescriptionChange(String edgeId) {
+        EdgeEdit edgeEdit = edgesToMerge.get(edgeId);
+        Edge editedEdge = new UserEdge(edgeEdit.getPointedSynset(), edgeEdit.getOriginSynset(),
+                edgeEdit.getOriginal().getDescription(), edgeEdit.getEdited().getRelationType(), edgeEdit.getEdited().getWeight());
+        edgeEdit.setEdited(editedEdge);
+        replaceEdgeInUpdatedSynset(editedEdge);
+    }
+
+    public void mergeDescriptions(String edgeId) {
+        EdgeEdit edgeEdit = edgesToMerge.get(edgeId);
+        String mergedDescription = String.format("%s%n---%n%s", edgeEdit.getEdited().getDescription(), edgeEdit.getOriginal().getDescription());
+        Edge editedEdge = new UserEdge(edgeEdit.getPointedSynset(), edgeEdit.getOriginSynset(), mergedDescription,
+            edgeEdit.getEdited().getRelationType(), edgeEdit.getEdited().getWeight());
+        edgeEdit.setEdited(editedEdge);
+        replaceEdgeInUpdatedSynset(editedEdge);
+    }
+
+    public void cancelEdgeReplacement(String id) {
+        edgesToMerge.remove(id);
+        replaceEdgeInUpdatedSynset(originalSynset.getOutgoingEdges().get(id));
     }
 
     public void cancelSynsetEdition() {
         isSynsetDataUpdated = false;
+    }
+
+    public String getId() {
+        return originalSynset.getId();
     }
 }

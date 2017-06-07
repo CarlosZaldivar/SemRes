@@ -15,6 +15,7 @@ import org.mockito.Mockito;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import static com.github.semres.Utils.createTestDatabase;
 import static org.junit.Assert.*;
@@ -372,6 +373,108 @@ public class BoardTest {
     }
 
     @Test
+    public void updateSynsetWithDuplicateEdges() throws Exception {
+        String originSynsetId = "bn:00024922n";
+        String pointedSynsetId = "bn:00024923n";
+        BabelNetSynset originSynset = new BabelNetSynset("Foo");
+        originSynset.setId(originSynsetId);
+        BabelNetSynset pointedSynset = new BabelNetSynset("Bar");
+        pointedSynset.setId(pointedSynsetId);
+
+        UserEdge userEdge = new UserEdge(pointedSynsetId, originSynsetId, holonym, 1);
+
+        BabelNetSynset updatedOriginSynset = getMockOriginBabelNetSynset(originSynsetId, pointedSynsetId);
+        BabelNetSynset updatedPointedSynset = getMockPointedBabelNetSynset(pointedSynsetId);
+
+        BabelNetManager mockManager = Mockito.mock(BabelNetManager.class);
+        when(mockManager.getSynset(originSynsetId)).thenReturn(updatedOriginSynset);
+        when(mockManager.getSynset(pointedSynsetId)).thenReturn(updatedPointedSynset);
+
+        Database database = createTestDatabase();
+        Board board = new Board(database, mockManager);
+
+        board.addSynset(originSynset);
+        board.addSynset(pointedSynset);
+        board.addEdge(userEdge);
+        board.save();
+
+        board.update(board.checkForUpdates());
+
+        assertTrue(board.getSynset(originSynsetId).getOutgoingEdges().size() == 1);
+        assertTrue(board.getEdge(userEdge.getId()) instanceof BabelNetEdge);
+    }
+
+    @Test
+    public void cancelEdgeReplacement() throws Exception {
+        String originSynsetId = "bn:00024922n";
+        String pointedSynsetId = "bn:00024923n";
+        BabelNetSynset originSynset = new BabelNetSynset("Foo");
+        originSynset.setId(originSynsetId);
+        BabelNetSynset pointedSynset = new BabelNetSynset("Bar");
+        pointedSynset.setId(pointedSynsetId);
+
+        UserEdge userEdge = new UserEdge(pointedSynsetId, originSynsetId, holonym, 1);
+
+        BabelNetSynset updatedOriginSynset = getMockOriginBabelNetSynset(originSynsetId, pointedSynsetId);
+        BabelNetSynset updatedPointedSynset = getMockPointedBabelNetSynset(pointedSynsetId);
+
+        BabelNetManager mockManager = Mockito.mock(BabelNetManager.class);
+        when(mockManager.getSynset(originSynsetId)).thenReturn(updatedOriginSynset);
+        when(mockManager.getSynset(pointedSynsetId)).thenReturn(updatedPointedSynset);
+
+        Database database = createTestDatabase();
+        Board board = new Board(database, mockManager);
+
+        board.addSynset(originSynset);
+        board.addSynset(pointedSynset);
+        board.addEdge(userEdge);
+        board.save();
+
+        List<SynsetUpdate> updates = board.checkForUpdates();
+        SynsetUpdate update = updates.stream().filter(s -> s.getOriginalSynset().getId().equals(originSynsetId)).findFirst().get();
+        update.cancelEdgeReplacement(userEdge.getId());
+        board.update(updates);
+
+        assertTrue(board.getSynset(originSynsetId).getOutgoingEdges().size() == 1);
+        assertTrue(board.getEdge(userEdge.getId()) instanceof UserEdge);
+    }
+
+    @Test
+    public void mergeEdgeDescription() throws Exception {
+        String originSynsetId = "bn:00024922n";
+        String pointedSynsetId = "bn:00024923n";
+        BabelNetSynset originSynset = new BabelNetSynset("Foo");
+        originSynset.setId(originSynsetId);
+        BabelNetSynset pointedSynset = new BabelNetSynset("Bar");
+        pointedSynset.setId(pointedSynsetId);
+
+        UserEdge userEdge = new UserEdge(pointedSynsetId, originSynsetId, "Description 1", holonym, 1);
+
+        BabelNetSynset updatedOriginSynset = getMockOriginBabelNetSynset(originSynsetId, pointedSynsetId, "Description 2");
+        BabelNetSynset updatedPointedSynset = getMockPointedBabelNetSynset(pointedSynsetId);
+
+        BabelNetManager mockManager = Mockito.mock(BabelNetManager.class);
+        when(mockManager.getSynset(originSynsetId)).thenReturn(updatedOriginSynset);
+        when(mockManager.getSynset(pointedSynsetId)).thenReturn(updatedPointedSynset);
+
+        Database database = createTestDatabase();
+        Board board = new Board(database, mockManager);
+
+        board.addSynset(originSynset);
+        board.addSynset(pointedSynset);
+        board.addEdge(userEdge);
+        board.save();
+
+        List<SynsetUpdate> updates = board.checkForUpdates();
+        SynsetUpdate update = updates.stream().filter(s -> s.getOriginalSynset().getId().equals(originSynsetId)).findFirst().get();
+        update.mergeDescriptions(userEdge.getId());
+        board.update(updates);
+
+        assertTrue(board.getSynset(originSynsetId).getOutgoingEdges().size() == 1);
+        assertTrue(board.getEdge(userEdge.getId()).getDescription().equals(String.format("Description 2%n---%nDescription 1")));
+    }
+
+    @Test
     public void removeSynsetInAnUpdate() throws Exception {
         BabelNetSynset originalSynset = new BabelNetSynset("Foo");
         String originSynsetId = "bn:00024922n";
@@ -448,10 +551,14 @@ public class BoardTest {
     }
 
     private BabelNetSynset getMockOriginBabelNetSynset(String originSynsetId, String pointedSynsetId) throws InvalidBabelSynsetIDException {
+        return getMockOriginBabelNetSynset(originSynsetId, pointedSynsetId, "Edge description");
+    }
+
+    private BabelNetSynset getMockOriginBabelNetSynset(String originSynsetId, String pointedSynsetId, String edgeDescription) throws InvalidBabelSynsetIDException {
         BabelSense mockOriginBabelSense = getMockOriginBabelSense();
 
         BabelPointer mockBabelPointer = Mockito.mock(BabelPointer.class);
-        when(mockBabelPointer.getName()).thenReturn("Edge description");
+        when(mockBabelPointer.getName()).thenReturn(edgeDescription);
         when(mockBabelPointer.getRelationGroup()).thenReturn(BabelPointer.RelationGroup.OTHER);
 
         BabelSynsetIDRelation relation = new BabelSynsetIDRelation(null, mockBabelPointer, pointedSynsetId);
