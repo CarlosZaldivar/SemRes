@@ -1,9 +1,7 @@
 package com.github.semres.gui;
 
-import com.github.semres.Edge;
-import com.github.semres.RelationType;
-import com.github.semres.Synset;
-import com.github.semres.SynsetUpdate;
+import com.github.semres.*;
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -16,17 +14,22 @@ import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 
 public class UpdatesListController extends ChildController implements Initializable {
+    @FXML private ScrollPane scrollPane;
+    @FXML private StackPane stackPane;
     @FXML private BorderPane mainPane;
+    @FXML private VBox edgeMergesVB;
     @FXML private VBox progressIndicatorVB;
     @FXML private Button applyButton;
     @FXML private TableView<EdgeData> removedEdgesTable;
@@ -52,6 +55,7 @@ public class UpdatesListController extends ChildController implements Initializa
     private ObservableList<EdgeData> removedEdges;
     private ObservableList<Synset> removedSynsets;
     private Task<List<SynsetUpdate>> updateTask;
+    private List<EdgeMergePanel> mergePanels = new ArrayList<>();
 
     private MainController mainController;
 
@@ -108,6 +112,9 @@ public class UpdatesListController extends ChildController implements Initializa
         addedEdgeCancelColumn.setCellFactory(addedEdgesCellFactory);
         removedEdgeCancelColumn.setCellFactory(removedEdgesCellFactory);
         removedSynsetCancelColumn.setCellFactory(removedSynsetsCellFactory);
+
+        stackPane.prefWidthProperty().bind(scrollPane.widthProperty());
+        stackPane.prefHeightProperty().bind(Bindings.createDoubleBinding(() -> scrollPane.getHeight() - 10, scrollPane.heightProperty()));
     }
 
     public void applyUpdates() {
@@ -130,6 +137,12 @@ public class UpdatesListController extends ChildController implements Initializa
 
             for (Edge edge : update.getRemovedEdges().values()) {
                 addEdgeToObservableList(edge, update, removedEdges);
+            }
+
+            for (EdgeEdit edgeEdit : update.getEdgesToMerge().values()) {
+                EdgeMergePanel mergePanel = new EdgeMergePanel(edgeEdit, this);
+                mergePanels.add(mergePanel);
+                edgeMergesVB.getChildren().add(mergePanel);
             }
         }
     }

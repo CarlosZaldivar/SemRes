@@ -1,6 +1,6 @@
 package com.github.semres;
 
-class EdgeEdit {
+public class EdgeEdit {
     private final Edge original;
     private Edge edited;
 
@@ -16,19 +16,19 @@ class EdgeEdit {
         this.edited = edited;
     }
 
-    Edge getOriginal() {
+    public Edge getOriginal() {
         return original;
     }
 
-    Edge getEdited() {
+    public Edge getEdited() {
         return edited;
     }
 
-    String getOriginSynset() {
+    public String getOriginSynset() {
         return original.getOriginSynset();
     }
 
-    String getPointedSynset() {
+    public String getPointedSynset() {
         return original.getPointedSynset();
     }
 }

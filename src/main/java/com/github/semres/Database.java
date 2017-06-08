@@ -226,7 +226,7 @@ public class Database {
     }
 
 
-    void addRelationType(RelationType relationType) {
+    public void addRelationType(RelationType relationType) {
         try (RepositoryConnection conn = repository.getConnection()) {
             // Check if relation type with this name exists
             ValueFactory factory = conn.getValueFactory();
