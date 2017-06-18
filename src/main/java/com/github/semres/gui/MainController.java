@@ -210,7 +210,10 @@ public class MainController extends Controller implements Initializable {
         JSArray synsetIds =  browser.executeJavaScriptAndReturnValue("clear()").asArray();
         for (int i = 0; i < synsetIds.length(); ++i) {
             String id = synsetIds.get(0).getStringValue();
-            addSynsetToView(board.getSynset(id));
+            Synset synset = board.getSynset(id);
+            if (synset != null) {
+                addSynsetToView(synset);
+            }
         }
     }
 

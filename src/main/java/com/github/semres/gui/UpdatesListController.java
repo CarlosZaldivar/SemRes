@@ -199,8 +199,14 @@ public class UpdatesListController extends ChildController implements Initializa
                             setText(null);
                         }
                         else {
+                            EdgeData edgeData = getTableView().getItems().get(getIndex());
+
+                            // Disable canceling of edge removal if the edge source or target are going to be deleted.
+                            button.disableProperty().bind(Bindings.createBooleanBinding(() ->
+                                removedSynsets.stream().anyMatch(s -> s.getId().equals(edgeData.getFromId()) || s.getId().equals(edgeData.getToId())),
+                                removedSynsets));
+
                             button.setOnAction((ActionEvent event) -> {
-                                EdgeData edgeData = getTableView().getItems().get(getIndex());
                                 SynsetUpdate update = updates.stream().filter(u -> u.getOriginalSynset().getId().equals(edgeData.getFromId())).findFirst().get();
                                 update.cancelEdgeRemoval(edgeData.getId());
                                 removedEdgesTable.getItems().remove(edgeData);
