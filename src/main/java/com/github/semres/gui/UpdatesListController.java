@@ -21,7 +21,6 @@ import javafx.util.Callback;
 
 import java.io.IOException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 
@@ -55,7 +54,6 @@ public class UpdatesListController extends ChildController implements Initializa
     private ObservableList<EdgeData> removedEdges;
     private ObservableList<Synset> removedSynsets;
     private Task<List<SynsetUpdate>> updateTask;
-    private List<EdgeMergePanel> mergePanels = new ArrayList<>();
 
     private MainController mainController;
 
@@ -140,8 +138,7 @@ public class UpdatesListController extends ChildController implements Initializa
             }
 
             for (EdgeEdit edgeEdit : update.getEdgesToMerge().values()) {
-                EdgeMergePanel mergePanel = new EdgeMergePanel(edgeEdit, this);
-                mergePanels.add(mergePanel);
+                EdgeMergePanel mergePanel = new EdgeMergePanel(update, edgeEdit, this);
                 edgeMergesVB.getChildren().add(mergePanel);
             }
         }
@@ -250,6 +247,11 @@ public class UpdatesListController extends ChildController implements Initializa
                 return cell;
             }
         };
+    }
+
+    public void cancelEdgeMerge(EdgeMergePanel edgeMergePanel) {
+        edgeMergePanel.getSynsetUpdate().cancelEdgeReplacement(edgeMergePanel.getEdgeEdit().getId());
+        edgeMergesVB.getChildren().remove(edgeMergePanel);
     }
 
     public static class EdgeData {

@@ -355,7 +355,7 @@ public class Board {
             }
 
             for (EdgeEdit edgeEdit : update.getEdgesToMerge().values()) {
-                attachedDatabase.editEdge(edgeEdit.getOriginal(), edgeEdit.getEdited());
+                attachedDatabase.editEdge(edgeEdit.getEdited(), edgeEdit.getOriginal());
             }
 
             // If synset is already loaded on board replace it with the updated version.

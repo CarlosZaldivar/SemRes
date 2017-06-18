@@ -31,4 +31,8 @@ public class EdgeEdit {
     public String getPointedSynset() {
         return original.getPointedSynset();
     }
+
+    public String getId() {
+        return original.getId();
+    }
 }

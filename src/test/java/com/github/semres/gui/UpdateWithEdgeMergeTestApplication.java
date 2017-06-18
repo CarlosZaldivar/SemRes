@@ -70,8 +70,8 @@ public class UpdateWithEdgeMergeTestApplication extends Main {
         RelationType userRelationType = new RelationType("Custom relation", "User");
         database.addRelationType(userRelationType);
 
-        UserEdge firstUserEdge = new UserEdge(firstPointedSynsetId, originSynsetId, userRelationType, 1);
-        UserEdge secondUserEdge = new UserEdge(secondPointedSynsetId, originSynsetId, new BabelNetManager().getRelationTypes().get(1), 1);
+        UserEdge firstUserEdge = new UserEdge(firstPointedSynsetId, originSynsetId, "User description", userRelationType, 1);
+        UserEdge secondUserEdge = new UserEdge(secondPointedSynsetId, originSynsetId, new BabelNetManager().getRelationTypes().get(1), 0);
 
         database.addSynset(originSynset);
         database.addSynset(firstPointedSynset);
@@ -86,12 +86,12 @@ public class UpdateWithEdgeMergeTestApplication extends Main {
         BabelSense mockOriginBabelSense = getMockOriginBabelSense();
 
         BabelPointer mockFirstAddedPointer = Mockito.mock(BabelPointer.class);
-        when(mockFirstAddedPointer.getName()).thenReturn("Added edge");
+        when(mockFirstAddedPointer.getName()).thenReturn("BabelNet description");
         when(mockFirstAddedPointer.getRelationGroup()).thenReturn(BabelPointer.RelationGroup.OTHER);
         BabelSynsetIDRelation firstAddedRelation = new BabelSynsetIDRelation(null, mockFirstAddedPointer, firstPointedSynsetId);
 
         BabelPointer mockSecondAddedPointer = Mockito.mock(BabelPointer.class);
-        when(mockSecondAddedPointer.getName()).thenReturn("Added edge");
+        when(mockSecondAddedPointer.getName()).thenReturn("BabelNet description");
         when(mockSecondAddedPointer.getRelationGroup()).thenReturn(BabelPointer.RelationGroup.OTHER);
         BabelSynsetIDRelation secondAddedRelation = new BabelSynsetIDRelation(null, mockSecondAddedPointer, secondPointedSynsetId);
 

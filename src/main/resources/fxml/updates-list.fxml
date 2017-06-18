@@ -1,22 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Accordion?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ButtonBar?>
+<?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ProgressIndicator?>
+<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TitledPane?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
-<?import javafx.scene.layout.BorderPane?>
-
-<?import javafx.scene.control.ButtonBar?>
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.layout.StackPane?>
-<?import javafx.scene.control.ScrollPane?>
-<ScrollPane fx:id="scrollPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.102"
-            xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.github.semres.gui.UpdatesListController" hbarPolicy="NEVER">
+<ScrollPane fx:id="scrollPane" hbarPolicy="NEVER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.102" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.github.semres.gui.UpdatesListController">
     <StackPane fx:id="stackPane">
       <BorderPane fx:id="mainPane">
         <top>
@@ -45,7 +44,7 @@
                       <TableColumn fx:id="removedEdgeToColumn" prefWidth="75.0" text="To" />
                       <TableColumn fx:id="removedEdgeTypeColumn" prefWidth="75.0" text="Type" />
                       <TableColumn fx:id="removedEdgeWeightColumn" prefWidth="75.0" text="Weight" />
-                      <TableColumn fx:id="removedEdgeCancelColumn" prefWidth="75.0"/>
+                      <TableColumn fx:id="removedEdgeCancelColumn" prefWidth="75.0" />
                     </columns>
                   </TableView>
                 </AnchorPane>
@@ -64,8 +63,9 @@
                 </AnchorPane>
               </TitledPane>
               <TitledPane text="Duplicate edges">
-                <AnchorPane layoutX="62.0" layoutY="62.0" prefHeight="160.0" prefWidth="163.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                    <VBox fx:id="edgeMergesVB"/>
+                <AnchorPane>
+                    <VBox fx:id="edgeMergesVB" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
+                          AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0"/>
                 </AnchorPane>
               </TitledPane>
             </panes>
@@ -77,13 +77,13 @@
               <Button fx:id="applyButton" onAction="#applyUpdates" text="Apply" />
             </buttons>
             <padding>
-              <Insets right="50.0" bottom="10" left="20" top="10"/>
+              <Insets bottom="10" left="20" right="50.0" top="10" />
             </padding>
           </ButtonBar>
         </bottom>
       </BorderPane>
       <VBox fx:id="progressIndicatorVB" alignment="CENTER">
-        <ProgressIndicator/>
+        <ProgressIndicator />
       </VBox>
     </StackPane>
 </ScrollPane>
