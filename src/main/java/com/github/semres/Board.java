@@ -287,38 +287,55 @@ public class Board {
         List<Synset> synsets = attachedDatabase.getSynsets(CommonIRI.BABELNET_SYNSET);
         List<SynsetUpdate> updates = new ArrayList<>();
         for (Synset synset : synsets) {
-            BabelNetSynset originalSynset = (BabelNetSynset) synset;
-            originalSynset.setOutgoingEdges(attachedDatabase.getOutgoingEdges(originalSynset));
-            BabelNetSynset updatedSynset = babelNetManager.getSynset(originalSynset.getId());
-
-            // If synset is not found in BabelNet, remove it.
-            if (updatedSynset == null) {
-                updates.add(new SynsetUpdate(originalSynset, null, null));
-                continue;
-            }
-
-            updatedSynset = updatedSynset.loadEdgesFromBabelNet();
-
-            Map<String, BabelNetSynset> relatedSynsets = new HashMap<>();
-
-            for (Edge edge : originalSynset.getOutgoingEdges().values().stream().filter((e) -> e instanceof BabelNetEdge).collect(Collectors.toList())) {
-                relatedSynsets.put(edge.getPointedSynset(), (BabelNetSynset) loadSynset(edge.getPointedSynset()));
-            }
-
-            for (Edge edge : updatedSynset.getOutgoingEdges().values()) {
-                if (isIdAlreadyTaken(edge.getPointedSynset())) {
-                    relatedSynsets.put(edge.getPointedSynset(), (BabelNetSynset) loadSynset(edge.getPointedSynset()));
-                } else {
-                    relatedSynsets.put(edge.getPointedSynset(), babelNetManager.getSynset(edge.getPointedSynset()));
-                }
-            }
-
-            SynsetUpdate update = new SynsetUpdate(originalSynset, updatedSynset, relatedSynsets);
-            if (update.isSynsetUpdated()) {
+            SynsetUpdate update = parseUpdates((BabelNetSynset) synset);
+            if (update != null) {
                 updates.add(update);
             }
         }
         return updates;
+    }
+
+    public List<SynsetUpdate> checkForUpdates(String checkedSynsetId) throws IOException {
+        if (isBoardEdited()) {
+            throw new RuntimeException("Cannot check for updates with unsaved changes.");
+        }
+
+        Synset synset = attachedDatabase.getSynset(checkedSynsetId);
+        SynsetUpdate synsetUpdate = parseUpdates((BabelNetSynset) synset);
+        if (synsetUpdate != null) {
+            return Arrays.asList(synsetUpdate);
+        } else {
+            return new ArrayList<>();
+        }
+    }
+
+    private SynsetUpdate parseUpdates(BabelNetSynset originalSynset) throws IOException {
+        originalSynset.setOutgoingEdges(attachedDatabase.getOutgoingEdges(originalSynset));
+        BabelNetSynset updatedSynset = babelNetManager.getSynset(originalSynset.getId());
+
+        // If synset is not found in BabelNet, remove it.
+        if (updatedSynset == null) {
+            return new SynsetUpdate(originalSynset, null, null);
+        }
+
+        updatedSynset = updatedSynset.loadEdgesFromBabelNet();
+
+        Map<String, BabelNetSynset> relatedSynsets = new HashMap<>();
+
+        for (Edge edge : originalSynset.getOutgoingEdges().values().stream().filter((e) -> e instanceof BabelNetEdge).collect(Collectors.toList())) {
+            relatedSynsets.put(edge.getPointedSynset(), (BabelNetSynset) loadSynset(edge.getPointedSynset()));
+        }
+
+        for (Edge edge : updatedSynset.getOutgoingEdges().values()) {
+            if (isIdAlreadyTaken(edge.getPointedSynset())) {
+                relatedSynsets.put(edge.getPointedSynset(), (BabelNetSynset) loadSynset(edge.getPointedSynset()));
+            } else {
+                relatedSynsets.put(edge.getPointedSynset(), babelNetManager.getSynset(edge.getPointedSynset()));
+            }
+        }
+
+        SynsetUpdate synsetUpdate = new SynsetUpdate(originalSynset, updatedSynset, relatedSynsets);
+        return synsetUpdate.isSynsetUpdated() ? synsetUpdate : null;
     }
 
     public void update(List<SynsetUpdate> updates) {

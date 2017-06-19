@@ -56,6 +56,8 @@ public class UpdatesListController extends ChildController implements Initializa
     private Task<List<SynsetUpdate>> updateTask;
 
     private MainController mainController;
+    private boolean checkSingleSynset;
+    private String checkedSynsetId;
 
     @Override
     public void setParent(Controller parent) {
@@ -67,12 +69,21 @@ public class UpdatesListController extends ChildController implements Initializa
         updatesThread.start();
     }
 
+    public void setCheckedSynsetId(String synsetId) {
+        checkedSynsetId = synsetId;
+        checkSingleSynset = true;
+    }
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         updateTask = new Task<List<SynsetUpdate>>() {
             @Override
             protected List<SynsetUpdate> call() throws IOException, InterruptedException {
-                return mainController.checkForUpdates();
+                if (checkSingleSynset) {
+                    return mainController.checkForUpdates(checkedSynsetId);
+                } else {
+                    return mainController.checkForUpdates();
+                }
             }
         };
         mainPane.visibleProperty().bind(updateTask.runningProperty().not());

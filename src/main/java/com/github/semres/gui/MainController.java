@@ -47,7 +47,7 @@ public class MainController extends Controller implements Initializable {
     @FXML private Menu exportSubmenu;
     @FXML private MenuItem saveMenuItem;
     @FXML private MenuItem updateMenuItem;
-    BrowserView boardView;
+    private BrowserView boardView;
     private Board board;
     private Browser browser;
     private BabelNetManager babelNetManager;
@@ -201,6 +201,10 @@ public class MainController extends Controller implements Initializable {
         return board.checkForUpdates();
     }
 
+    public List<SynsetUpdate> checkForUpdates(String checkedSynsetId) throws IOException {
+        return board.checkForUpdates(checkedSynsetId);
+    }
+
     public void update(List<SynsetUpdate> updates) {
         board.update(updates);
         redrawNodes();
@@ -209,7 +213,7 @@ public class MainController extends Controller implements Initializable {
     private void redrawNodes() {
         JSArray synsetIds =  browser.executeJavaScriptAndReturnValue("clear()").asArray();
         for (int i = 0; i < synsetIds.length(); ++i) {
-            String id = synsetIds.get(0).getStringValue();
+            String id = synsetIds.get(i).getStringValue();
             Synset synset = board.getSynset(id);
             if (synset != null) {
                 addSynsetToView(synset);
@@ -241,6 +245,30 @@ public class MainController extends Controller implements Initializable {
         openNewWindow("/fxml/updates-list.fxml", "BabelNet updates");
     }
 
+    public void openUpdatesWindow(String checkedSynsetId) throws IOException {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/updates-list.fxml"));
+        Parent root;
+        try {
+            root = loader.load();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return;
+        }
+        Stage newStage = new Stage();
+        newStage.setTitle("BabelNet updates");
+        newStage.setScene(new Scene(root));
+        newStage.sizeToScene();
+        newStage.initOwner(menuBar.getScene().getWindow());
+        newStage.initModality(Modality.WINDOW_MODAL);
+
+        UpdatesListController updatesListController = loader.getController();
+        updatesListController.setCheckedSynsetId(checkedSynsetId);
+        updatesListController.setParent(MainController.this);
+
+        blockBrowserView(newStage);
+        newStage.show();
+    }
+
     private Controller openNewWindow(String fxmlPath, String title) throws IOException {
         FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
         Parent root = loader.load();
@@ -254,21 +282,24 @@ public class MainController extends Controller implements Initializable {
         ChildController childController = loader.getController();
         childController.setParent(MainController.this);
 
-        // Block input on BrowserView and return to default handlers when window is closed.
+        blockBrowserView(newStage);
+        newStage.show();
+        return childController;
+    }
+
+    // Block input on BrowserView and return to default handlers when window is closed.
+    private void blockBrowserView(Stage stage) {
         boardView.setMouseEventsHandler((e) -> true);
         boardView.setScrollEventsHandler((e) -> true);
         boardView.setGestureEventsHandler((e) -> true);
         boardView.setKeyEventsHandler((e) -> true);
-        newStage.setOnHidden((e) -> {
-                boardView.setMouseEventsHandler(null);
-                boardView.setScrollEventsHandler(null);
-                boardView.setGestureEventsHandler(null);
-                boardView.setKeyEventsHandler(null);
-            }
+        stage.setOnHidden((e) -> {
+                    boardView.setMouseEventsHandler(null);
+                    boardView.setScrollEventsHandler(null);
+                    boardView.setGestureEventsHandler(null);
+                    boardView.setKeyEventsHandler(null);
+                }
         );
-
-        newStage.show();
-        return childController;
     }
 
     private Map<String, Object> synsetToMap(Synset synset) {
@@ -462,6 +493,16 @@ public class MainController extends Controller implements Initializable {
             }
 
             browser.executeJavaScript(String.format("addBabelNetEdges(\"%s\", %s, %s);", synsetId, synsetsToJson(pointedSynsets), edgesToJson(edges)));
+        }
+
+        public void checkForUpdates(String synsetId) {
+            Platform.runLater(() -> {
+                try {
+                    openUpdatesWindow(synsetId);
+                } catch (IOException e) {
+                    Utils.showAlert(e.getMessage());
+                }
+            });
         }
     }
 }

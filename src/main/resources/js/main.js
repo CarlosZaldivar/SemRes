@@ -109,6 +109,12 @@ cy.contextMenus({
             onClickFunction: downloadEdgesFromBabelNet
         },
         {
+            id: 'checkForUpdates',
+            title: 'Check for updates',
+            selector: 'node[class="com.github.semres.babelnet.BabelNetSynset"]',
+            onClickFunction: checkForUpdates
+        },
+        {
             id: 'synsetDetails',
             title: 'Details',
             selector: 'node',
@@ -266,6 +272,10 @@ function collapse(cyTarget, synsetsToCollapse) {
 
 function downloadEdgesFromBabelNet(event) {
     javaApp.downloadEdgesFromBabelNet(event.cyTarget.id());
+}
+
+function checkForUpdates(event) {
+    javaApp.checkForUpdates(event.cyTarget.id());
 }
 
 function removeSynset(event) {
