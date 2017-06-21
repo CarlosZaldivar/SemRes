@@ -17,6 +17,10 @@ import org.eclipse.rdf4j.repository.Repository;
 import org.eclipse.rdf4j.repository.RepositoryConnection;
 import org.eclipse.rdf4j.sail.memory.model.BooleanMemLiteral;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -46,6 +50,10 @@ public class BabelNetSynsetSerializer extends SynsetSerializer {
             model.add(factory.createStatement(synsetIri, RDFS.COMMENT, description));
         }
 
+        if (synset.getLastEditedTime() != null) {
+            model.add(synsetIri, SemRes.LAST_EDITED, factory.createLiteral(Date.from(synset.getLastEditedTime().atZone(ZoneId.systemDefault()).toInstant())));
+        }
+
         model.add(synsetIri, RDF.TYPE, getSynsetClassIri());
         model.add(synsetIri, SemRes.ID, factory.createLiteral(synset.getId()));
 
@@ -70,20 +78,21 @@ public class BabelNetSynsetSerializer extends SynsetSerializer {
     @Override
     public BabelNetSynset rdfToSynset(IRI synsetIri) {
         BabelNetSynset synset;
-        String id;
-        String representation;
-        String description = null;
         boolean edgesLoaded;
 
         try (RepositoryConnection conn = repository.getConnection()) {
 
             // Get synset representation, id, description and the flag if the edges from BabelNet were loaded or not
-            String queryString = String.format("SELECT ?id ?representation ?edgesLoaded ?description " +
-                            "WHERE { <%1$s> <%2$s> ?id . <%1$s> <%3$s> ?representation . <%1$s> <%4$s> ?edgesLoaded . OPTIONAL { <%1$s> <%5$s> ?description }}",
-                    synsetIri.stringValue(), SemRes.ID, RDFS.LABEL, CommonIRI.EDGES_DOWNLOADED, RDFS.COMMENT);
-
+            String queryString = String.format("SELECT ?id ?representation ?edgesLoaded ?description ?lastEdited " +
+                            "WHERE { <%1$s> <%2$s> ?id . <%1$s> <%3$s> ?representation . <%1$s> <%4$s> ?edgesLoaded . " +
+                            "OPTIONAL { <%1$s> <%5$s> ?description } . OPTIONAL { <%1$s> <%6$s> ?lastEdited }}",
+                    synsetIri.stringValue(), SemRes.ID, RDFS.LABEL, CommonIRI.EDGES_DOWNLOADED, RDFS.COMMENT, SemRes.LAST_EDITED);
 
             TupleQuery tupleQuery = conn.prepareTupleQuery(QueryLanguage.SPARQL, queryString);
+            String id;
+            String representation;
+            String description = null;
+            LocalDateTime lastEdited = null;
 
             try (TupleQueryResult result = tupleQuery.evaluate()) {
                 if (result.hasNext()) {
@@ -95,6 +104,11 @@ public class BabelNetSynsetSerializer extends SynsetSerializer {
 
                     if (bindingSet.getValue("description") != null) {
                         description = bindingSet.getValue("description").stringValue();
+                    }
+
+                    if (bindingSet.getValue("lastEdited") != null) {
+                        lastEdited = LocalDateTime.parse(bindingSet.getValue("lastEdited").stringValue(),
+                                DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSXXX"));
                     }
                 } else {
                     return null;
@@ -125,6 +139,9 @@ public class BabelNetSynsetSerializer extends SynsetSerializer {
             synset.setId(id);
             if (description != null) {
                 synset.setDescription(description);
+            }
+            if (lastEdited != null) {
+                synset.setLastEditedTime(lastEdited);
             }
         }
         return synset;

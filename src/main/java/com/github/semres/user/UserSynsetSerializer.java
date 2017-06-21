@@ -11,12 +11,16 @@ import org.eclipse.rdf4j.query.*;
 import org.eclipse.rdf4j.repository.Repository;
 import org.eclipse.rdf4j.repository.RepositoryConnection;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.util.Date;
+
 public class UserSynsetSerializer extends SynsetSerializer {
 
     public UserSynsetSerializer(Repository repository, String baseIri) {
         super(repository, baseIri);
     }
-
 
     @Override
     public Model synsetToRdf(Synset synset) {
@@ -42,6 +46,10 @@ public class UserSynsetSerializer extends SynsetSerializer {
             model.add(factory.createStatement(synsetIri, RDFS.COMMENT, description));
         }
 
+        if (synset.getLastEditedTime() != null) {
+            model.add(synsetIri, SemRes.LAST_EDITED, factory.createLiteral(Date.from(synset.getLastEditedTime().atZone(ZoneId.systemDefault()).toInstant())));
+        }
+
         model.add(synsetIri, RDF.TYPE, getSynsetClassIri());
         model.add(synsetIri, SemRes.ID, factory.createLiteral(synset.getId()));
 
@@ -55,9 +63,10 @@ public class UserSynsetSerializer extends SynsetSerializer {
         String representation;
         String description ;
 
-        String queryString = String.format("SELECT ?id ?representation ?description " +
-                        "WHERE { <%1$s> <%2$s> ?id . <%1$s> <%3$s> ?representation . OPTIONAL { <%1$s> <%4$s> ?description }}",
-                        synsetIri.stringValue(), SemRes.ID, RDFS.LABEL, RDFS.COMMENT);
+        String queryString = String.format("SELECT ?id ?representation ?description ?lastEdited " +
+                        "WHERE { <%1$s> <%2$s> ?id . <%1$s> <%3$s> ?representation . " +
+                        "OPTIONAL { <%1$s> <%4$s> ?description } . OPTIONAL { <%1$s> <%5$s> ?lastEdited }}",
+                        synsetIri.stringValue(), SemRes.ID, RDFS.LABEL, RDFS.COMMENT, SemRes.LAST_EDITED);
 
         try (RepositoryConnection conn = repository.getConnection()) {
             TupleQuery tupleQuery = conn.prepareTupleQuery(QueryLanguage.SPARQL, queryString);
@@ -68,6 +77,7 @@ public class UserSynsetSerializer extends SynsetSerializer {
 
                     id = bindingSet.getValue("id").stringValue();
                     representation = bindingSet.getValue("representation").stringValue();
+                    LocalDateTime lastEdited;
 
                     synset = new UserSynset(representation);
                     synset.setId(id);
@@ -75,6 +85,11 @@ public class UserSynsetSerializer extends SynsetSerializer {
                     if (bindingSet.getValue("description") != null) {
                         description = bindingSet.getValue("description").stringValue();
                         synset = synset.changeDescription(description);
+                    }
+                    if (bindingSet.getValue("lastEdited") != null) {
+                        lastEdited = LocalDateTime.parse(bindingSet.getValue("lastEdited").stringValue(),
+                                DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSXXX"));
+                        synset.setLastEditedTime(lastEdited);
                     }
                 }
             }

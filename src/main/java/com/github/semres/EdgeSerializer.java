@@ -9,6 +9,9 @@ import org.eclipse.rdf4j.model.vocabulary.RDF;
 import org.eclipse.rdf4j.model.vocabulary.RDFS;
 import org.eclipse.rdf4j.repository.Repository;
 
+import java.time.ZoneId;
+import java.util.Date;
+
 public abstract class EdgeSerializer {
     protected final Repository repository;
     protected final String baseIri;
@@ -36,6 +39,10 @@ public abstract class EdgeSerializer {
 
         model.add(factory.createIRI(baseIri + "synsets/" + edge.getOriginSynset()), edgeIri, factory.createIRI(baseIri + "synsets/" + edge.getPointedSynset()));
         model.add(edgeIri, SemRes.WEIGHT, factory.createLiteral(edge.getWeight()));
+
+        if (edge.getLastEditedTime() != null) {
+            model.add(edgeIri, SemRes.LAST_EDITED, factory.createLiteral(Date.from(edge.getLastEditedTime().atZone(ZoneId.systemDefault()).toInstant())));
+        }
 
         return model;
     }

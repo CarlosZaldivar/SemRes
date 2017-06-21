@@ -22,6 +22,7 @@ public class SemRes {
     public static final IRI REMOVED_RELATION;
     public static final IRI WEIGHT;
     public static final IRI SOURCE;
+    public static final IRI LAST_EDITED;
 
     static {
         SimpleValueFactory factory = SimpleValueFactory.getInstance();
@@ -33,6 +34,7 @@ public class SemRes {
         RELATION_TYPE_PROPERTY = factory.createIRI(SemRes.baseIri + "properties/RelationType");
         WEIGHT = factory.createIRI(baseIri + "properties/Weight");
         SOURCE = factory.createIRI(baseIri + "properties/Source");
+        LAST_EDITED = factory.createIRI(baseIri + "properties/LastEdited");
     }
 
     public static void main(String[] args) {

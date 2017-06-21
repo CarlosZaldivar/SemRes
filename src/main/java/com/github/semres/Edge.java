@@ -3,12 +3,15 @@ package com.github.semres;
 
 import org.apache.commons.lang.Validate;
 
+import java.time.LocalDateTime;
+
 public abstract class Edge {
     private final String pointedSynset;
     private final String originSynset;
     protected RelationType relationType;
     protected String description;
     protected double weight;
+    private LocalDateTime lastEditedTime;
 
     protected Edge(String pointedSynset, String originSynset, RelationType relationType, double weight) {
         if (weight < 0) {
@@ -36,6 +39,14 @@ public abstract class Edge {
         this.relationType = edge.relationType;
         this.description = edge.description;
         this.weight = edge.weight;
+    }
+
+    public LocalDateTime getLastEditedTime() {
+        return lastEditedTime;
+    }
+
+    public void setLastEditedTime(LocalDateTime lastEditedTime) {
+        this.lastEditedTime = lastEditedTime;
     }
 
     public String getPointedSynset() {

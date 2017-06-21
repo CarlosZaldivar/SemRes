@@ -9,6 +9,8 @@ import org.eclipse.rdf4j.query.*;
 import org.eclipse.rdf4j.repository.Repository;
 import org.eclipse.rdf4j.repository.util.Repositories;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 public class BabelNetEdgeSerializer extends EdgeSerializer {
@@ -18,12 +20,12 @@ public class BabelNetEdgeSerializer extends EdgeSerializer {
 
     @Override
     public BabelNetEdge rdfToEdge(IRI edgeIri) {
-        String queryString = String.format("SELECT ?originSynsetId ?pointedSynsetId ?weight ?relationTypeName ?relationTypeSource ?description " +
+        String queryString = String.format("SELECT ?originSynsetId ?pointedSynsetId ?weight ?relationTypeName ?relationTypeSource ?description ?lastEdited " +
                 "WHERE { ?originSynset <%1$s> ?pointedSynset . <%1$s> <%2$s> ?weight . " +
                 "?originSynset <%3$s> ?originSynsetId . ?pointedSynset <%3$s> ?pointedSynsetId . " +
                 "<%1$s> <%4$s> ?relationType . ?relationType <%5$s> ?relationTypeName . ?relationType <%6$s> ?relationTypeSource . " +
-                "OPTIONAL { <%1$s> <%7$s> ?description }}",
-                edgeIri.stringValue(), SemRes.WEIGHT, SemRes.ID, SemRes.RELATION_TYPE_PROPERTY, RDFS.LABEL, SemRes.SOURCE, RDFS.COMMENT);
+                "OPTIONAL { <%1$s> <%7$s> ?description } . OPTIONAL { <%1$s> <%8$s> ?lastEdited }}",
+                edgeIri.stringValue(), SemRes.WEIGHT, SemRes.ID, SemRes.RELATION_TYPE_PROPERTY, RDFS.LABEL, SemRes.SOURCE, RDFS.COMMENT, SemRes.LAST_EDITED);
         List<BindingSet> results = Repositories.tupleQuery(repository, queryString, iter -> QueryResults.asList(iter));
 
         if (results.size() > 1) {
@@ -49,7 +51,13 @@ public class BabelNetEdgeSerializer extends EdgeSerializer {
 
         double weight = Double.parseDouble(result.getValue("weight").stringValue());
 
-        return new BabelNetEdge(pointedSynset, originSynset, description, relationType, weight);
+        BabelNetEdge edge = new BabelNetEdge(pointedSynset, originSynset, description, relationType, weight);
+
+        if (result.hasBinding("lastEdited")) {
+            edge.setLastEditedTime(LocalDateTime.parse(result.getValue("lastEdited").stringValue(),
+                    DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSXXX")));
+        }
+        return edge;
     }
 
     @Override

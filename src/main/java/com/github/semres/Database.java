@@ -12,6 +12,7 @@ import org.eclipse.rdf4j.repository.RepositoryConnection;
 
 import java.lang.reflect.InvocationTargetException;
 import java.math.BigInteger;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -45,6 +46,7 @@ public class Database {
     }
 
     public void addSynset(Synset synset) {
+        synset.setLastEditedTime(LocalDateTime.now());
         try (RepositoryConnection conn = repository.getConnection()) {
             conn.add(getSerializerForSynset(synset).synsetToRdf(synset));
         }
@@ -55,6 +57,7 @@ public class Database {
             throw new RuntimeException("Edge already exists");
         }
 
+        edge.setLastEditedTime(LocalDateTime.now());
         try (RepositoryConnection conn = repository.getConnection()) {
             conn.add(getSerializerForEdge(edge).edgeToRdf(edge));
         }
@@ -64,6 +67,7 @@ public class Database {
         if (!edited.getId().equals(original.getId())) {
             throw new IllegalArgumentException("Original and edited synsets have different IDs.");
         }
+        edited.setLastEditedTime(LocalDateTime.now());
 
         try (RepositoryConnection conn = repository.getConnection()) {
             conn.remove(getSerializerForSynset(original).synsetToRdf(original));
@@ -77,6 +81,7 @@ public class Database {
             throw new IllegalArgumentException("Original and edited edges have different IDs.");
         }
 
+        edited.setLastEditedTime(LocalDateTime.now());
         try (RepositoryConnection conn = repository.getConnection()) {
             conn.remove(getSerializerForEdge(original).edgeToRdf(original));
             conn.add(getSerializerForEdge(edited).edgeToRdf(edited));
