@@ -23,7 +23,7 @@ public class AddingDatabaseController extends ChildController {
             Stage stage = (Stage) createButton.getScene().getWindow();
             stage.close();
         } catch (IllegalArgumentException e) {
-            System.out.println("illegal argument");
+            Utils.showAlert("Database name already taken.");
         }
     }
 }
