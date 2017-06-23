@@ -1,12 +1,15 @@
 "use strict";
 
+var startTime = moment();
+
 var cy = cytoscape({
     container: document.getElementById('cy'),
     style: [
         {
             selector: 'node',
             style: {
-                'label': 'data(representation)'
+                'label': 'data(representation)',
+                'background-color': nodeBackgroundColor
             }
         },
         {
@@ -15,19 +18,9 @@ var cy = cytoscape({
                 'label': 'data(relationType)',
                 'curve-style': 'bezier',
                 'target-arrow-shape': 'triangle',
-                'font-size': '10'
-            }
-        },
-        {
-            selector: 'node[class="com.github.semres.babelnet.BabelNetSynset"]',
-            style: {
-                'background-color': 'blue'
-            }
-        },
-        {
-            selector: 'node[class="com.github.semres.user.UserSynset"]',
-            style: {
-                'background-color': 'green'
+                'font-size': '10',
+                'line-color': edgeBackgroundColor,
+                'target-arrow-color': edgeBackgroundColor
             }
         },
         {
@@ -52,7 +45,6 @@ var cy = cytoscape({
                 'border-color': 'red'
             }
         },
-
         {
             selector: '.edgehandles-preview, .edgehandles-ghost-edge',
             css: {
@@ -334,6 +326,30 @@ function updateEdge(editedEdge) {
     oldEdge.data('relationType', editedEdge.relationType);
     oldEdge.data('description', editedEdge.description);
     oldEdge.data('weight', editedEdge.weight);
+}
+
+function nodeBackgroundColor(node) {
+    var synset = node.data();
+    if (moment(synset.lastEditedTime, 'YYYY-MM-DDTHH:mm:ss.SSS').isAfter(startTime)) {
+        return 'yellow';
+    }
+    if (synset.class === "com.github.semres.babelnet.BabelNetSynset") {
+        return 'blue';
+    } else {
+        return 'green'
+    }
+}
+
+function edgeBackgroundColor(node) {
+    var edge = node.data();
+    if (moment(edge.lastEditedTime, 'YYYY-MM-DDTHH:mm:ss.SSS').isAfter(startTime)) {
+        return 'yellow';
+    }
+    if (edge.class === "com.github.semres.babelnet.BabelNetEdge") {
+        return 'blue';
+    } else {
+        return 'green'
+    }
 }
 
 function escapeColon(string) {

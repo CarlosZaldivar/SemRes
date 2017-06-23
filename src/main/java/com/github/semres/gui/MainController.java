@@ -2,6 +2,7 @@ package com.github.semres.gui;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.github.semres.*;
 import com.github.semres.babelnet.BabelNetManager;
 import com.github.semres.babelnet.BabelNetSynset;
@@ -315,7 +316,7 @@ public class MainController extends Controller implements Initializable {
     }
 
     private String synsetToJson(Synset synset) {
-        ObjectMapper mapper = new ObjectMapper();
+        ObjectMapper mapper = getMapper();
         String jsonSynset = null;
         try {
             jsonSynset = mapper.writeValueAsString(synsetToMap(synset));
@@ -327,7 +328,7 @@ public class MainController extends Controller implements Initializable {
 
     private String synsetsToJson(Collection<? extends Synset> synsets) {
         List<Map<String, Object>> synsetMaps = synsets.stream().map(this::synsetToMap).collect(Collectors.toList());
-        ObjectMapper mapper = new ObjectMapper();
+        ObjectMapper mapper = getMapper();
         String jsonSynsets = null;
         try {
             jsonSynsets = mapper.writeValueAsString(synsetMaps);
@@ -345,12 +346,13 @@ public class MainController extends Controller implements Initializable {
         edgeMap.put("relationType", edge.getRelationType().toString().toLowerCase());
         edgeMap.put("targetSynset", synsetToMap(board.getSynset(edge.getPointedSynset())));
         edgeMap.put("sourceSynset", synsetToMap(board.getSynset(edge.getOriginSynset())));
+        edgeMap.put("lastEditedTime", edge.getLastEditedTime());
         return edgeMap;
     }
 
     private String edgeToJson(Edge edge) {
         String jsonEdge = null;
-        ObjectMapper mapper = new ObjectMapper();
+        ObjectMapper mapper = getMapper();
         try {
             jsonEdge = mapper.writeValueAsString(edgeToMap(edge));
         } catch (JsonProcessingException e) {
@@ -361,7 +363,7 @@ public class MainController extends Controller implements Initializable {
 
     private String edgesToJson(Collection<? extends Edge> edges) {
         List<Map<String, Object>> edgeMaps = edges.stream().map(this::edgeToMap).collect(Collectors.toList());
-        ObjectMapper mapper = new ObjectMapper();
+        ObjectMapper mapper = getMapper();
         String jsonEdges = null;
         try {
             jsonEdges = mapper.writeValueAsString(edgeMaps);
@@ -369,6 +371,15 @@ public class MainController extends Controller implements Initializable {
             e.printStackTrace();
         }
         return jsonEdges;
+    }
+
+    private ObjectMapper getMapper() {
+        ObjectMapper mapper = new ObjectMapper();
+
+        // Configure mapper to properly parse LocalDateTime
+        mapper.findAndRegisterModules();
+        mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+        return mapper;
     }
 
     public void dispose() {
