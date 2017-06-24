@@ -8,6 +8,8 @@ import com.github.semres.babelnet.BabelNetManager;
 import com.github.semres.babelnet.BabelNetSynset;
 import com.github.semres.user.UserEdge;
 import com.teamdev.jxbrowser.chromium.*;
+import com.teamdev.jxbrowser.chromium.events.FinishLoadingEvent;
+import com.teamdev.jxbrowser.chromium.events.LoadAdapter;
 import com.teamdev.jxbrowser.chromium.events.ScriptContextAdapter;
 import com.teamdev.jxbrowser.chromium.events.ScriptContextEvent;
 import com.teamdev.jxbrowser.chromium.javafx.BrowserView;
@@ -99,6 +101,19 @@ public class MainController extends Controller implements Initializable {
         this.board = board;
         board.setBabelNetManager(babelNetManager);
         browser.loadURL(getClass().getResource("/html/board.html").toExternalForm());
+
+        // Disable option to update synsets if there's no api key.
+        if (StringUtils.isEmpty(BabelNetManager.getApiKey())) {
+            browser.addLoadListener(new LoadAdapter() {
+                @Override
+                public void onFinishLoadingFrame(FinishLoadingEvent event) {
+                    if (event.isMainFrame()) {
+                        browser.executeJavaScript("disableUpdates()");
+                    }
+                }
+            });
+        }
+
         String remoteDebuggingURL = browser.getRemoteDebuggingURL();
         log.info("Remote debugging URL: " + remoteDebuggingURL);
 

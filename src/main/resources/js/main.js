@@ -56,7 +56,7 @@ var cy = cytoscape({
     ]
 });
 
-cy.contextMenus({
+var menus = cy.contextMenus({
     menuItems: [
         {
             id: 'removeSynset',
@@ -326,6 +326,10 @@ function updateEdge(editedEdge) {
     oldEdge.data('relationType', editedEdge.relationType);
     oldEdge.data('description', editedEdge.description);
     oldEdge.data('weight', editedEdge.weight);
+}
+
+function disableUpdates() {
+    menus.disableMenuItem("checkForUpdates");
 }
 
 function nodeBackgroundColor(node) {
