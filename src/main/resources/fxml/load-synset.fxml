@@ -29,7 +29,7 @@
                 </rowConstraints>
                 <AnchorPane prefHeight="200.0" prefWidth="200.0">
                     <TextField fx:id="searchBox" AnchorPane.bottomAnchor="14.0" AnchorPane.leftAnchor="14.0"
-                               AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="14.0"/>
+                               AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="14.0" onAction="#search"/>
                 </AnchorPane>
                 <AnchorPane prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1">
                     <Button mnemonicParsing="false" onAction="#search" text="Search"
