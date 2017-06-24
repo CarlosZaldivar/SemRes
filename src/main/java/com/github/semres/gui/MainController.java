@@ -381,6 +381,7 @@ public class MainController extends Controller implements Initializable {
         edgeMap.put("targetSynset", synsetToMap(board.getSynset(edge.getPointedSynset())));
         edgeMap.put("sourceSynset", synsetToMap(board.getSynset(edge.getOriginSynset())));
         edgeMap.put("lastEditedTime", edge.getLastEditedTime());
+        edgeMap.put("class", edge.getClass().getCanonicalName());
         return edgeMap;
     }
 
