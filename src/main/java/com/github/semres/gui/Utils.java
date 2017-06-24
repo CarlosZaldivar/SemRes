@@ -7,8 +7,15 @@ import javafx.scene.layout.Region;
 final class Utils {
     private Utils() {}
 
-    static void showAlert(String message) {
+    static void showError(String message) {
         Alert alert = new Alert(Alert.AlertType.ERROR, message);
+        // Resize dialog so that the whole text would fit.
+        alert.getDialogPane().getChildren().stream().filter(node -> node instanceof Label).forEach(node -> ((Label) node).setMinHeight(Region.USE_PREF_SIZE));
+        alert.showAndWait();
+    }
+
+    static void showInfo(String message) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION, message);
         // Resize dialog so that the whole text would fit.
         alert.getDialogPane().getChildren().stream().filter(node -> node instanceof Label).forEach(node -> ((Label) node).setMinHeight(Region.USE_PREF_SIZE));
         alert.showAndWait();

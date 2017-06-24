@@ -1,31 +1,38 @@
 package com.github.semres.gui;
 
+import com.esotericsoftware.yamlbeans.YamlException;
 import com.github.semres.DatabasesManager;
-import com.github.semres.SemRes;
+import com.github.semres.Settings;
 import com.github.semres.babelnet.BabelNetManager;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import org.apache.log4j.Logger;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 
 public class Main extends Application {
     private MainController mainController;
     private DatabasesManager databasesManager;
     private BabelNetManager babelNetManager;
-
-    private final static Logger logger = Logger.getLogger(SemRes.class);
+    private boolean startupCompleted;
 
     @Override
-    public void start(Stage primaryStage) throws Exception {
+    public void start(Stage primaryStage) throws IOException {
+        Settings settings;
         try {
-            databasesManager = new DatabasesManager();
-        } catch (IOException e) {
-            logger.error("Could not load settings from conf.yaml", e);
+            settings = new Settings();
+        } catch (FileNotFoundException e) {
+            Utils.showError("Could not find conf.yaml");
+            return;
+        } catch (YamlException e) {
+            Utils.showError("Could not parse conf.yaml");
+            return;
         }
+
+        databasesManager = new DatabasesManager(settings);
         babelNetManager = new BabelNetManager();
 
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/main.fxml"));
@@ -36,13 +43,17 @@ public class Main extends Application {
         primaryStage.setTitle("SemRes");
         primaryStage.setScene(new Scene(root));
         primaryStage.sizeToScene();
+
+        startupCompleted = true;
         primaryStage.show();
     }
 
     @Override
     public void stop() {
-        databasesManager.save();
-        mainController.dispose();
+        if (startupCompleted) {
+            databasesManager.save();
+            mainController.dispose();
+        }
     }
 
     public MainController getMainController() {

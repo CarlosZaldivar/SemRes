@@ -27,10 +27,14 @@ public class SimpleUpdateTestApplication extends Main {
     String pointedAddedSynsetId = "bn:00024925n";
 
     @Override
-    public void start(Stage primaryStage) throws Exception {
+    public void start(Stage primaryStage) throws IOException {
         super.start(primaryStage);
-        getMainController().setBabelNetManager(createMockBabelNetManager());
-        getMainController().setDatabasesManager(createMockDatabasesManager());
+        try {
+            getMainController().setBabelNetManager(createMockBabelNetManager());
+            getMainController().setDatabasesManager(createMockDatabasesManager());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
 

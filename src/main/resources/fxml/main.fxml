@@ -20,8 +20,9 @@
         <Menu fx:id="viewMenu" disable="true" mnemonicParsing="false" text="View">
             <MenuItem mnemonicParsing="false" onAction="#openLoadSynsetWindow" text="Load synset" />
         </Menu>
-        <Menu fx:id="babelNetMenu" disable="true" mnemonicParsing="false" text="BabelNet">
-            <MenuItem mnemonicParsing="false" onAction="#openSearchBabelNetWindow" text="Search" />
+        <Menu fx:id="babelNetMenu" mnemonicParsing="false" text="BabelNet">
+            <MenuItem mnemonicParsing="false" onAction="#openApiKeyWindow" text="API key" />
+            <MenuItem fx:id="searchBabelNetMenuItem" mnemonicParsing="false" onAction="#openSearchBabelNetWindow" text="Search" />
             <MenuItem fx:id="updateMenuItem" mnemonicParsing="false" onAction="#openUpdatesWindow" text="Check for updates"/>
         </Menu>
         <Menu mnemonicParsing="false" text="Help">

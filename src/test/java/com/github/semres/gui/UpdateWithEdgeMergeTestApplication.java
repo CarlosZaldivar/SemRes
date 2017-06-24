@@ -26,10 +26,14 @@ public class UpdateWithEdgeMergeTestApplication extends Main {
     private String secondPointedSynsetId = "bn:00024924n";
 
     @Override
-    public void start(Stage primaryStage) throws Exception {
+    public void start(Stage primaryStage) throws IOException {
         super.start(primaryStage);
-        getMainController().setBabelNetManager(createMockBabelNetManager());
-        getMainController().setDatabasesManager(createMockDatabasesManager());
+        try {
+            getMainController().setBabelNetManager(createMockBabelNetManager());
+            getMainController().setDatabasesManager(createMockDatabasesManager());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
 

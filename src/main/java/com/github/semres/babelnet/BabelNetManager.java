@@ -9,21 +9,27 @@ import org.eclipse.rdf4j.model.impl.LinkedHashModel;
 import org.eclipse.rdf4j.model.vocabulary.RDF;
 import org.eclipse.rdf4j.model.vocabulary.RDFS;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 public class BabelNetManager extends Source {
     private static Language language = Language.EN;
+    private static String configurationPath;
+    private static String apiKey;
 
-    public static void loadConfiguration(String path) {
+    public static void setConfigurationPath(String configurationPath) {
+        BabelNetManager.configurationPath = configurationPath;
+    }
+
+    public static void loadConfiguration() {
         Configuration jltConf = Configuration.getInstance();
-        jltConf.setConfigurationFile(new File(path + "config/jlt.properties"));
+        jltConf.setConfigurationFile(new File(configurationPath + "config/jlt.properties"));
 
         BabelNetConfiguration babelnetConf = BabelNetConfiguration.getInstance();
-        babelnetConf.setConfigurationFile(new File(path + "config/babelnet.properties"));
-        babelnetConf.setBasePath(path);
+        babelnetConf.setConfigurationFile(new File(configurationPath + "config/babelnet.properties"));
+        apiKey = babelnetConf.getBabelNetKey();
     }
 
     public static String getLanguage() {
@@ -36,6 +42,25 @@ public class BabelNetManager extends Source {
 
     public static void setLanguage(String languageCode) {
         language = Language.valueOf(languageCode);
+    }
+
+    public static void setApiKey(String apiKey) throws IOException {
+        // https://stackoverflow.com/a/15337487/5459240
+        FileInputStream in = new FileInputStream(configurationPath + "config/babelnet.var.properties");
+        Properties props = new Properties();
+        props.load(in);
+        in.close();
+
+        FileOutputStream out = new FileOutputStream(configurationPath + "config/babelnet.var.properties");
+        props.setProperty("babelnet.key", apiKey);
+        props.store(out, null);
+        out.close();
+        BabelNetConfiguration babelnetConf = BabelNetConfiguration.getInstance();
+        babelnetConf.setConfigurationFile(new File(configurationPath + "config/babelnet.properties"));
+    }
+
+    public static String getApiKey() {
+        return apiKey;
     }
 
     public BabelSynset getBabelSynset(String id) throws IOException {

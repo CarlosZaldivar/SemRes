@@ -4,4 +4,3 @@ dist/
 *.iml
 node/
 node_modules/
-src/main/resources/babelnet-config/config/babelnet.var.properties

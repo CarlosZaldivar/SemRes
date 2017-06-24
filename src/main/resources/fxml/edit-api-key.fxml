@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<?import javafx.geometry.Insets?>
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="150" prefWidth="330"
+            xmlns="http://javafx.com/javafx/8.0.102" xmlns:fx="http://javafx.com/fxml/1" stylesheets="@../css/readonly-text.css"
+            fx:controller="com.github.semres.gui.EditApiKeyController">
+    <center>
+        <TextField fx:id="apiKeyTF">
+            <BorderPane.margin>
+                <Insets left="20.0" right="20.0" />
+            </BorderPane.margin>
+        </TextField>
+    </center>
+    <bottom>
+        <ButtonBar BorderPane.alignment="CENTER">
+            <buttons>
+                <Button fx:id="editButton" mnemonicParsing="false" onAction="#startEditing" text="Edit" />
+                <Button fx:id="cancelButton" mnemonicParsing="false" onAction="#cancelEditing" text="Cancel" />
+                <Button fx:id="okButton" mnemonicParsing="false" onAction="#save" text="OK" />
+            </buttons>
+            <padding>
+                <Insets bottom="10.0" left="20.0" right="20.0" top="10.0" />
+            </padding>
+        </ButtonBar>
+    </bottom>
+</BorderPane>

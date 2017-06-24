@@ -55,9 +55,9 @@ public class SearchBabelNetController extends ChildController implements Initial
         searchService.setOnSucceeded(workerStateEvent -> showResults());
         searchService.setOnFailed(workerStateEvent -> {
             if (searchService.getException() instanceof IOException) {
-                Utils.showAlert("There was a problem connecting to BabelNet.");
+                Utils.showError("There was a problem connecting to BabelNet.");
             } else {
-                Utils.showAlert(searchService.getException().getMessage());
+                Utils.showError(searchService.getException().getMessage());
             }
         });
 
@@ -75,9 +75,9 @@ public class SearchBabelNetController extends ChildController implements Initial
         downloadEdgesService.setOnSucceeded(workerStateEvent -> addDownloadedEdges());
         downloadEdgesService.setOnFailed(workerStateEvent -> {
             if (searchService.getException() instanceof IOException) {
-                Utils.showAlert("There was a problem connecting to BabelNet.");
+                Utils.showError("There was a problem connecting to BabelNet.");
             } else {
-                Utils.showAlert(searchService.getException().getMessage());
+                Utils.showError(searchService.getException().getMessage());
             }
         });
 

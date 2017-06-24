@@ -1,7 +1,5 @@
 package com.github.semres;
 
-import com.esotericsoftware.yamlbeans.YamlException;
-import com.github.semres.babelnet.CommonIRI;
 import org.eclipse.rdf4j.model.IRI;
 import org.eclipse.rdf4j.model.Model;
 import org.eclipse.rdf4j.model.ValueFactory;
@@ -17,7 +15,6 @@ import org.eclipse.rdf4j.repository.sail.config.SailRepositoryConfig;
 import org.eclipse.rdf4j.sail.memory.config.MemoryStoreConfig;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -32,7 +29,7 @@ public class DatabasesManager {
     private final Model metadataStatements;
     private final LocalRepositoryManager repositoryManager;
 
-    DatabasesManager(Settings settings) {
+    public DatabasesManager(Settings settings) {
         metadataStatements = new LinkedHashModel();
         relationTypes = new ArrayList<>();
         for (Source source: settings.getSources()) {
@@ -43,10 +40,6 @@ public class DatabasesManager {
         }
         repositoryManager = new LocalRepositoryManager(new File(settings.getDatabasesDirectory()));
         repositoryManager.initialize();
-    }
-
-    public DatabasesManager() throws FileNotFoundException, YamlException {
-        this(new Settings());
     }
 
     public List<Class> getSynsetSerializerClasses() {

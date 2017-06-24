@@ -90,7 +90,7 @@ public class UpdatesListController extends ChildController implements Initializa
         progressIndicatorVB.visibleProperty().bind(updateTask.runningProperty());
 
         updateTask.setOnSucceeded(workerStateEvent -> showUpdates());
-        updateTask.setOnFailed(workerStateEvent -> Utils.showAlert(updateTask.getException().getMessage()));
+        updateTask.setOnFailed(workerStateEvent -> Utils.showError(updateTask.getException().getMessage()));
 
         addedEdgeFromColumn.setCellValueFactory(new PropertyValueFactory<>("from"));
         addedEdgeToColumn.setCellValueFactory(new PropertyValueFactory<>("to"));

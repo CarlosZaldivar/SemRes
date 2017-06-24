@@ -68,7 +68,7 @@ public class RelationTypesController extends ChildController {
                 addingEdgeController.removeRelationType(relationType);
                 observableList.remove(relationType);
             } catch (RelationTypeInUseException e) {
-                Utils.showAlert("This relation type is in use, it cannot be removed.");
+                Utils.showError("This relation type is in use, it cannot be removed.");
             }
         }
     }

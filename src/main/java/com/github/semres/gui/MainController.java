@@ -26,6 +26,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.apache.commons.beanutils.PropertyUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.eclipse.rdf4j.rio.RDFFormat;
 
@@ -48,11 +49,13 @@ public class MainController extends Controller implements Initializable {
     @FXML private Menu exportSubmenu;
     @FXML private MenuItem saveMenuItem;
     @FXML private MenuItem updateMenuItem;
+    @FXML private MenuItem searchBabelNetMenuItem;
     private BrowserView boardView;
     private Board board;
     private Browser browser;
     private BabelNetManager babelNetManager;
     private DatabasesManager databasesManager;
+    private String newApiKey;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -84,8 +87,12 @@ public class MainController extends Controller implements Initializable {
         ProtocolService protocolService = browserContext.getProtocolService();
         protocolService.setProtocolHandler("jar", new JarProtocolHandler());
 
-        // updateMenuItem should be disabled if there are unsaved changes on the board.
-        babelNetMenu.setOnShowing(e -> updateMenuItem.setDisable(board.isBoardEdited()));
+        // updateMenuItem should be disabled if there are unsaved changes on the board or there's no api key.
+        // searchBabelNetMenuItem should be disabled if there's no api key
+        babelNetMenu.setOnShowing(e -> {
+            searchBabelNetMenuItem.setDisable(board == null || StringUtils.isEmpty(BabelNetManager.getApiKey()));
+            updateMenuItem.setDisable(board == null || board.isBoardEdited() || StringUtils.isEmpty(BabelNetManager.getApiKey()));
+        });
     }
 
     void setBoard(Board board) {
@@ -99,7 +106,10 @@ public class MainController extends Controller implements Initializable {
         saveMenuItem.setDisable(false);
         exportSubmenu.setDisable(false);
         viewMenu.setDisable(false);
-        babelNetMenu.setDisable(false);
+    }
+
+    public String getNewApiKey() {
+        return newApiKey;
     }
 
     public void save() {
@@ -132,7 +142,7 @@ public class MainController extends Controller implements Initializable {
             try {
                 saveFile(content, file);
             } catch (IOException e) {
-                Utils.showAlert("Could not save file.");
+                Utils.showError("Could not save file.");
             }
         }
     }
@@ -141,6 +151,11 @@ public class MainController extends Controller implements Initializable {
         FileWriter fileWriter = new FileWriter(file);
         fileWriter.write(content);
         fileWriter.close();
+    }
+
+    void setBabelNetApiKey(String key) throws IOException {
+        BabelNetManager.setApiKey(key);
+        newApiKey = key;
     }
 
     void addSynset(Synset synset) {
@@ -268,6 +283,10 @@ public class MainController extends Controller implements Initializable {
 
         blockBrowserView(newStage);
         newStage.show();
+    }
+
+    public void openApiKeyWindow() throws IOException {
+        openNewWindow("/fxml/edit-api-key.fxml", "BabelNet API key");
     }
 
     private Controller openNewWindow(String fxmlPath, String title) throws IOException {
@@ -425,7 +444,7 @@ public class MainController extends Controller implements Initializable {
                 try {
                     openNewWindow("/fxml/add-synset.fxml","Add synset");
                 } catch (IOException e) {
-                    Utils.showAlert(e.getMessage());
+                    Utils.showError(e.getMessage());
                 }
             });
         }
@@ -437,7 +456,7 @@ public class MainController extends Controller implements Initializable {
                     childController.setOriginSynset(board.getSynset(originSynsetId));
                     childController.setDestinationSynset(board.getSynset(destinationSynsetId));
                 } catch (IOException e) {
-                    Utils.showAlert(e.getMessage());
+                    Utils.showError(e.getMessage());
                 }
             });
         }
@@ -449,7 +468,7 @@ public class MainController extends Controller implements Initializable {
                             (SynsetDetailsController) openNewWindow("/fxml/synset-details.fxml", "Synset details");
                     childController.setSynset(board.getSynset(synsetId));
                 } catch (IOException e) {
-                    Utils.showAlert(e.getMessage());
+                    Utils.showError(e.getMessage());
                 }
             });
         }
@@ -461,7 +480,7 @@ public class MainController extends Controller implements Initializable {
                             (EdgeDetailsController) openNewWindow("/fxml/edge-details.fxml", "Edge details");
                     childController.setEdge(board.getEdge(edgeId));
                 } catch (IOException e) {
-                    Utils.showAlert(e.getMessage());
+                    Utils.showError(e.getMessage());
                 }
             });
         }
@@ -495,7 +514,7 @@ public class MainController extends Controller implements Initializable {
             try {
                 edges = MainController.this.downloadBabelNetEdges(synsetId);
             } catch (IOException e) {
-                Utils.showAlert(e.getMessage());
+                Utils.showError(e.getMessage());
                 return;
             }
             List<Synset> pointedSynsets = new ArrayList<>();
@@ -511,7 +530,7 @@ public class MainController extends Controller implements Initializable {
                 try {
                     openUpdatesWindow(synsetId);
                 } catch (IOException e) {
-                    Utils.showAlert(e.getMessage());
+                    Utils.showError(e.getMessage());
                 }
             });
         }

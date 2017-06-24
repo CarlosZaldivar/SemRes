@@ -14,16 +14,31 @@ public class Settings {
     private String databasesDirectory;
     private List<Source> sources = new ArrayList<>();
 
-    Settings() throws FileNotFoundException, YamlException {
+    public Settings() throws FileNotFoundException, YamlException {
         YamlReader reader = new YamlReader(new FileReader(SemRes.getBaseDirectory() + "conf.yaml"));
 
         Map settingsMap = (Map) reader.read();
-        ((Map) settingsMap.get("sources")).forEach((key, value) -> sources.add(SourcesInitializer.initialize((String) key, (Map) value)));
+        Map sourcesMap = (Map) settingsMap.get("sources");
+
+        if (sourcesMap == null) {
+            throw new YamlException();
+        }
+
+        for (Object key : sourcesMap.keySet()) {
+            Source source = SourcesInitializer.initialize((String) key, (Map) sourcesMap.get(key));
+            if (source == null) {
+                throw new YamlException();
+            }
+            sources.add(source);
+        }
 
         // Always add custom user synsets and edges.
         sources.add(new UserManager());
 
         String databasesDirectory = (String) settingsMap.get("databases-directory");
+        if (databasesDirectory == null) {
+            throw new YamlException();
+        }
         this.databasesDirectory = databasesDirectory.startsWith("/") ? databasesDirectory : SemRes.getBaseDirectory() + databasesDirectory;
     }
 
