@@ -53,13 +53,7 @@ public class SearchBabelNetController extends ChildController implements Initial
         };
 
         searchService.setOnSucceeded(workerStateEvent -> showResults());
-        searchService.setOnFailed(workerStateEvent -> {
-            if (searchService.getException() instanceof IOException) {
-                Utils.showError("There was a problem connecting to BabelNet.");
-            } else {
-                Utils.showError(searchService.getException().getMessage());
-            }
-        });
+        setServiceErrorHandling(searchService);
 
         downloadEdgesService = new Service<Collection<Edge>>() {
             @Override
@@ -73,17 +67,23 @@ public class SearchBabelNetController extends ChildController implements Initial
             }
         };
         downloadEdgesService.setOnSucceeded(workerStateEvent -> addDownloadedEdges());
-        downloadEdgesService.setOnFailed(workerStateEvent -> {
-            if (searchService.getException() instanceof IOException) {
-                Utils.showError("There was a problem connecting to BabelNet.");
-            } else {
-                Utils.showError(searchService.getException().getMessage());
-            }
-        });
+        setServiceErrorHandling(downloadEdgesService);
 
         synsetsListView.visibleProperty().bind(searchService.runningProperty().not());
         synsetsListView.disableProperty().bind(downloadEdgesService.runningProperty());
         progressIndicatorVB.visibleProperty().bind(searchService.runningProperty().or(downloadEdgesService.runningProperty()));
+    }
+
+    private void setServiceErrorHandling(Service service) {
+        service.setOnFailed(workerStateEvent -> {
+            if (service.getException() instanceof IOException) {
+                Utils.showError("There was a problem connecting to BabelNet.");
+            } else if (service.getException() != null) {
+                Utils.showError(service.getException().getMessage());
+            } else {
+                Utils.showError("Error occurred");
+            }
+        });
     }
 
     @Override
