@@ -13,12 +13,12 @@ import java.util.*;
 public class BabelNetSynset extends Synset {
     private BabelSynset babelSynset;
     private Set<String> removedRelations = new HashSet<>();
-    private boolean isDownloadedWithEdges;
+    private boolean downloadedWithEdges;
     private BabelNetManager babelNetManager;
 
     private BabelNetSynset(BabelNetSynset babelNetSynset) {
         super(babelNetSynset);
-        this.isDownloadedWithEdges = babelNetSynset.isDownloadedWithEdges;
+        this.downloadedWithEdges = babelNetSynset.downloadedWithEdges;
         this.removedRelations = new HashSet<>(babelNetSynset.removedRelations);
         babelNetManager = babelNetSynset.babelNetManager;
     }
@@ -49,7 +49,7 @@ public class BabelNetSynset extends Synset {
 
     BabelNetSynset(String representation, Set<String> removedRelations, boolean isDownloadedWithEdges) {
         this(representation, removedRelations);
-        this.isDownloadedWithEdges = isDownloadedWithEdges;
+        this.downloadedWithEdges = isDownloadedWithEdges;
     }
 
     public void setBabelNetManager(BabelNetManager babelNetManager) {
@@ -83,7 +83,7 @@ public class BabelNetSynset extends Synset {
     }
 
     public BabelNetSynset loadEdgesFromBabelNet() throws IOException {
-        if (isDownloadedWithEdges) {
+        if (downloadedWithEdges) {
             throw new EdgesAlreadyLoadedException();
         }
 
@@ -108,7 +108,7 @@ public class BabelNetSynset extends Synset {
             }
         }
         newSynset.isExpanded = true;
-        newSynset.isDownloadedWithEdges = true;
+        newSynset.downloadedWithEdges = true;
         return newSynset;
     }
 
@@ -131,6 +131,10 @@ public class BabelNetSynset extends Synset {
     }
 
     public boolean isDownloadedWithEdges() {
-        return isDownloadedWithEdges;
+        return downloadedWithEdges;
+    }
+
+    public void setDownloadedWithEdges(boolean downloadedWithEdges) {
+        this.downloadedWithEdges = downloadedWithEdges;
     }
 }

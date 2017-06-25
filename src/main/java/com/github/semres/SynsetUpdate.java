@@ -65,6 +65,8 @@ public class SynsetUpdate {
                     addedEdges.put(edge.getId(), edge);
                 }
             }
+        } else if (originalSynset.isExpanded() && !updatedSynset.isExpanded()) {
+            updatedSynset.setOutgoingEdges(originalSynset.getOutgoingEdges());
         }
         this.updatedSynset = updatedSynset;
     }
@@ -75,7 +77,7 @@ public class SynsetUpdate {
     }
 
     private boolean edgesAreDifferent(Edge originalEdge, Edge updatedEdge) {
-        return originalEdge.getRelationType() != updatedEdge.getRelationType() || originalEdge.getWeight() != updatedEdge.getWeight() ||
+        return !originalEdge.getRelationType().equals(updatedEdge.getRelationType()) || originalEdge.getWeight() != updatedEdge.getWeight() ||
                !Objects.equals(originalEdge.getDescription(), updatedEdge.getDescription());
     }
 

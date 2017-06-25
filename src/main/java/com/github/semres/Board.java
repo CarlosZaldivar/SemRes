@@ -318,6 +318,11 @@ public class Board {
             return new SynsetUpdate(originalSynset, null, null);
         }
 
+        if (!originalSynset.isDownloadedWithEdges()) {
+            SynsetUpdate synsetUpdate = new SynsetUpdate(originalSynset, updatedSynset, new HashMap<>());
+            return synsetUpdate.isSynsetUpdated() ? synsetUpdate : null;
+        }
+
         updatedSynset = updatedSynset.loadEdgesFromBabelNet();
 
         Map<String, BabelNetSynset> relatedSynsets = new HashMap<>();

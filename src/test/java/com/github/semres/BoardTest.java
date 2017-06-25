@@ -250,6 +250,7 @@ public class BoardTest {
         String pointedSynsetId = "bn:00024923n";
         BabelNetSynset originSynset = new BabelNetSynset("Foo");
         originSynset.setId(originSynsetId);
+        originSynset.setDownloadedWithEdges(true);
         BabelNetSynset pointedSynset = new BabelNetSynset("Bar");
         pointedSynset.setId(pointedSynsetId);
 
@@ -278,6 +279,7 @@ public class BoardTest {
         String pointedSynsetId = "bn:00024923n";
         BabelNetSynset originSynset = new BabelNetSynset("Foo");
         originSynset.setId(originSynsetId);
+        originSynset.setDownloadedWithEdges(true);
         BabelNetSynset pointedSynset = new BabelNetSynset("Bar");
         pointedSynset.setId(pointedSynsetId);
 
@@ -307,6 +309,7 @@ public class BoardTest {
         BabelNetSynset originSynset = new BabelNetSynset("Foo");
         String originSynsetId = "bn:00024922n";
         originSynset.setId(originSynsetId);
+        originSynset.setDownloadedWithEdges(true);
 
         BabelNetSynset pointedSynset = new BabelNetSynset("Bar");
         String pointedSynsetId = "bn:00024923n";
@@ -378,6 +381,7 @@ public class BoardTest {
         String pointedSynsetId = "bn:00024923n";
         BabelNetSynset originSynset = new BabelNetSynset("Foo");
         originSynset.setId(originSynsetId);
+        originSynset.setDownloadedWithEdges(true);
         BabelNetSynset pointedSynset = new BabelNetSynset("Bar");
         pointedSynset.setId(pointedSynsetId);
 
@@ -410,6 +414,7 @@ public class BoardTest {
         String pointedSynsetId = "bn:00024923n";
         BabelNetSynset originSynset = new BabelNetSynset("Foo");
         originSynset.setId(originSynsetId);
+        originSynset.setDownloadedWithEdges(true);
         BabelNetSynset pointedSynset = new BabelNetSynset("Bar");
         pointedSynset.setId(pointedSynsetId);
 
@@ -445,6 +450,7 @@ public class BoardTest {
         String pointedSynsetId = "bn:00024923n";
         BabelNetSynset originSynset = new BabelNetSynset("Foo");
         originSynset.setId(originSynsetId);
+        originSynset.setDownloadedWithEdges(true);
         BabelNetSynset pointedSynset = new BabelNetSynset("Bar");
         pointedSynset.setId(pointedSynsetId);
 
@@ -479,6 +485,7 @@ public class BoardTest {
         BabelNetSynset originalSynset = new BabelNetSynset("Foo");
         String originSynsetId = "bn:00024922n";
         originalSynset.setId(originSynsetId);
+        originalSynset.setDownloadedWithEdges(true);
 
         BabelNetSynset pointedSynset = new BabelNetSynset("Bar");
         String pointedSynsetId = "bn:00024923n";
