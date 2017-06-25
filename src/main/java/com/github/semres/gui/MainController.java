@@ -46,6 +46,7 @@ public class MainController extends Controller implements Initializable {
     @FXML private MenuItem turtleMenuItem;
     @FXML private MenuItem nTriplesMenuItem;
     @FXML private AnchorPane boardPane;
+    @FXML private Menu fileMenu;
     @FXML private Menu viewMenu;
     @FXML private Menu babelNetMenu;
     @FXML private Menu exportSubmenu;
@@ -95,6 +96,8 @@ public class MainController extends Controller implements Initializable {
             searchBabelNetMenuItem.setDisable(board == null || StringUtils.isEmpty(BabelNetManager.getApiKey()));
             updateMenuItem.setDisable(board == null || board.isBoardEdited() || StringUtils.isEmpty(BabelNetManager.getApiKey()));
         });
+
+        fileMenu.setOnShowing(e -> saveMenuItem.setDisable(board == null || !board.isBoardEdited()));
     }
 
     void setBoard(Board board) {

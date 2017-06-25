@@ -18,6 +18,8 @@ public class BabelNetSynset extends Synset {
 
     private BabelNetSynset(BabelNetSynset babelNetSynset) {
         super(babelNetSynset);
+        this.isDownloadedWithEdges = babelNetSynset.isDownloadedWithEdges;
+        this.removedRelations = new HashSet<>(babelNetSynset.removedRelations);
         babelNetManager = babelNetSynset.babelNetManager;
     }
 

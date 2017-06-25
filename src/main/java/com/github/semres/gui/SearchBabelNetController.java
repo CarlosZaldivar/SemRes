@@ -57,8 +57,8 @@ public class SearchBabelNetController extends ChildController implements Initial
 
         downloadEdgesService = new Service<Collection<Edge>>() {
             @Override
-            protected Task createTask() {
-                return new Task() {
+            protected Task<Collection<Edge>> createTask() {
+                return new Task<Collection<Edge>>() {
                     @Override
                     protected Collection<Edge> call() throws Exception {
                         return mainController.downloadBabelNetEdges(clickedSynset.getId());
@@ -111,13 +111,21 @@ public class SearchBabelNetController extends ChildController implements Initial
             clickedSynset = (BabelNetSynset) synsetsListView.getSelectionModel().getSelectedItem().getSynset();
 
             if (mainController.synsetExists(clickedSynset.getId())) {
-                mainController.loadSynset(clickedSynset.getId());
-                mainController.addSynsetToView(mainController.getSynset(clickedSynset.getId()));
+                BabelNetSynset loaded = (BabelNetSynset) mainController.loadSynset(clickedSynset.getId());
+                if (!loaded.isExpanded()) {
+                    mainController.loadEdges(clickedSynset.getId());
+                }
+                if (!loaded.isDownloadedWithEdges()) {
+                    downloadEdgesService.restart();
+                } else {
+                    mainController.addSynsetToView(mainController.getSynset(clickedSynset.getId()));
+                    Stage stage = (Stage) synsetsListView.getScene().getWindow();
+                    stage.close();
+                }
             } else {
                 mainController.addSynsetToBoard(clickedSynset);
+                downloadEdgesService.restart();
             }
-
-            downloadEdgesService.restart();
         }
     }
 

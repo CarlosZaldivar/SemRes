@@ -27,7 +27,6 @@ public abstract class Synset {
     }
 
     public void setLastEditedTime(LocalDateTime lastEditedTime) {
-
         this.lastEditedTime = lastEditedTime;
     }
 
