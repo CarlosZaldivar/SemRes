@@ -20,6 +20,7 @@ public abstract class Synset {
         this.description = copiedSynset.description;
         this.id = copiedSynset.id;
         this.outgoingEdges = new HashMap<>(copiedSynset.outgoingEdges);
+        this.isExpanded = copiedSynset.isExpanded;
     }
 
     public LocalDateTime getLastEditedTime() {

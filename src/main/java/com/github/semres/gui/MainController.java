@@ -132,6 +132,7 @@ public class MainController extends Controller implements Initializable {
 
     public void save() {
         board.save();
+        browser.executeJavaScriptAndReturnValue("updateStartTime()");
     }
 
     public void export(ActionEvent event) {

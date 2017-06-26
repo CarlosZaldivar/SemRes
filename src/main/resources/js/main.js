@@ -332,6 +332,10 @@ function disableUpdates() {
     menus.disableMenuItem("checkForUpdates");
 }
 
+function updateStartTime() {
+    startTime = moment();
+}
+
 function nodeBackgroundColor(node) {
     var synset = node.data();
     if (moment(synset.lastEditedTime, 'YYYY-MM-DDTHH:mm:ss.SSS').isAfter(startTime)) {
