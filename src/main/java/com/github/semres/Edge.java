@@ -72,4 +72,9 @@ public abstract class Edge {
     public String getId() {
         return originSynset + "-" + pointedSynset;
     }
+
+    @Override
+    public String toString() {
+        return originSynset + " → " + pointedSynset;
+    }
 }

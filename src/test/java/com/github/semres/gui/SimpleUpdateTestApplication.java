@@ -69,9 +69,10 @@ public class SimpleUpdateTestApplication extends Main {
 
         BabelNetSynset originSynset = new BabelNetSynset("Origin");
         originSynset.setId(originSynsetId);
+        originSynset.setDownloadedWithEdges(true);
         BabelNetSynset pointedRemoved = new BabelNetSynset("Pointed removed");
         pointedRemoved.setId(pointedRemovedSynsetId);
-        BabelNetSynset pointedEdited  = new BabelNetSynset("Pointed edited");
+        BabelNetSynset pointedEdited  = new BabelNetSynset("Pointed before edit");
         pointedEdited.setId(pointedEditedSynsetId);
 
         RelationType relationType = new BabelNetManager().getRelationTypes().get(0);
@@ -152,7 +153,7 @@ public class SimpleUpdateTestApplication extends Main {
 
     private BabelSense getMockPointedEditedBabelSense() {
         BabelSense babelSense = Mockito.mock(BabelSense.class);
-        when(babelSense.getSenseString()).thenReturn("Pointed edited");
+        when(babelSense.getSenseString()).thenReturn("Pointed after edit");
         return babelSense;
     }
 

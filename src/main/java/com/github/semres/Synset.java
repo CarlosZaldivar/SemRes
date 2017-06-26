@@ -73,4 +73,9 @@ public abstract class Synset {
     abstract protected Synset addOutgoingEdge(Edge edge);
 
     abstract protected Synset removeOutgoingEdge(String id);
+
+    @Override
+    public String toString() {
+        return representation;
+    }
 }

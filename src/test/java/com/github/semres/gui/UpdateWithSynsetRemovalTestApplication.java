@@ -33,8 +33,6 @@ public class UpdateWithSynsetRemovalTestApplication extends Main  {
         }
     }
 
-
-
     private DatabasesManager createMockDatabasesManager() throws NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
         DatabasesManager mockManager = Mockito.mock(DatabasesManager.class);
 
@@ -60,6 +58,7 @@ public class UpdateWithSynsetRemovalTestApplication extends Main  {
 
         BabelNetSynset originSynset = new BabelNetSynset("Origin");
         originSynset.setId(originSynsetId);
+        originSynset.setDownloadedWithEdges(true);
         BabelNetSynset pointedSynset = new BabelNetSynset("Pointed removed");
         pointedSynset.setId(pointedSynsetId);
 

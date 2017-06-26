@@ -65,6 +65,7 @@ public class UpdateWithEdgeMergeTestApplication extends Main {
         Database database = com.github.semres.Utils.createTestDatabase();
 
         BabelNetSynset originSynset = new BabelNetSynset("Origin");
+        originSynset.setDownloadedWithEdges(true);
         originSynset.setId(originSynsetId);
         BabelNetSynset firstPointedSynset = new BabelNetSynset("First pointed");
         firstPointedSynset.setId(firstPointedSynsetId);

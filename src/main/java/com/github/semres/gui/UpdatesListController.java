@@ -25,6 +25,13 @@ import java.util.List;
 import java.util.ResourceBundle;
 
 public class UpdatesListController extends ChildController implements Initializable {
+    @FXML private Accordion accordion;
+    @FXML private TitledPane editedEdgesTP;
+    @FXML private TitledPane editedSynsetsTP;
+    @FXML private TitledPane duplicateEdgesTP;
+    @FXML private TitledPane removedSynsetsTP;
+    @FXML private TitledPane addedEdgesTP;
+    @FXML private TitledPane removedEdgesTP;
     @FXML private ScrollPane scrollPane;
     @FXML private StackPane stackPane;
     @FXML private BorderPane mainPane;
@@ -48,11 +55,15 @@ public class UpdatesListController extends ChildController implements Initializa
     @FXML private TableColumn<Synset, String> removedSynsetRepresentationColumn;
     @FXML private TableColumn<Synset, String> removedSynsetDescriptionColumn;
     @FXML private TableColumn<Synset, String> removedSynsetCancelColumn;
+    @FXML private ListView<Synset> editedSynsetsLV;
+    @FXML private ListView<Edge> editedEdgesLV;
 
     private List<SynsetUpdate> updates;
     private ObservableList<EdgeData> addedEdges;
     private ObservableList<EdgeData> removedEdges;
     private ObservableList<Synset> removedSynsets;
+    private ObservableList<Synset> editedSynsets;
+    private ObservableList<Edge> editedEdges;
     private Task<List<SynsetUpdate>> updateTask;
 
     private MainController mainController;
@@ -109,10 +120,14 @@ public class UpdatesListController extends ChildController implements Initializa
         addedEdges = FXCollections.observableArrayList();
         removedEdges = FXCollections.observableArrayList();
         removedSynsets = FXCollections.observableArrayList();
+        editedSynsets = FXCollections.observableArrayList();
+        editedEdges = FXCollections.observableArrayList();
 
         addedEdgesTable.setItems(addedEdges);
         removedEdgesTable.setItems(removedEdges);
         removedSynsetsTable.setItems(removedSynsets);
+        editedSynsetsLV.setItems(editedSynsets);
+        editedEdgesLV.setItems(editedEdges);
 
         Callback<TableColumn<EdgeData, String>, TableCell<EdgeData, String>> addedEdgesCellFactory = createAddedEdgesCancelCell();
         Callback<TableColumn<EdgeData, String>, TableCell<EdgeData, String>> removedEdgesCellFactory = createRemovedEdgesCancelCell();
@@ -140,6 +155,10 @@ public class UpdatesListController extends ChildController implements Initializa
                 continue;
             }
 
+            if (update.isSynsetDataUpdated()) {
+                editedSynsets.add(update.getOriginalSynset());
+            }
+
             for (Edge edge : update.getAddedEdges().values()) {
                 addEdgeToObservableList(edge, update, addedEdges);
             }
@@ -152,7 +171,32 @@ public class UpdatesListController extends ChildController implements Initializa
                 EdgeMergePanel mergePanel = new EdgeMergePanel(update, edgeEdit, this);
                 edgeMergesVB.getChildren().add(mergePanel);
             }
+
+            for (EdgeEdit edgeEdit : update.getEdgeEdits().values()) {
+                editedEdges.add(edgeEdit.getOriginal());
+            }
         }
+
+        if (removedSynsets.isEmpty()) {
+            accordion.getPanes().remove(removedSynsetsTP);
+        }
+        if (editedSynsets.isEmpty()) {
+            accordion.getPanes().remove(editedSynsetsTP);
+        }
+        if (addedEdges.isEmpty()) {
+            accordion.getPanes().remove(addedEdgesTP);
+        }
+        if (removedEdges.isEmpty()) {
+            accordion.getPanes().remove(removedEdgesTP);
+        }
+        if (edgeMergesVB.getChildren().isEmpty()) {
+            accordion.getPanes().remove(duplicateEdgesTP);
+        }
+        if (editedEdges.isEmpty()) {
+            accordion.getPanes().remove(editedEdgesTP);
+        }
+
+        checkIfNoChangesLeft();
     }
 
     private void addEdgeToObservableList(Edge edge, SynsetUpdate update, ObservableList<EdgeData> list) {
@@ -182,6 +226,10 @@ public class UpdatesListController extends ChildController implements Initializa
                                 SynsetUpdate update = updates.stream().filter(u -> u.getOriginalSynset().getId().equals(edgeData.getFromId())).findFirst().get();
                                 update.cancelEdgeAddition(edgeData.getId());
                                 addedEdgesTable.getItems().remove(edgeData);
+                                if (addedEdges.isEmpty()) {
+                                    accordion.getPanes().remove(addedEdgesTP);
+                                }
+                                checkIfNoChangesLeft();
                             });
                             setGraphic(button);
                             setText(null);
@@ -221,6 +269,10 @@ public class UpdatesListController extends ChildController implements Initializa
                                 SynsetUpdate update = updates.stream().filter(u -> u.getOriginalSynset().getId().equals(edgeData.getFromId())).findFirst().get();
                                 update.cancelEdgeRemoval(edgeData.getId());
                                 removedEdgesTable.getItems().remove(edgeData);
+                                if (removedEdges.isEmpty()) {
+                                    accordion.getPanes().remove(removedEdgesTP);
+                                }
+                                checkIfNoChangesLeft();
                             });
                             setGraphic(button);
                             setText(null);
@@ -254,6 +306,10 @@ public class UpdatesListController extends ChildController implements Initializa
                                 SynsetUpdate update = updates.stream().filter(u -> u.getOriginalSynset().getId().equals(synset.getId())).findFirst().get();
                                 updates.remove(update);
                                 removedSynsetsTable.getItems().remove(synset);
+                                if (removedSynsets.isEmpty()) {
+                                    accordion.getPanes().remove(removedSynsetsTP);
+                                }
+                                checkIfNoChangesLeft();
                             });
                             setGraphic(button);
                             setText(null);
@@ -266,9 +322,20 @@ public class UpdatesListController extends ChildController implements Initializa
         };
     }
 
+    private void checkIfNoChangesLeft() {
+        if (accordion.getPanes().isEmpty()) {
+            stackPane.getChildren().clear();
+            stackPane.getChildren().add(new Label("No updates"));
+        }
+    }
+
     public void cancelEdgeMerge(EdgeMergePanel edgeMergePanel) {
         edgeMergePanel.getSynsetUpdate().cancelEdgeReplacement(edgeMergePanel.getEdgeEdit().getId());
         edgeMergesVB.getChildren().remove(edgeMergePanel);
+        if (edgeMergesVB.getChildren().isEmpty()) {
+            accordion.getPanes().remove(duplicateEdgesTP);
+        }
+        checkIfNoChangesLeft();
     }
 
     public static class EdgeData {
