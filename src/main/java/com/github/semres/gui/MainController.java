@@ -145,10 +145,10 @@ public class MainController extends Controller implements Initializable {
             extensionFilter = new FileChooser.ExtensionFilter("Turtle text files (*.ttl)", "*.ttl");
         } else if (clickedMenuItem == nTriplesMenuItem) {
             format = RDFFormat.NTRIPLES;
-            extensionFilter = new FileChooser.ExtensionFilter("N-Triples text files (*.nt)", "*.ttl");
+            extensionFilter = new FileChooser.ExtensionFilter("N-Triples text files (*.nt)", "*.nt");
         } else {
             format = RDFFormat.RDFXML;
-            extensionFilter = new FileChooser.ExtensionFilter("RDF/XML text files (*.nt)", "*.rdf");
+            extensionFilter = new FileChooser.ExtensionFilter("RDF/XML text files (*.rdf)", "*.rdf");
         }
 
         String content = board.export(format);
