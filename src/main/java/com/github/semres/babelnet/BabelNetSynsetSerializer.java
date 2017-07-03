@@ -135,11 +135,8 @@ public class BabelNetSynsetSerializer extends SynsetSerializer {
                 }
             }
 
-            synset = new BabelNetSynset(representation, removedRelations, edgesLoaded);
+            synset = new BabelNetSynset(representation, description, removedRelations, edgesLoaded);
             synset.setId(id);
-            if (description != null) {
-                synset.setDescription(description);
-            }
             if (lastEdited != null) {
                 synset.setLastEditedTime(lastEdited);
             }

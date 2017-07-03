@@ -42,13 +42,17 @@ public class BabelNetSynset extends Synset {
         super(representation);
     }
 
-    BabelNetSynset(String representation, Set<String> removedRelations) {
-        super(representation);
+    public BabelNetSynset(String representation, String description) {
+        super(representation, description);
+    }
+
+    BabelNetSynset(String representation, String description, Set<String> removedRelations) {
+        super(representation, description);
         this.removedRelations = removedRelations;
     }
 
-    BabelNetSynset(String representation, Set<String> removedRelations, boolean isDownloadedWithEdges) {
-        this(representation, removedRelations);
+    BabelNetSynset(String representation, String description, Set<String> removedRelations, boolean isDownloadedWithEdges) {
+        this(representation, description, removedRelations);
         this.downloadedWithEdges = isDownloadedWithEdges;
     }
 
@@ -120,10 +124,6 @@ public class BabelNetSynset extends Synset {
         Edge newEdge =
                 new BabelNetEdge(edge.getBabelSynsetIDTarget().getID(), getId(), babelPointer.getName(), relationType, edge.getWeight());
         outgoingEdges.put(newEdge.getId(), newEdge);
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
     }
 
     private boolean edgeIsRelevant(BabelSynsetIDRelation edge) {

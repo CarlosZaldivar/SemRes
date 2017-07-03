@@ -8,6 +8,7 @@ import com.github.semres.gui.IDAlreadyTakenException;
 import com.github.semres.user.UserEdge;
 import com.github.semres.user.UserSynset;
 import it.uniroma1.lcl.babelnet.*;
+import it.uniroma1.lcl.babelnet.data.BabelGloss;
 import it.uniroma1.lcl.babelnet.data.BabelPointer;
 import it.uniroma1.lcl.jlt.util.Language;
 import org.junit.Test;
@@ -210,21 +211,23 @@ public class BoardTest {
 
     @Test
     public void update() throws Exception {
-        BabelNetSynset originalSynset = new BabelNetSynset("Foo");
+        BabelNetSynset originalSynset = new BabelNetSynset("Foo", "Description 1");
         originalSynset.setId("bn:00024922n");
-        originalSynset.setDescription("Description 1");
 
 
         BabelSense mockBabelSense = Mockito.mock(BabelSense.class);
         when(mockBabelSense.getSenseString()).thenReturn("Bar");
 
+        BabelGloss mockBabelGloss = Mockito.mock(BabelGloss.class);
+        when(mockBabelGloss.getGloss()).thenReturn("Description 2");
+
         BabelSynset mockBabelSynset = Mockito.mock(BabelSynset.class);
         when(mockBabelSynset.getMainSense(any(Language.class))).thenReturn(mockBabelSense);
         when(mockBabelSynset.getId()).thenReturn(new BabelSynsetID("bn:00024922n"));
+        when(mockBabelSynset.getMainGloss(BabelNetManager.getJltLanguage())).thenReturn(mockBabelGloss);
         when(mockBabelSynset.getEdges()).thenReturn(new ArrayList<>());
 
         BabelNetSynset updatedSynset = new BabelNetSynset(mockBabelSynset);
-        updatedSynset.setDescription("Description 2");
 
         BabelNetManager mockManager = Mockito.mock(BabelNetManager.class);
         when(mockManager.getSynset("bn:00024922n")).thenReturn(updatedSynset);

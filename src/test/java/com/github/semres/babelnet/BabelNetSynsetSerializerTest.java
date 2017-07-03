@@ -32,7 +32,8 @@ public class BabelNetSynsetSerializerTest {
         assertTrue(model.filter(null, RDFS.LABEL, null).size() == 1);
         assertTrue(model.filter(null, RDFS.COMMENT, null).size() == 0);
 
-        synset.setDescription("Type of vehicle.");
+        synset = new BabelNetSynset("Car", "Type of vehicle.");
+        synset.setId("123");
 
         model = synsetSerializer.synsetToRdf(synset);
 
@@ -56,9 +57,8 @@ public class BabelNetSynsetSerializerTest {
         repo.initialize();
         BabelNetSynsetSerializer synsetSerializer = new BabelNetSynsetSerializer(repo, baseIri);
 
-        BabelNetSynset synset = new BabelNetSynset("Car");
+        BabelNetSynset synset = new BabelNetSynset("Car", "Type of vehicle.");
         synset.setId("123");
-        synset.setDescription("Type of vehicle.");
 
         Model model = synsetSerializer.synsetToRdf(synset);
 

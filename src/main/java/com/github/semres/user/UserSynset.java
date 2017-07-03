@@ -9,8 +9,7 @@ public class UserSynset extends Synset {
     }
 
     public UserSynset(String representation, String description) {
-        super(representation);
-        this.description = description;
+        super(representation, description);
     }
 
     private UserSynset(UserSynset copiedSynset) {

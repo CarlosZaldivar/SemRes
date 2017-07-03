@@ -15,6 +15,11 @@ public abstract class Synset {
         this.representation = representation;
     }
 
+    protected  Synset(String representation, String description) {
+        this.representation = representation;
+        this.description = description;
+    }
+
     protected Synset(Synset copiedSynset) {
         this.representation = copiedSynset.representation;
         this.description = copiedSynset.description;
