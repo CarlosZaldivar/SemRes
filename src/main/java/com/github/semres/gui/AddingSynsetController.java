@@ -1,6 +1,5 @@
 package com.github.semres.gui;
 
-import com.github.semres.user.UserSynset;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.fxml.FXML;
@@ -23,12 +22,7 @@ public class AddingSynsetController extends ChildController implements Initializ
         String representation = representationTF.getText();
         String description = descriptionTA.getText();
 
-        UserSynset newSynset = new UserSynset(representation);
-
-        if (!description.isEmpty()) {
-            newSynset = newSynset.changeDescription(description);
-        }
-        mainController.addSynset(newSynset);
+        mainController.createSynset(representation, description);
         Stage stage = (Stage) addButton.getScene().getWindow();
         stage.close();
     }

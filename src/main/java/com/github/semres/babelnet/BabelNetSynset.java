@@ -8,6 +8,7 @@ import it.uniroma1.lcl.babelnet.*;
 import it.uniroma1.lcl.babelnet.data.BabelPointer;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.*;
 
 public class BabelNetSynset extends Synset {
@@ -24,8 +25,7 @@ public class BabelNetSynset extends Synset {
     }
 
     public BabelNetSynset(BabelSynset synset) {
-        super(synset.getMainSense(BabelNetManager.getJltLanguage()).getSenseString());
-        setId(synset.getId().getID());
+        super(synset.getMainSense(BabelNetManager.getJltLanguage()).getSenseString(), synset.getId().getID());
         babelNetManager = new BabelNetManager();
 
         String description;
@@ -38,22 +38,37 @@ public class BabelNetSynset extends Synset {
         babelSynset = synset;
     }
 
-    public BabelNetSynset(String representation) {
-        super(representation);
+    public BabelNetSynset(String representation, String id) {
+        super(representation, id);
     }
 
-    public BabelNetSynset(String representation, String description) {
-        super(representation, description);
+    public BabelNetSynset(String representation, String id, String description) {
+        super(representation, id, description);
     }
 
-    BabelNetSynset(String representation, String description, Set<String> removedRelations) {
-        super(representation, description);
+    private BabelNetSynset(String representation, String id, String description, Set<String> removedRelations) {
+        super(representation, id, description);
         this.removedRelations = removedRelations;
     }
 
-    BabelNetSynset(String representation, String description, Set<String> removedRelations, boolean isDownloadedWithEdges) {
-        this(representation, description, removedRelations);
+    private BabelNetSynset(String representation, String id, String description, Set<String> removedRelations, boolean isDownloadedWithEdges) {
+        this(representation, id, description, removedRelations);
         this.downloadedWithEdges = isDownloadedWithEdges;
+    }
+
+    public BabelNetSynset(String representation, String id, String description, boolean isDownloadedWithEdges) {
+        this(representation, id, description);
+        this.downloadedWithEdges = isDownloadedWithEdges;
+    }
+
+    public BabelNetSynset(String representation, String id, boolean isDownloadedWithEdges) {
+        this(representation, id);
+        this.downloadedWithEdges = isDownloadedWithEdges;
+    }
+
+    public BabelNetSynset(String representation, String id, String description, Set<String> removedRelations, boolean edgesLoaded, LocalDateTime lastEditedTime) {
+        this(representation, id, description, removedRelations, edgesLoaded);
+        this.lastEditedTime = lastEditedTime;
     }
 
     public void setBabelNetManager(BabelNetManager babelNetManager) {
@@ -132,9 +147,5 @@ public class BabelNetSynset extends Synset {
 
     public boolean isDownloadedWithEdges() {
         return downloadedWithEdges;
-    }
-
-    public void setDownloadedWithEdges(boolean downloadedWithEdges) {
-        this.downloadedWithEdges = downloadedWithEdges;
     }
 }

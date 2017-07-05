@@ -1,6 +1,5 @@
 package com.github.semres.babelnet;
 
-import com.github.semres.Edge;
 import com.github.semres.SemRes;
 import org.eclipse.rdf4j.model.Model;
 import org.eclipse.rdf4j.model.ValueFactory;
@@ -24,16 +23,14 @@ public class BabelNetSynsetSerializerTest {
         BabelNetSynsetSerializer synsetSerializer = new BabelNetSynsetSerializer(repo, baseIri);
 
         // Testing basic synset
-        BabelNetSynset synset = new BabelNetSynset("Car");
-        synset.setId("123");
+        BabelNetSynset synset = new BabelNetSynset("Car", "123");
         Model model = synsetSerializer.synsetToRdf(synset);
 
         assertTrue(model.filter(null, SemRes.ID, factory.createLiteral("123")).size() == 1);
         assertTrue(model.filter(null, RDFS.LABEL, null).size() == 1);
         assertTrue(model.filter(null, RDFS.COMMENT, null).size() == 0);
 
-        synset = new BabelNetSynset("Car", "Type of vehicle.");
-        synset.setId("123");
+        synset = new BabelNetSynset("Car", "123", "Type of vehicle.");
 
         model = synsetSerializer.synsetToRdf(synset);
 
@@ -57,8 +54,7 @@ public class BabelNetSynsetSerializerTest {
         repo.initialize();
         BabelNetSynsetSerializer synsetSerializer = new BabelNetSynsetSerializer(repo, baseIri);
 
-        BabelNetSynset synset = new BabelNetSynset("Car", "Type of vehicle.");
-        synset.setId("123");
+        BabelNetSynset synset = new BabelNetSynset("Car", "123", "Type of vehicle.");
 
         Model model = synsetSerializer.synsetToRdf(synset);
 

@@ -64,13 +64,9 @@ public class UpdateWithEdgeMergeTestApplication extends Main {
     private Database createTestDatabase() throws NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
         Database database = com.github.semres.Utils.createTestDatabase();
 
-        BabelNetSynset originSynset = new BabelNetSynset("Origin");
-        originSynset.setDownloadedWithEdges(true);
-        originSynset.setId(originSynsetId);
-        BabelNetSynset firstPointedSynset = new BabelNetSynset("First pointed");
-        firstPointedSynset.setId(firstPointedSynsetId);
-        BabelNetSynset secondPointedSynset = new BabelNetSynset("Second pointed");
-        secondPointedSynset.setId(secondPointedSynsetId);
+        BabelNetSynset originSynset = new BabelNetSynset("Origin", originSynsetId, null, true);
+        BabelNetSynset firstPointedSynset = new BabelNetSynset("First pointed", firstPointedSynsetId);
+        BabelNetSynset secondPointedSynset = new BabelNetSynset("Second pointed", secondPointedSynsetId);
 
         RelationType userRelationType = new RelationType("Custom relation", "User");
         database.addRelationType(userRelationType);

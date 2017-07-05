@@ -22,11 +22,8 @@ public class BabelNetEdgeSerializerTest {
         ValueFactory factory = repo.getValueFactory();
         EdgeSerializer edgeSerializer = new BabelNetEdgeSerializer(repo, baseIri);
 
-        Synset pointedSynset = new UserSynset("Foo1");
-        Synset originSynset = new UserSynset("Foo2");
-
-        pointedSynset.setId("123");
-        originSynset.setId("124");
+        Synset pointedSynset = new UserSynset("Foo1", "123");
+        Synset originSynset = new UserSynset("Foo2", "124");
 
         RelationType relationType = new BabelNetManager().getRelationTypes().get(0);
         BabelNetEdge edge = new BabelNetEdge(pointedSynset.getId(), originSynset.getId(), relationType, 0.4);
@@ -50,11 +47,8 @@ public class BabelNetEdgeSerializerTest {
         BabelNetEdgeSerializer edgeSerializer = new BabelNetEdgeSerializer(repo, baseIri);
         UserSynsetSerializer synsetSerializer = new UserSynsetSerializer(repo, baseIri);
 
-        UserSynset pointedSynset = new UserSynset("Foo1");
-        UserSynset originSynset = new UserSynset("Foo2");
-
-        pointedSynset.setId("123");
-        originSynset.setId("124");
+        UserSynset pointedSynset = new UserSynset("Foo1", "123");
+        UserSynset originSynset = new UserSynset("Foo2", "124");
 
         RelationType holonym = new BabelNetManager().getRelationTypes().stream().filter(r -> r.getType().equals("HOLONYM")).findFirst().get();
         BabelNetEdge edge = new BabelNetEdge(pointedSynset.getId(), originSynset.getId(), holonym, 0.5);

@@ -8,15 +8,18 @@ public abstract class Synset {
     protected String representation;
     protected String description;
     protected boolean isExpanded;
-    private LocalDateTime lastEditedTime;
-    private String id;
+    protected LocalDateTime lastEditedTime;
+    private final String id;
 
-    protected Synset(String representation) {
+    protected Synset(String representation, String id) {
         this.representation = representation;
+        this.id = id;
+        this.description = null;
     }
 
-    protected  Synset(String representation, String description) {
+    protected  Synset(String representation, String id, String description) {
         this.representation = representation;
+        this.id = id;
         this.description = description;
     }
 
@@ -32,7 +35,7 @@ public abstract class Synset {
         return lastEditedTime;
     }
 
-    public void setLastEditedTime(LocalDateTime lastEditedTime) {
+    void setLastEditedTime(LocalDateTime lastEditedTime) {
         this.lastEditedTime = lastEditedTime;
     }
 
@@ -50,10 +53,6 @@ public abstract class Synset {
 
     public String getId() {
         return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
     }
 
     public Map<String, Edge> getOutgoingEdges() {
@@ -76,9 +75,9 @@ public abstract class Synset {
         isExpanded = true;
     }
 
-    abstract protected Synset addOutgoingEdge(Edge edge);
+    abstract public Synset addOutgoingEdge(Edge edge);
 
-    abstract protected Synset removeOutgoingEdge(String id);
+    abstract public Synset removeOutgoingEdge(String id);
 
     @Override
     public String toString() {

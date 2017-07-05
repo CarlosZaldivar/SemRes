@@ -2,11 +2,8 @@ package com.github.semres.gui;
 
 import com.github.semres.EdgeEdit;
 import com.github.semres.SynsetUpdate;
-import javafx.beans.binding.Bindings;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Group;
-import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.Label;

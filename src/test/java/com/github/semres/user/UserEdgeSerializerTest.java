@@ -20,11 +20,8 @@ public class UserEdgeSerializerTest {
         ValueFactory factory = repo.getValueFactory();
         EdgeSerializer edgeSerializer = new UserEdgeSerializer(repo, baseIri);
 
-        Synset pointedSynset = new UserSynset("Foo1");
-        Synset originSynset = new UserSynset("Foo2");
-
-        pointedSynset.setId("123");
-        originSynset.setId("124");
+        Synset pointedSynset = new UserSynset("Foo1", "123");
+        Synset originSynset = new UserSynset("Foo2", "124");
 
         UserEdge edge = new UserEdge(pointedSynset.getId(), originSynset.getId(), new BabelNetManager().getRelationTypes().get(0), 0.4);
         Model model = edgeSerializer.edgeToRdf(edge);
@@ -47,11 +44,8 @@ public class UserEdgeSerializerTest {
         UserEdgeSerializer edgeSerializer = new UserEdgeSerializer(repo, baseIri);
         UserSynsetSerializer synsetSerializer = new UserSynsetSerializer(repo, baseIri);
 
-        UserSynset pointedSynset = new UserSynset("Foo1");
-        UserSynset originSynset = new UserSynset("Foo2");
-
-        pointedSynset.setId("123");
-        originSynset.setId("124");
+        UserSynset pointedSynset = new UserSynset("Foo1", "123");
+        UserSynset originSynset = new UserSynset("Foo2", "124");
 
         UserEdge edge = new UserEdge(pointedSynset.getId(), originSynset.getId(), new BabelNetManager().getRelationTypes().get(0), 0.5);
 

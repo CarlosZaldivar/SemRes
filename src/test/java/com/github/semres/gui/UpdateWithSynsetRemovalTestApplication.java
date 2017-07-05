@@ -56,11 +56,8 @@ public class UpdateWithSynsetRemovalTestApplication extends Main  {
     private Database createTestDatabase() throws NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
         Database database = com.github.semres.Utils.createTestDatabase();
 
-        BabelNetSynset originSynset = new BabelNetSynset("Origin");
-        originSynset.setId(originSynsetId);
-        originSynset.setDownloadedWithEdges(true);
-        BabelNetSynset pointedSynset = new BabelNetSynset("Pointed removed");
-        pointedSynset.setId(pointedSynsetId);
+        BabelNetSynset originSynset = new BabelNetSynset("Origin", originSynsetId, true);
+        BabelNetSynset pointedSynset = new BabelNetSynset("Pointed removed", pointedSynsetId);
 
         BabelNetEdge edge = new BabelNetEdge(pointedSynset.getId(), originSynset.getId(), new BabelNetManager().getRelationTypes().get(0), 1.0);
 

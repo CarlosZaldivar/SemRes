@@ -6,6 +6,7 @@ import com.github.semres.babelnet.BabelNetSynset;
 import com.github.semres.babelnet.CommonIRI;
 import com.github.semres.gui.IDAlreadyTakenException;
 import com.github.semres.user.UserEdge;
+import com.github.semres.user.UserSynset;
 import org.eclipse.rdf4j.model.Model;
 import org.eclipse.rdf4j.rio.RDFFormat;
 import org.eclipse.rdf4j.rio.Rio;
@@ -137,10 +138,20 @@ public class Board {
         return true;
     }
 
+    public UserSynset createSynset(String representation) {
+        return createSynset(representation, null);
+    }
+
+    public UserSynset createSynset(String representation, String description) {
+        String id = attachedDatabase.generateNewSynsetId();
+        UserSynset newSynset = new UserSynset(representation, id, description);
+        synsets.put(newSynset.getId(), newSynset);
+        newSynsets.put(newSynset.getId(), newSynset);
+        return newSynset;
+    }
+
     public void addSynset(Synset newSynset) {
-        if (newSynset.getId() == null) {
-            newSynset.setId(attachedDatabase.generateNewSynsetId());
-        } else if (isIdAlreadyTaken(newSynset.getId())) {
+        if (isIdAlreadyTaken(newSynset.getId())) {
             throw new IDAlreadyTakenException();
         }
         synsets.put(newSynset.getId(), newSynset);

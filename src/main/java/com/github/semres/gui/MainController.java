@@ -177,12 +177,17 @@ public class MainController extends Controller implements Initializable {
         newApiKey = key;
     }
 
-    void addSynset(Synset synset) {
+    void createSynset(String representation, String description) {
+        Synset synset = board.createSynset(representation, description);
+        addSynsetToView(synset);
+    }
+
+    void addSynset(BabelNetSynset synset) {
         addSynsetToBoard(synset);
         addSynsetToView(synset);
     }
 
-    void addSynsetToBoard(Synset synset) {
+    void addSynsetToBoard(BabelNetSynset synset) {
         board.addSynset(synset);
     }
 

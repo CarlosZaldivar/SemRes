@@ -61,7 +61,7 @@ public class UserSynsetSerializer extends SynsetSerializer {
         UserSynset synset = null;
         String id;
         String representation;
-        String description ;
+        String description = null;
 
         String queryString = String.format("SELECT ?id ?representation ?description ?lastEdited " +
                         "WHERE { <%1$s> <%2$s> ?id . <%1$s> <%3$s> ?representation . " +
@@ -77,20 +77,18 @@ public class UserSynsetSerializer extends SynsetSerializer {
 
                     id = bindingSet.getValue("id").stringValue();
                     representation = bindingSet.getValue("representation").stringValue();
-                    LocalDateTime lastEdited;
+                    LocalDateTime lastEdited = null;
 
-                    synset = new UserSynset(representation);
-                    synset.setId(id);
 
                     if (bindingSet.getValue("description") != null) {
                         description = bindingSet.getValue("description").stringValue();
-                        synset = synset.changeDescription(description);
                     }
                     if (bindingSet.getValue("lastEdited") != null) {
                         lastEdited = LocalDateTime.parse(bindingSet.getValue("lastEdited").stringValue(),
                                 DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSXXX"));
-                        synset.setLastEditedTime(lastEdited);
                     }
+
+                    synset = new UserSynset(representation, id, description, lastEdited);
                 }
             }
         }

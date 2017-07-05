@@ -28,11 +28,22 @@ public class BoardTest {
     private RelationType meronym = new BabelNetManager().getRelationTypes().stream().filter(r -> r.getType().equals("MERONYM")).findFirst().get();
 
     @Test
+    public void createSynset() throws Exception {
+        Database database = createTestDatabase();
+        Board board = new Board(database);
+
+        board.createSynset("Foo", null);
+        board.save();
+
+        assertTrue(database.searchSynsets("Foo").size() == 1);
+    }
+
+    @Test
     public void addSynset() throws Exception {
         Database database = createTestDatabase();
         Board board = new Board(database);
 
-        Synset synset = new UserSynset("Foo");
+        Synset synset = new UserSynset("Foo", "123");
         board.addSynset(synset);
         board.save();
 
@@ -44,8 +55,7 @@ public class BoardTest {
         Database database = createTestDatabase();
         Board board = new Board(database);
 
-        Synset synset = new UserSynset("Foo");
-        synset.setId("123");
+        Synset synset = new UserSynset("Foo", "123");
         board.addSynset(synset);
         board.save();
         board.removeSynset("123");
@@ -58,10 +68,8 @@ public class BoardTest {
         Database database = createTestDatabase();
         Board board = new Board(database);
 
-        Synset originSynset = new UserSynset("Foo");
-        originSynset.setId("123");
-        Synset pointedSynset = new UserSynset("Bar");
-        pointedSynset.setId("124");
+        Synset originSynset = new UserSynset("Foo", "123");
+        Synset pointedSynset = new UserSynset("Bar", "124");
 
         Edge edge = new UserEdge(pointedSynset.getId(), originSynset.getId(), holonym, 0);
         board.addSynset(originSynset);
@@ -82,10 +90,8 @@ public class BoardTest {
         Database database = createTestDatabase();
         Board board = new Board(database);
 
-        Synset originSynset = new BabelNetSynset("Foo");
-        originSynset.setId("bn:00024922n");
-        Synset pointedSynset = new BabelNetSynset("Bar");
-        pointedSynset.setId("bn:00024923n");
+        Synset originSynset = new BabelNetSynset("Foo", "bn:00024922n");
+        Synset pointedSynset = new BabelNetSynset("Bar", "bn:00024923n");
 
         Edge edge = new BabelNetEdge(pointedSynset.getId(), originSynset.getId(), holonym, 0);
 
@@ -110,8 +116,7 @@ public class BoardTest {
         Database database = createTestDatabase();
         Board board = new Board(database);
 
-        Synset synset = new BabelNetSynset("Foo");
-        synset.setId("bn:00024922n");
+        Synset synset = new BabelNetSynset("Foo", "bn:00024922n");
         board.addSynset(synset);
         board.save();
 
@@ -136,10 +141,8 @@ public class BoardTest {
         Board board = new Board(database);
 
 
-        Synset originSynset = new BabelNetSynset("Foo");
-        originSynset.setId("bn:00024922n");
-        Synset pointedSynset = new BabelNetSynset("Bar");
-        pointedSynset.setId("bn:00024923n");
+        Synset originSynset = new BabelNetSynset("Foo", "bn:00024922n");
+        Synset pointedSynset = new BabelNetSynset("Bar", "bn:00024923n");
 
         Edge edge = new UserEdge(pointedSynset.getId(), originSynset.getId(), holonym, 1);
 
@@ -165,7 +168,7 @@ public class BoardTest {
         Database database = createTestDatabase();
         Board board = new Board(database);
 
-        UserSynset synset = new UserSynset("Foo", "Bar");
+        UserSynset synset = new UserSynset("Foo", "123", "Bar");
         board.addSynset(synset);
         board.save();
         assertTrue(database.getSynset(synset.getId()).getDescription().equals("Bar"));
@@ -182,10 +185,8 @@ public class BoardTest {
         Database database = createTestDatabase();
         Board board = new Board(database);
 
-        UserSynset originSynset = new UserSynset("Foo");
-        UserSynset pointedSynset = new UserSynset("Bar");
-        board.addSynset(originSynset);
-        board.addSynset(pointedSynset);
+        UserSynset originSynset = board.createSynset("Foo");
+        UserSynset pointedSynset = board.createSynset("Bar");
 
         UserEdge edge = new UserEdge(pointedSynset.getId(), originSynset.getId(), "Description 1", holonym, 0);
         board.addEdge(edge);
@@ -211,9 +212,7 @@ public class BoardTest {
 
     @Test
     public void update() throws Exception {
-        BabelNetSynset originalSynset = new BabelNetSynset("Foo", "Description 1");
-        originalSynset.setId("bn:00024922n");
-
+        BabelNetSynset originalSynset = new BabelNetSynset("Foo", "bn:00024922n", "Description 1");
 
         BabelSense mockBabelSense = Mockito.mock(BabelSense.class);
         when(mockBabelSense.getSenseString()).thenReturn("Bar");
@@ -251,11 +250,8 @@ public class BoardTest {
     public void updateSynsetByAddingEdge() throws Exception {
         String originSynsetId = "bn:00024922n";
         String pointedSynsetId = "bn:00024923n";
-        BabelNetSynset originSynset = new BabelNetSynset("Foo");
-        originSynset.setId(originSynsetId);
-        originSynset.setDownloadedWithEdges(true);
-        BabelNetSynset pointedSynset = new BabelNetSynset("Bar");
-        pointedSynset.setId(pointedSynsetId);
+        BabelNetSynset originSynset = new BabelNetSynset("Foo", originSynsetId, null, true);
+        BabelNetSynset pointedSynset = new BabelNetSynset("Bar", pointedSynsetId);
 
         BabelNetSynset updatedOriginSynset = getMockOriginBabelNetSynset(originSynsetId, pointedSynsetId);
         BabelNetSynset updatedPointedSynset = getMockPointedBabelNetSynset(pointedSynsetId);
@@ -280,11 +276,8 @@ public class BoardTest {
     public void updateSynsetByAddingEdgeWithNewSynset() throws Exception {
         String originSynsetId = "bn:00024922n";
         String pointedSynsetId = "bn:00024923n";
-        BabelNetSynset originSynset = new BabelNetSynset("Foo");
-        originSynset.setId(originSynsetId);
-        originSynset.setDownloadedWithEdges(true);
-        BabelNetSynset pointedSynset = new BabelNetSynset("Bar");
-        pointedSynset.setId(pointedSynsetId);
+        BabelNetSynset originSynset = new BabelNetSynset("Foo", originSynsetId, null, true);
+        BabelNetSynset pointedSynset = new BabelNetSynset("Bar", pointedSynsetId);
 
         BabelNetSynset updatedOriginSynset = getMockOriginBabelNetSynset(originSynsetId, pointedSynsetId);
         BabelNetSynset updatedPointedSynset = getMockPointedBabelNetSynset(pointedSynsetId);
@@ -309,14 +302,11 @@ public class BoardTest {
 
     @Test
     public void updateSynsetByRemovingEdge() throws Exception {
-        BabelNetSynset originSynset = new BabelNetSynset("Foo");
         String originSynsetId = "bn:00024922n";
-        originSynset.setId(originSynsetId);
-        originSynset.setDownloadedWithEdges(true);
+        BabelNetSynset originSynset = new BabelNetSynset("Foo", originSynsetId, true);
 
-        BabelNetSynset pointedSynset = new BabelNetSynset("Bar");
         String pointedSynsetId = "bn:00024923n";
-        pointedSynset.setId(pointedSynsetId);
+        BabelNetSynset pointedSynset = new BabelNetSynset("Bar", pointedSynsetId);
 
         BabelNetEdge edge = new BabelNetEdge(pointedSynset.getId(), originSynset.getId(), holonym, 0.0);
 
@@ -344,13 +334,11 @@ public class BoardTest {
 
     @Test
     public void updateSynsetByAddingEdgeThatWasRemoved() throws Exception {
-        BabelNetSynset originalSynset = new BabelNetSynset("Foo");
         String originSynsetId = "bn:00024922n";
-        originalSynset.setId(originSynsetId);
+        BabelNetSynset originalSynset = new BabelNetSynset("Foo", originSynsetId);
 
-        BabelNetSynset pointedSynset = new BabelNetSynset("Bar");
         String pointedSynsetId = "bn:00024923n";
-        pointedSynset.setId(pointedSynsetId);
+        BabelNetSynset pointedSynset = new BabelNetSynset("Bar", pointedSynsetId);
 
         BabelNetEdge edge = new BabelNetEdge(pointedSynset.getId(), originalSynset.getId(), holonym, 0.0);
 
@@ -382,11 +370,8 @@ public class BoardTest {
     public void updateSynsetWithDuplicateEdges() throws Exception {
         String originSynsetId = "bn:00024922n";
         String pointedSynsetId = "bn:00024923n";
-        BabelNetSynset originSynset = new BabelNetSynset("Foo");
-        originSynset.setId(originSynsetId);
-        originSynset.setDownloadedWithEdges(true);
-        BabelNetSynset pointedSynset = new BabelNetSynset("Bar");
-        pointedSynset.setId(pointedSynsetId);
+        BabelNetSynset originSynset = new BabelNetSynset("Foo", originSynsetId, true);
+        BabelNetSynset pointedSynset = new BabelNetSynset("Bar", pointedSynsetId);
 
         UserEdge userEdge = new UserEdge(pointedSynsetId, originSynsetId, holonym, 1);
 
@@ -415,11 +400,8 @@ public class BoardTest {
     public void cancelEdgeReplacement() throws Exception {
         String originSynsetId = "bn:00024922n";
         String pointedSynsetId = "bn:00024923n";
-        BabelNetSynset originSynset = new BabelNetSynset("Foo");
-        originSynset.setId(originSynsetId);
-        originSynset.setDownloadedWithEdges(true);
-        BabelNetSynset pointedSynset = new BabelNetSynset("Bar");
-        pointedSynset.setId(pointedSynsetId);
+        BabelNetSynset originSynset = new BabelNetSynset("Foo", originSynsetId, true);
+        BabelNetSynset pointedSynset = new BabelNetSynset("Bar", pointedSynsetId);
 
         UserEdge userEdge = new UserEdge(pointedSynsetId, originSynsetId, holonym, 1);
 
@@ -451,11 +433,8 @@ public class BoardTest {
     public void mergeEdgeDescription() throws Exception {
         String originSynsetId = "bn:00024922n";
         String pointedSynsetId = "bn:00024923n";
-        BabelNetSynset originSynset = new BabelNetSynset("Foo");
-        originSynset.setId(originSynsetId);
-        originSynset.setDownloadedWithEdges(true);
-        BabelNetSynset pointedSynset = new BabelNetSynset("Bar");
-        pointedSynset.setId(pointedSynsetId);
+        BabelNetSynset originSynset = new BabelNetSynset("Foo", originSynsetId, true);
+        BabelNetSynset pointedSynset = new BabelNetSynset("Bar", pointedSynsetId);
 
         UserEdge userEdge = new UserEdge(pointedSynsetId, originSynsetId, "Description 1", holonym, 1);
 
@@ -485,14 +464,11 @@ public class BoardTest {
 
     @Test
     public void removeSynsetInAnUpdate() throws Exception {
-        BabelNetSynset originalSynset = new BabelNetSynset("Foo");
         String originSynsetId = "bn:00024922n";
-        originalSynset.setId(originSynsetId);
-        originalSynset.setDownloadedWithEdges(true);
+        BabelNetSynset originalSynset = new BabelNetSynset("Foo", originSynsetId, null, true);
 
-        BabelNetSynset pointedSynset = new BabelNetSynset("Bar");
         String pointedSynsetId = "bn:00024923n";
-        pointedSynset.setId(pointedSynsetId);
+        BabelNetSynset pointedSynset = new BabelNetSynset("Bar", pointedSynsetId);
 
         BabelNetEdge edge = new BabelNetEdge(pointedSynset.getId(), originalSynset.getId(), holonym, 0.0);
 
@@ -524,10 +500,8 @@ public class BoardTest {
         Database database = createTestDatabase();
         Board board = new Board(database);
 
-        Synset originSynset = new UserSynset("Foo");
-        originSynset.setId("123");
-        Synset pointedSynset = new UserSynset("Bar");
-        pointedSynset.setId("124");
+        Synset originSynset = new UserSynset("Foo", "123");
+        Synset pointedSynset = new UserSynset("Bar", "124");
 
         RelationType oldRelationType = new RelationType("RelationX", "User");
         UserEdge edge = new UserEdge(pointedSynset.getId(), originSynset.getId(), oldRelationType, 0);

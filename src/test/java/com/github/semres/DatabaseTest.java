@@ -35,11 +35,8 @@ public class DatabaseTest {
     public void getSynsets() throws Exception {
         Database database = createTestDatabase();
 
-        UserSynset synset1 = new UserSynset("Foo1");
-        synset1.setId("123");
-        synset1 = synset1.changeDescription("Bar");
-        Synset synset2 = new UserSynset("Foo2");
-        synset2.setId("124");
+        UserSynset synset1 = new UserSynset("Foo1", "123", "Bar");
+        Synset synset2 = new UserSynset("Foo2", "124");
 
         database.addSynset(synset1);
         database.addSynset(synset2);
@@ -68,10 +65,8 @@ public class DatabaseTest {
     public void getSynsetsByType() throws Exception {
         Database database = createTestDatabase();
 
-        UserSynset userSynset = new UserSynset("Foo");
-        userSynset.setId("123");
-        BabelNetSynset babelNetSynset = new BabelNetSynset("Bar");
-        babelNetSynset.setId("124");
+        UserSynset userSynset = new UserSynset("Foo", "123");
+        BabelNetSynset babelNetSynset = new BabelNetSynset("Bar", "124");
 
         database.addSynset(userSynset);
         database.addSynset(babelNetSynset);
@@ -88,8 +83,7 @@ public class DatabaseTest {
     public void removeSynset() throws Exception {
         Database database = createTestDatabase();
 
-        UserSynset synset = new UserSynset("Foo");
-        synset.setId("123");
+        UserSynset synset = new UserSynset("Foo", "123");
 
         database.addSynset(synset);
         assertTrue(database.getSynsets().size() == 1);
@@ -101,12 +95,9 @@ public class DatabaseTest {
     public void removeSynsetWithEdges() throws Exception {
         Database database = createTestDatabase();
 
-        UserSynset firstSynset = new UserSynset("Foo");
-        firstSynset.setId("123");
-        UserSynset middleSynset = new UserSynset("Bar");
-        middleSynset.setId("124");
-        UserSynset lastSynset = new UserSynset("Car");
-        lastSynset.setId("125");
+        UserSynset firstSynset = new UserSynset("Foo", "123");
+        UserSynset middleSynset = new UserSynset("Bar", "124");
+        UserSynset lastSynset = new UserSynset("Car", "125");
 
         RelationType relationType = new BabelNetManager().getRelationTypes().get(0);
         Edge firstEdge = new UserEdge(middleSynset.getId(), firstSynset.getId(), relationType, 1);
@@ -128,10 +119,8 @@ public class DatabaseTest {
     public void removeEdge() throws Exception {
         Database database = createTestDatabase();
 
-        UserSynset originSynset = new UserSynset("Foo");
-        originSynset.setId("123");
-        UserSynset pointedSynset = new UserSynset("Bar");
-        pointedSynset.setId("124");
+        UserSynset originSynset = new UserSynset("Foo", "123");
+        UserSynset pointedSynset = new UserSynset("Bar", "124");
         Edge edge = new UserEdge(pointedSynset.getId(), originSynset.getId(), new BabelNetManager().getRelationTypes().get(0), 1);
 
         database.addSynset(originSynset);
@@ -147,8 +136,7 @@ public class DatabaseTest {
     public void editSynset() throws Exception {
         Database database = createTestDatabase();
 
-        UserSynset originalSynset = new UserSynset("Foo");
-        originalSynset.setId("123");
+        UserSynset originalSynset = new UserSynset("Foo", "123");
         originalSynset = originalSynset.changeDescription("aaa");
 
         database.addSynset(originalSynset);
@@ -167,10 +155,8 @@ public class DatabaseTest {
     public void removeBabelNetEdge() throws Exception {
         Database database = createTestDatabase();
 
-        BabelNetSynset originSynset = new BabelNetSynset("Foo");
-        originSynset.setId("bn:00024922n");
-        BabelNetSynset pointedSynset = new BabelNetSynset("Bar");
-        pointedSynset.setId("bn:00024923n");
+        BabelNetSynset originSynset = new BabelNetSynset("Foo", "bn:00024922n");
+        BabelNetSynset pointedSynset = new BabelNetSynset("Bar", "bn:00024923n");
         Edge edge = new BabelNetEdge(pointedSynset.getId(), originSynset.getId(), new BabelNetManager().getRelationTypes().get(0), 1);
 
         database.addSynset(originSynset);
@@ -195,14 +181,9 @@ public class DatabaseTest {
     public void searchSynsets() throws Exception {
         Database database = createTestDatabase();
 
-        UserSynset synset1 = new UserSynset("Foo");
-        synset1.setId("123");
-        synset1 = synset1.changeDescription("Foo1");
-        UserSynset synset2 = new UserSynset("Foo");
-        synset2.setId("124");
-        synset2 = synset2.changeDescription("Foo2");
-        UserSynset synset3 = new UserSynset("Bar");
-        synset3.setId("125");
+        UserSynset synset1 = new UserSynset("Foo", "123", "Foo1");
+        UserSynset synset2 = new UserSynset("Foo", "124", "Foo2");
+        UserSynset synset3 = new UserSynset("Bar", "125");
 
         database.addSynset(synset1);
         database.addSynset(synset2);
@@ -232,10 +213,8 @@ public class DatabaseTest {
     public void getOutgoingEdges() throws Exception {
         Database database = createTestDatabase();
 
-        UserSynset originSynset = new UserSynset("Foo1");
-        originSynset.setId("123");
-        Synset pointedSynset = new UserSynset("Foo2");
-        pointedSynset.setId("124");
+        UserSynset originSynset = new UserSynset("Foo1", "123");
+        Synset pointedSynset = new UserSynset("Foo2", "124");
 
         database.addSynset(originSynset);
         database.addSynset(pointedSynset);
@@ -278,8 +257,7 @@ public class DatabaseTest {
 
         assertFalse(database.hasSynset("123"));
 
-        UserSynset synset = new UserSynset("Foo");
-        synset.setId("123");
+        UserSynset synset = new UserSynset("Foo", "123");
         database.addSynset(synset);
 
         assertTrue(database.hasSynset("123"));
@@ -290,10 +268,8 @@ public class DatabaseTest {
         Database database = createTestDatabase();
         assertFalse(database.hasEdge("123-124"));
 
-        UserSynset originSynset = new UserSynset("Foo");
-        originSynset.setId("123");
-        UserSynset pointedSynset = new UserSynset("Bar");
-        pointedSynset.setId("124");
+        UserSynset originSynset = new UserSynset("Foo", "123");
+        UserSynset pointedSynset = new UserSynset("Bar", "124");
         Edge edge = new UserEdge(pointedSynset.getId(), originSynset.getId(), new BabelNetManager().getRelationTypes().get(0), 1);
         database.addEdge(edge);
 
@@ -344,10 +320,8 @@ public class DatabaseTest {
         RelationType relationType = new RelationType("RelationX", "User");
         database.addRelationType(relationType);
 
-        UserSynset originSynset = new UserSynset("Foo");
-        originSynset.setId("123");
-        UserSynset pointedSynset = new UserSynset("Bar");
-        pointedSynset.setId("124");
+        UserSynset originSynset = new UserSynset("Foo", "123");
+        UserSynset pointedSynset = new UserSynset("Bar", "124");
         Edge edge = new UserEdge(pointedSynset.getId(), originSynset.getId(), relationType, 1);
 
         database.addSynset(originSynset);

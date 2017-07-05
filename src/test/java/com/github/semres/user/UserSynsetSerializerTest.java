@@ -23,8 +23,7 @@ public class UserSynsetSerializerTest {
         SynsetSerializer synsetSerializer = new UserSynsetSerializer(repo, "http://example.org/");
 
         // Testing basic synset
-        UserSynset synset = new UserSynset("Foo");
-        synset.setId("123");
+        UserSynset synset = new UserSynset("Foo", "123");
         Model model = synsetSerializer.synsetToRdf(synset);
 
         assertTrue(model.filter(null, SemRes.ID, factory.createLiteral("123")).size() == 1);
@@ -46,8 +45,7 @@ public class UserSynsetSerializerTest {
         repo.initialize();
         UserSynsetSerializer synsetSerializer = new UserSynsetSerializer(repo, "http://example.org/");
 
-        UserSynset synset = new UserSynset("Car");
-        synset.setId("123");
+        UserSynset synset = new UserSynset("Car", "123");
         synset = synset.changeDescription("Type of vehicle.");
 
         Model model = synsetSerializer.synsetToRdf(synset);
