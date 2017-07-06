@@ -60,8 +60,8 @@ public class UserEdgeSerializerTest {
         edge = edgeSerializer.rdfToEdge("124-123");
 
         assertTrue(edge.getId().equals("124-123"));
-        assertTrue(edge.getOriginSynset().equals("124"));
-        assertTrue(edge.getPointedSynset().equals("123"));
+        assertTrue(edge.getOriginSynsetId().equals("124"));
+        assertTrue(edge.getPointedSynsetId().equals("123"));
         assertTrue(edge.getDescription() == null);
         assertTrue(edge.getRelationType().getType().equals("HOLONYM"));
         assertTrue(edge.getWeight() == 0.5);

@@ -114,7 +114,7 @@ public class SynsetUpdate {
     }
 
     public BabelNetSynset getPointedSynset(Edge edge) {
-        return relatedSynsets.get(edge.getPointedSynset());
+        return relatedSynsets.get(edge.getPointedSynsetId());
     }
 
     public void cancelEdgeRemoval(String id) {

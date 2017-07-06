@@ -37,7 +37,7 @@ public abstract class EdgeSerializer {
 
         model.add(edgeIri, SemRes.RELATION_TYPE_PROPERTY, factory.createIRI(baseIri + "relationTypes/" + edge.getRelationType().getType()));
 
-        model.add(factory.createIRI(baseIri + "synsets/" + edge.getOriginSynset()), edgeIri, factory.createIRI(baseIri + "synsets/" + edge.getPointedSynset()));
+        model.add(factory.createIRI(baseIri + "synsets/" + edge.getOriginSynsetId()), edgeIri, factory.createIRI(baseIri + "synsets/" + edge.getPointedSynsetId()));
         model.add(edgeIri, SemRes.WEIGHT, factory.createLiteral(edge.getWeight()));
 
         if (edge.getLastEditedTime() != null) {

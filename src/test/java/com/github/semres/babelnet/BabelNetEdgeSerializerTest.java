@@ -64,8 +64,8 @@ public class BabelNetEdgeSerializerTest {
         edge = edgeSerializer.rdfToEdge(edge.getId());
 
         assertTrue(edge.getId().equals("124-123"));
-        assertTrue(edge.getOriginSynset().equals("124"));
-        assertTrue(edge.getPointedSynset().equals("123"));
+        assertTrue(edge.getOriginSynsetId().equals("124"));
+        assertTrue(edge.getPointedSynsetId().equals("123"));
         assertTrue(edge.getDescription() == null);
         assertTrue(edge.getRelationType().equals(holonym));
         assertTrue(edge.getWeight() == 0.5);

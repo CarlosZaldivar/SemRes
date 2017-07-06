@@ -225,7 +225,7 @@ public class DatabaseTest {
         Edge edge = new ArrayList<>(database.getOutgoingEdges(loadedSynset)).get(0);
 
         assertTrue(edge.getId().equals("123-124"));
-        assertTrue(edge.getPointedSynset().equals(pointedSynset.getId()));
+        assertTrue(edge.getPointedSynsetId().equals(pointedSynset.getId()));
         assertTrue(edge.getDescription() == null);
     }
 

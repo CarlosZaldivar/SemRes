@@ -349,9 +349,9 @@ public class UpdatesListController extends ChildController implements Initializa
 
         public EdgeData(String from, String to, Edge edge) {
             this.id = edge.getId();
-            this.fromId = edge.getOriginSynset();
+            this.fromId = edge.getOriginSynsetId();
             this.from = new SimpleStringProperty(from);
-            this.toId = edge.getPointedSynset();
+            this.toId = edge.getPointedSynsetId();
             this.to = new SimpleStringProperty(to);
             this.type = new SimpleStringProperty(edge.getRelationType().toString());
             this.weight = new SimpleDoubleProperty(edge.getWeight());

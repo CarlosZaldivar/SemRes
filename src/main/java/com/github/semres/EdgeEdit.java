@@ -25,11 +25,11 @@ public class EdgeEdit {
     }
 
     public String getOriginSynset() {
-        return original.getOriginSynset();
+        return original.getOriginSynsetId();
     }
 
     public String getPointedSynset() {
-        return original.getPointedSynset();
+        return original.getPointedSynsetId();
     }
 
     public String getId() {

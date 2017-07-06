@@ -3,6 +3,8 @@ package com.github.semres.user;
 import com.github.semres.Edge;
 import com.github.semres.RelationType;
 
+import java.time.LocalDateTime;
+
 public class UserEdge extends Edge {
     public UserEdge(String pointedSynset, String originSynset, RelationType relationType, double weight) {
         super(pointedSynset, originSynset, relationType, weight);
@@ -14,6 +16,10 @@ public class UserEdge extends Edge {
 
     public UserEdge(Edge edge) {
         super(edge);
+    }
+
+    public UserEdge(String pointedSynset, String originSynset, String description, RelationType relationType, double weight, LocalDateTime lastEditedTime) {
+        super(pointedSynset, originSynset, description, relationType, weight, lastEditedTime);
     }
 
     public UserEdge changeWeight(double weight) {

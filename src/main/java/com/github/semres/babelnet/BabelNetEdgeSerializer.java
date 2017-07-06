@@ -51,13 +51,14 @@ public class BabelNetEdgeSerializer extends EdgeSerializer {
 
         double weight = Double.parseDouble(result.getValue("weight").stringValue());
 
-        BabelNetEdge edge = new BabelNetEdge(pointedSynset, originSynset, description, relationType, weight);
-
+        LocalDateTime lastEditedTime = null;
         if (result.hasBinding("lastEdited")) {
-            edge.setLastEditedTime(LocalDateTime.parse(result.getValue("lastEdited").stringValue(),
-                    DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSXXX")));
+            lastEditedTime = LocalDateTime.parse(result.getValue("lastEdited").stringValue(),
+                    DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSXXX"));
         }
-        return edge;
+
+
+        return new BabelNetEdge(pointedSynset, originSynset, description, relationType, weight, lastEditedTime);
     }
 
     @Override

@@ -81,8 +81,8 @@ public class Board {
                 continue;
             }
 
-            if (!synsets.containsKey(edge.getPointedSynset())) {
-                Synset pointedSynset = attachedDatabase.getSynset(edge.getPointedSynset());
+            if (!synsets.containsKey(edge.getPointedSynsetId())) {
+                Synset pointedSynset = attachedDatabase.getSynset(edge.getPointedSynsetId());
                 synsets.put(pointedSynset.getId(), pointedSynset);
             }
 
@@ -113,7 +113,7 @@ public class Board {
 
         for (Edge edge : edges) {
             synsetEdit.addEdge(edge);
-            String pointedSynsetId = edge.getPointedSynset();
+            String pointedSynsetId = edge.getPointedSynsetId();
 
             // If pointed synset is not already on board or in the database download it from BabelNet.
             if (!synsets.containsKey(pointedSynsetId)) {
@@ -128,7 +128,7 @@ public class Board {
     }
 
     private boolean isEdgeRemoved(Edge edge) {
-        String originSynsetId = edge.getOriginSynset();
+        String originSynsetId = edge.getOriginSynsetId();
         if (!synsetEdits.containsKey(originSynsetId)) {
             return false;
         }
@@ -163,8 +163,8 @@ public class Board {
             throw new IDAlreadyTakenException();
         }
 
-        String originSynsetId = newEdge.getOriginSynset();
-        String pointedSynsetId = newEdge.getPointedSynset();
+        String originSynsetId = newEdge.getOriginSynsetId();
+        String pointedSynsetId = newEdge.getPointedSynsetId();
 
         if (synsets.get(originSynsetId) == null) {
             throw new RuntimeException("Trying to add edge without corresponding origin synset on the board.");
@@ -218,7 +218,7 @@ public class Board {
 
     public void editEdge(UserEdge oldEdge, UserEdge editedEdge) {
         SynsetEdit synsetEdit;
-        String originSynsetId = oldEdge.getOriginSynset();
+        String originSynsetId = oldEdge.getOriginSynsetId();
         if (!synsetEdits.containsKey(originSynsetId)) {
             synsetEdit = new SynsetEdit(synsets.get(originSynsetId), synsets.get(originSynsetId));
             synsetEdits.put(originSynsetId, synsetEdit);
@@ -339,14 +339,14 @@ public class Board {
         Map<String, BabelNetSynset> relatedSynsets = new HashMap<>();
 
         for (Edge edge : originalSynset.getOutgoingEdges().values().stream().filter((e) -> e instanceof BabelNetEdge).collect(Collectors.toList())) {
-            relatedSynsets.put(edge.getPointedSynset(), (BabelNetSynset) loadSynset(edge.getPointedSynset()));
+            relatedSynsets.put(edge.getPointedSynsetId(), (BabelNetSynset) loadSynset(edge.getPointedSynsetId()));
         }
 
         for (Edge edge : updatedSynset.getOutgoingEdges().values()) {
-            if (isIdAlreadyTaken(edge.getPointedSynset())) {
-                relatedSynsets.put(edge.getPointedSynset(), (BabelNetSynset) loadSynset(edge.getPointedSynset()));
+            if (isIdAlreadyTaken(edge.getPointedSynsetId())) {
+                relatedSynsets.put(edge.getPointedSynsetId(), (BabelNetSynset) loadSynset(edge.getPointedSynsetId()));
             } else {
-                relatedSynsets.put(edge.getPointedSynset(), babelNetManager.getSynset(edge.getPointedSynset()));
+                relatedSynsets.put(edge.getPointedSynsetId(), babelNetManager.getSynset(edge.getPointedSynsetId()));
             }
         }
 
@@ -375,7 +375,7 @@ public class Board {
             }
 
             for (Edge edge : update.getAddedEdges().values()) {
-                if (!isIdAlreadyTaken(edge.getPointedSynset())) {
+                if (!isIdAlreadyTaken(edge.getPointedSynsetId())) {
                     Synset pointedSynset = update.getPointedSynset(edge);
                     attachedDatabase.addSynset(pointedSynset);
                     synsets.put(pointedSynset.getId(), pointedSynset);

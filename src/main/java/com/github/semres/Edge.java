@@ -41,16 +41,17 @@ public abstract class Edge {
         this.weight = edge.weight;
     }
 
+    public Edge(String pointedSynset, String originSynset, String description, RelationType relationType, double weight, LocalDateTime lastEditedTime) {
+        this(pointedSynset, originSynset, description, relationType, weight);
+        this.lastEditedTime = lastEditedTime;
+    }
+
     public LocalDateTime getLastEditedTime() {
         return lastEditedTime;
     }
 
-    public void setLastEditedTime(LocalDateTime lastEditedTime) {
+    protected void setLastEditedTime(LocalDateTime lastEditedTime) {
         this.lastEditedTime = lastEditedTime;
-    }
-
-    public String getPointedSynset() {
-        return pointedSynset;
     }
 
     public double getWeight() {
@@ -61,8 +62,12 @@ public abstract class Edge {
         return description;
     }
 
-    public String getOriginSynset() {
+    public String getOriginSynsetId() {
         return originSynset;
+    }
+
+    public String getPointedSynsetId() {
+        return pointedSynset;
     }
 
     public RelationType getRelationType() {
