@@ -1,7 +1,5 @@
 package com.github.semres.gui;
 
-import javafx.beans.binding.Bindings;
-import javafx.beans.binding.BooleanBinding;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
@@ -34,7 +32,6 @@ public class AddingSynsetController extends ChildController implements Initializ
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        BooleanBinding representationValid = Bindings.createBooleanBinding(() -> representationTF.getText().length() > 0, representationTF.textProperty());
-        addButton.disableProperty().bind(representationValid.not());
+        addButton.disableProperty().bind(representationTF.textProperty().isEmpty());
     }
 }

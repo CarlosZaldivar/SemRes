@@ -4,8 +4,6 @@ import com.github.semres.Synset;
 import com.github.semres.babelnet.BabelNetSynset;
 import com.github.semres.user.UserSynset;
 import javafx.application.Platform;
-import javafx.beans.binding.Bindings;
-import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.fxml.FXML;
@@ -43,8 +41,7 @@ public class SynsetDetailsController extends ChildController implements Initiali
         representationTF.editableProperty().bind(editing);
         descriptionTA.editableProperty().bind(editing);
 
-        BooleanBinding representationValid = Bindings.createBooleanBinding(() -> representationTF.getText().length() > 0, representationTF.textProperty());
-        okButton.disableProperty().bind(representationValid.not());
+        okButton.disableProperty().bind(representationTF.textProperty().isEmpty());
 
         Platform.runLater(() -> idTF.getParent().requestFocus());
     }
