@@ -11,8 +11,8 @@ public class CommonIRI {
 
     static {
         SimpleValueFactory factory = SimpleValueFactory.getInstance();
-        BABELNET_SYNSET = factory.createIRI(SemRes.baseIri + "BabelNet/BabelNetSynset");
-        BABELNET_EDGE = factory.createIRI(SemRes.baseIri + "BabelNet/BabelNetEdge");
-        EDGES_DOWNLOADED = factory.createIRI(SemRes.baseIri + "BabelNet/EdgesDownloaded");
+        BABELNET_SYNSET = factory.createIRI(SemRes.baseIri + "BabelNet/classes/BabelNetSynset");
+        BABELNET_EDGE = factory.createIRI(SemRes.baseIri + "BabelNet/classes/BabelNetEdge");
+        EDGES_DOWNLOADED = factory.createIRI(SemRes.baseIri + "BabelNet/properties/EdgesDownloaded");
     }
 }

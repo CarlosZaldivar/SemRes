@@ -10,7 +10,7 @@ public class CommonIRI {
 
     static {
         SimpleValueFactory factory = SimpleValueFactory.getInstance();
-        USER_SYNSET = factory.createIRI(SemRes.baseIri + "User/UserSynset");
-        USER_EDGE = factory.createIRI(SemRes.baseIri + "User/UserEdge");
+        USER_SYNSET = factory.createIRI(SemRes.baseIri + "User/classes/UserSynset");
+        USER_EDGE = factory.createIRI(SemRes.baseIri + "User/classes/UserEdge");
     }
 }
