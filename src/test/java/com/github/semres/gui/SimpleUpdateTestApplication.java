@@ -21,10 +21,10 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 public class SimpleUpdateTestApplication extends Main {
-    String originSynsetId = "bn:00024922n";
-    String pointedRemovedSynsetId = "bn:00024923n";
-    String pointedEditedSynsetId = "bn:00024924n";
-    String pointedAddedSynsetId = "bn:00024925n";
+    private String originSynsetId = "bn:00024922n";
+    private String pointedRemovedSynsetId = "bn:00024923n";
+    private String pointedEditedSynsetId = "bn:00024924n";
+    private String pointedAddedSynsetId = "bn:00024925n";
 
     @Override
     public void start(Stage primaryStage) throws IOException {
@@ -67,13 +67,9 @@ public class SimpleUpdateTestApplication extends Main {
     private Database createTestDatabase() throws NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
         Database database = com.github.semres.Utils.createTestDatabase();
 
-        BabelNetSynset originSynset = new BabelNetSynset("Origin");
-        originSynset.setId(originSynsetId);
-        originSynset.setDownloadedWithEdges(true);
-        BabelNetSynset pointedRemoved = new BabelNetSynset("Pointed removed");
-        pointedRemoved.setId(pointedRemovedSynsetId);
-        BabelNetSynset pointedEdited  = new BabelNetSynset("Pointed before edit");
-        pointedEdited.setId(pointedEditedSynsetId);
+        BabelNetSynset originSynset = new BabelNetSynset("Origin", originSynsetId, true);
+        BabelNetSynset pointedRemoved = new BabelNetSynset("Pointed removed", pointedRemovedSynsetId);
+        BabelNetSynset pointedEdited  = new BabelNetSynset("Pointed before edit", pointedEditedSynsetId);
 
         RelationType relationType = new BabelNetManager().getRelationTypes().get(0);
         BabelNetEdge edgeToRemove = new BabelNetEdge(pointedRemoved.getId(), originSynset.getId(), relationType, 1.0);
