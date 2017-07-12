@@ -44,7 +44,7 @@ public class BabelNetSynsetSerializerTest {
 
         model = synsetSerializer.synsetToRdf(synsetWithRemovedEdge);
 
-        assertTrue(model.filter(null, SemRes.REMOVED_RELATION,
+        assertTrue(model.filter(null, CommonIRI.REMOVED_RELATION,
                 factory.createIRI(baseIri + "synsets/" + synset.getId() + "/removedRelations/" + "124")).size() == 1);
     }
 

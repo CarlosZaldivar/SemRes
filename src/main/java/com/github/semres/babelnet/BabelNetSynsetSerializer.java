@@ -60,7 +60,7 @@ public class BabelNetSynsetSerializer extends SynsetSerializer {
         for (String removedRelation : ((BabelNetSynset) synset).getRemovedRelations()) {
             IRI removedRelationIRI = factory.createIRI(baseIri + "synsets/" + synset.getId() + "/removedRelations/" + removedRelation);
             model.add(factory.createStatement(removedRelationIRI, SemRes.ID, factory.createLiteral(removedRelation)));
-            model.add(factory.createStatement(synsetIri, SemRes.REMOVED_RELATION, removedRelationIRI));
+            model.add(factory.createStatement(synsetIri, CommonIRI.REMOVED_RELATION, removedRelationIRI));
         }
 
         // Add information if BabelNet edges has been downloaded.
@@ -117,7 +117,7 @@ public class BabelNetSynsetSerializer extends SynsetSerializer {
 
             // Get removed relations
             queryString = String.format("SELECT ?removedRelationId WHERE { <%s> <%s> ?removedRelation . ?removedRelation <%s> ?removedRelationId }",
-                    synsetIri.stringValue(), SemRes.REMOVED_RELATION, SemRes.ID);
+                    synsetIri.stringValue(), CommonIRI.REMOVED_RELATION, SemRes.ID);
             tupleQuery = conn.prepareTupleQuery(QueryLanguage.SPARQL, queryString);
 
             Set<String> removedRelations = new HashSet<>();

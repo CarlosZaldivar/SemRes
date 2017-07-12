@@ -19,7 +19,6 @@ public class SemRes {
     // Properties
     public static final IRI ID;
     public static final IRI RELATION_TYPE_PROPERTY;
-    public static final IRI REMOVED_RELATION;
     public static final IRI WEIGHT;
     public static final IRI SOURCE;
     public static final IRI LAST_EDITED;
@@ -30,7 +29,6 @@ public class SemRes {
         EDGE = factory.createIRI(baseIri + "classes/Edge");
         RELATION_TYPE_CLASS = factory.createIRI(baseIri + "classes/RelationType");
         ID = factory.createIRI(baseIri + "properties/Id");
-        REMOVED_RELATION = factory.createIRI(baseIri + "properties/RemovedRelation");
         RELATION_TYPE_PROPERTY = factory.createIRI(SemRes.baseIri + "properties/RelationType");
         WEIGHT = factory.createIRI(baseIri + "properties/Weight");
         SOURCE = factory.createIRI(baseIri + "properties/Source");
