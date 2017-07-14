@@ -184,7 +184,7 @@ function addSynset(synset, pointedSynsets, edges) {
 }
 
 function addSynsetToCytoscape(synset) {
-    if (cy.elements('#' + escapeColon(synset.id)).length === 1) {
+    if (elementExists(synset)) {
         return;
     }
     cy.add({
@@ -193,6 +193,10 @@ function addSynsetToCytoscape(synset) {
             selector: 'node'
         }]
     });
+}
+
+function elementExists(element) {
+    return cy.elements('#' + escapeColon(element.id)).length === 1;
 }
 
 function addEdge(edge) {
@@ -293,6 +297,9 @@ function expandSynset(synsetId, pointedSynsets, edges) {
     originSynset.expanded = true;
 
     pointedSynsets.forEach(function (synset) {
+        if (!elementExists(synset) && synset.expanded === true) {
+            synset.expanded = false;
+        }
         addSynsetToCytoscape(synset);
     });
     edges.forEach(function (edge) {
