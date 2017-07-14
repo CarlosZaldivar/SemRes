@@ -455,7 +455,7 @@ public class BoardTest {
 
         List<SynsetUpdate> updates = board.checkForUpdates();
         SynsetUpdate update = updates.stream().filter(s -> s.getOriginalSynset().getId().equals(originSynsetId)).findFirst().get();
-        update.mergeDescriptions(userEdge.getId());
+        update.mergeEdgeDescriptions(userEdge.getId());
         board.update(updates);
 
         assertTrue(board.getSynset(originSynsetId).getOutgoingEdges().size() == 1);

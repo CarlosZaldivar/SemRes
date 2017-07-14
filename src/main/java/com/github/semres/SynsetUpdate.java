@@ -129,7 +129,7 @@ public class SynsetUpdate {
         addedEdges.remove(id);
     }
 
-    public void cancelRelationTypeChange(String edgeId) {
+    public void cancelEdgeRelationTypeChange(String edgeId) {
         EdgeEdit edgeEdit = edgesToMerge.get(edgeId);
         Edge editedEdge = new UserEdge(edgeEdit.getPointedSynset(), edgeEdit.getOriginSynset(),
                 edgeEdit.getEdited().getDescription(), edgeEdit.getOriginal().getRelationType(), edgeEdit.getEdited().getWeight());
@@ -143,7 +143,7 @@ public class SynsetUpdate {
         updatedSynset.setOutgoingEdges(edges);
     }
 
-    public void cancelWeightChange(String edgeId) {
+    public void cancelEdgeWeightChange(String edgeId) {
         EdgeEdit edgeEdit = edgesToMerge.get(edgeId);
         Edge editedEdge = new UserEdge(edgeEdit.getPointedSynset(), edgeEdit.getOriginSynset(),
                 edgeEdit.getEdited().getDescription(), edgeEdit.getEdited().getRelationType(), edgeEdit.getOriginal().getWeight());
@@ -151,7 +151,7 @@ public class SynsetUpdate {
         replaceEdgeInUpdatedSynset(editedEdge);
     }
 
-    public void cancelDescriptionChange(String edgeId) {
+    public void cancelEdgeDescriptionChange(String edgeId) {
         EdgeEdit edgeEdit = edgesToMerge.get(edgeId);
         Edge editedEdge = new UserEdge(edgeEdit.getPointedSynset(), edgeEdit.getOriginSynset(),
                 edgeEdit.getOriginal().getDescription(), edgeEdit.getEdited().getRelationType(), edgeEdit.getEdited().getWeight());
@@ -159,7 +159,7 @@ public class SynsetUpdate {
         replaceEdgeInUpdatedSynset(editedEdge);
     }
 
-    public void mergeDescriptions(String edgeId) {
+    public void mergeEdgeDescriptions(String edgeId) {
         EdgeEdit edgeEdit = edgesToMerge.get(edgeId);
         String mergedDescription = String.format("%s%n---%n%s", edgeEdit.getEdited().getDescription(), edgeEdit.getOriginal().getDescription());
         Edge editedEdge = new UserEdge(edgeEdit.getPointedSynset(), edgeEdit.getOriginSynset(), mergedDescription,

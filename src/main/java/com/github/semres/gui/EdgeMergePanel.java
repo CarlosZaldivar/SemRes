@@ -94,7 +94,7 @@ public class EdgeMergePanel extends TitledPane {
     }
 
     public void cancelRelationReplace() {
-        synsetUpdate.cancelRelationTypeChange(edgeEdit.getOriginal().getId());
+        synsetUpdate.cancelEdgeRelationTypeChange(edgeEdit.getOriginal().getId());
         removeRelationTypeRow();
         if (noMoreChanges()) {
             removeItself();
@@ -109,12 +109,12 @@ public class EdgeMergePanel extends TitledPane {
     }
 
     public void mergeDescription() {
-        synsetUpdate.mergeDescriptions(edgeEdit.getOriginal().getId());
+        synsetUpdate.mergeEdgeDescriptions(edgeEdit.getOriginal().getId());
         descriptionButtonBar.getButtons().remove(mergeDescriptionButton);
     }
 
     public void cancelDescriptionReplace() {
-        synsetUpdate.cancelDescriptionChange(edgeEdit.getOriginal().getId());
+        synsetUpdate.cancelEdgeDescriptionChange(edgeEdit.getOriginal().getId());
         removeDescriptionRow();
         if (noMoreChanges()) {
             removeItself();
@@ -129,7 +129,7 @@ public class EdgeMergePanel extends TitledPane {
     }
 
     public void cancelWeightReplace() {
-        synsetUpdate.cancelWeightChange(edgeEdit.getOriginal().getId());
+        synsetUpdate.cancelEdgeWeightChange(edgeEdit.getOriginal().getId());
         removeWeightRow();
         if (noMoreChanges()) {
             removeItself();
