@@ -20,7 +20,7 @@ public class UserSynsetSerializerTest {
         Repository repo = new SailRepository(new MemoryStore());
         repo.initialize();
         ValueFactory factory = repo.getValueFactory();
-        SynsetSerializer synsetSerializer = new UserSynsetSerializer(repo, "http://example.org/");
+        SynsetSerializer synsetSerializer = new UserSynsetSerializer("http://example.org/");
 
         // Testing basic synset
         UserSynset synset = new UserSynset("Foo", "123");
@@ -43,7 +43,7 @@ public class UserSynsetSerializerTest {
     public void rdfToSynset() throws Exception {
         Repository repo = new SailRepository(new MemoryStore());
         repo.initialize();
-        UserSynsetSerializer synsetSerializer = new UserSynsetSerializer(repo, "http://example.org/");
+        UserSynsetSerializer synsetSerializer = new UserSynsetSerializer("http://example.org/");
 
         UserSynset synset = new UserSynset("Car", "123");
         synset = synset.changeDescription("Type of vehicle.");
@@ -54,7 +54,7 @@ public class UserSynsetSerializerTest {
             connection.add(model);
         }
 
-        synset = synsetSerializer.rdfToSynset("123");
+        synset = synsetSerializer.rdfToSynset("123", repo);
         assertTrue(synset.getId().equals("123"));
         assertTrue(synset.getRepresentation().equals("Car"));
         assertTrue(synset.getDescription().equals("Type of vehicle."));

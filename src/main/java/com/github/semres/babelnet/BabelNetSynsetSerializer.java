@@ -7,6 +7,7 @@ import it.uniroma1.lcl.babelnet.BabelSynsetID;
 import it.uniroma1.lcl.babelnet.InvalidBabelSynsetIDException;
 import org.eclipse.rdf4j.model.*;
 import org.eclipse.rdf4j.model.impl.LinkedHashModel;
+import org.eclipse.rdf4j.model.impl.SimpleValueFactory;
 import org.eclipse.rdf4j.model.vocabulary.RDF;
 import org.eclipse.rdf4j.model.vocabulary.RDFS;
 import org.eclipse.rdf4j.query.BindingSet;
@@ -25,8 +26,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class BabelNetSynsetSerializer extends SynsetSerializer {
-    public BabelNetSynsetSerializer(Repository repository, String baseIri) {
-        super(repository, baseIri);
+    public BabelNetSynsetSerializer(String baseIri) {
+        super(baseIri);
     }
 
     @Override
@@ -36,7 +37,7 @@ public class BabelNetSynsetSerializer extends SynsetSerializer {
         }
 
         Model model = new LinkedHashModel();
-        ValueFactory factory = repository.getValueFactory();
+        ValueFactory factory = SimpleValueFactory.getInstance();
 
         IRI synsetIri = factory.createIRI(baseIri + "synsets/" + synset.getId());
 
@@ -70,13 +71,13 @@ public class BabelNetSynsetSerializer extends SynsetSerializer {
     }
 
     @Override
-    public BabelNetSynset rdfToSynset(String synsetId) {
-        ValueFactory factory = repository.getValueFactory();
-        return rdfToSynset(factory.createIRI(baseIri + "synsets/" + synsetId));
+    public BabelNetSynset rdfToSynset(String synsetId, Repository repository) {
+        ValueFactory factory = SimpleValueFactory.getInstance();
+        return rdfToSynset(factory.createIRI(baseIri + "synsets/" + synsetId), repository);
     }
 
     @Override
-    public BabelNetSynset rdfToSynset(IRI synsetIri) {
+    public BabelNetSynset rdfToSynset(IRI synsetIri, Repository repository) {
         BabelNetSynset synset;
         boolean edgesLoaded;
 

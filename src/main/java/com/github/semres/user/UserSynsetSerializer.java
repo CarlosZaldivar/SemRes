@@ -5,6 +5,7 @@ import com.github.semres.Synset;
 import com.github.semres.SynsetSerializer;
 import org.eclipse.rdf4j.model.*;
 import org.eclipse.rdf4j.model.impl.LinkedHashModel;
+import org.eclipse.rdf4j.model.impl.SimpleValueFactory;
 import org.eclipse.rdf4j.model.vocabulary.RDF;
 import org.eclipse.rdf4j.model.vocabulary.RDFS;
 import org.eclipse.rdf4j.query.*;
@@ -18,8 +19,8 @@ import java.util.Date;
 
 public class UserSynsetSerializer extends SynsetSerializer {
 
-    public UserSynsetSerializer(Repository repository, String baseIri) {
-        super(repository, baseIri);
+    public UserSynsetSerializer(String baseIri) {
+        super(baseIri);
     }
 
     @Override
@@ -29,7 +30,7 @@ public class UserSynsetSerializer extends SynsetSerializer {
         }
 
         Model model = new LinkedHashModel();
-        ValueFactory factory = repository.getValueFactory();
+        ValueFactory factory = SimpleValueFactory.getInstance();
 
         model.add(getSynsetClassIri(), RDF.TYPE, RDFS.CLASS);
         model.add(getSynsetClassIri(), RDFS.SUBCLASSOF, SemRes.SYNSET);
@@ -57,7 +58,7 @@ public class UserSynsetSerializer extends SynsetSerializer {
     }
 
     @Override
-    public UserSynset rdfToSynset(IRI synsetIri) {
+    public UserSynset rdfToSynset(IRI synsetIri, Repository repository) {
         UserSynset synset = null;
         String id;
         String representation;
@@ -96,9 +97,9 @@ public class UserSynsetSerializer extends SynsetSerializer {
     }
 
     @Override
-    public UserSynset rdfToSynset(String synsetId) {
-        ValueFactory factory = repository.getValueFactory();
-        return rdfToSynset(factory.createIRI(baseIri + "synsets/" + synsetId));
+    public UserSynset rdfToSynset(String synsetId, Repository repository) {
+        ValueFactory factory = SimpleValueFactory.getInstance();
+        return rdfToSynset(factory.createIRI(baseIri + "synsets/" + synsetId), repository);
     }
 
     @Override

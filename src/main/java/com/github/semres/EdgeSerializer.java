@@ -5,6 +5,7 @@ import org.eclipse.rdf4j.model.Literal;
 import org.eclipse.rdf4j.model.Model;
 import org.eclipse.rdf4j.model.ValueFactory;
 import org.eclipse.rdf4j.model.impl.LinkedHashModel;
+import org.eclipse.rdf4j.model.impl.SimpleValueFactory;
 import org.eclipse.rdf4j.model.vocabulary.RDF;
 import org.eclipse.rdf4j.model.vocabulary.RDFS;
 import org.eclipse.rdf4j.repository.Repository;
@@ -13,17 +14,15 @@ import java.time.ZoneId;
 import java.util.Date;
 
 public abstract class EdgeSerializer {
-    protected final Repository repository;
     protected final String baseIri;
 
-    protected EdgeSerializer(Repository repository, String baseIri) {
-        this.repository = repository;
+    public EdgeSerializer(String baseIri) {
         this.baseIri = baseIri;
     }
 
     public Model edgeToRdf(Edge edge) {
         Model model = new LinkedHashModel();
-        ValueFactory factory = repository.getValueFactory();
+        ValueFactory factory = SimpleValueFactory.getInstance();
 
         IRI edgeIri = factory.createIRI(baseIri + "outgoingEdges/" + edge.getId());
 
@@ -47,8 +46,8 @@ public abstract class EdgeSerializer {
         return model;
     }
 
-    abstract public Edge rdfToEdge(String edgeId);
-    abstract public Edge rdfToEdge(IRI edge);
+    abstract public Edge rdfToEdge(String edgeId, Repository repository);
+    abstract public Edge rdfToEdge(IRI edge, Repository repository);
     abstract public String getEdgeClass();
     abstract public IRI getEdgeClassIri();
 }

@@ -20,7 +20,7 @@ public class BabelNetSynsetSerializerTest {
         Repository repo = new SailRepository(new MemoryStore());
         repo.initialize();
         ValueFactory factory = repo.getValueFactory();
-        BabelNetSynsetSerializer synsetSerializer = new BabelNetSynsetSerializer(repo, baseIri);
+        BabelNetSynsetSerializer synsetSerializer = new BabelNetSynsetSerializer(baseIri);
 
         // Testing basic synset
         BabelNetSynset synset = new BabelNetSynset("Car", "123");
@@ -52,7 +52,7 @@ public class BabelNetSynsetSerializerTest {
     public void rdfToSynset() throws Exception {
         Repository repo = new SailRepository(new MemoryStore());
         repo.initialize();
-        BabelNetSynsetSerializer synsetSerializer = new BabelNetSynsetSerializer(repo, baseIri);
+        BabelNetSynsetSerializer synsetSerializer = new BabelNetSynsetSerializer(baseIri);
 
         BabelNetSynset synset = new BabelNetSynset("Car", "123", "Type of vehicle.");
 
@@ -62,7 +62,7 @@ public class BabelNetSynsetSerializerTest {
             connection.add(model);
         }
 
-        synset = synsetSerializer.rdfToSynset("123");
+        synset = synsetSerializer.rdfToSynset("123", repo);
         assertTrue(synset.getId().equals("123"));
         assertTrue(synset.getRepresentation().equals("Car"));
         assertTrue(synset.getDescription().equals("Type of vehicle."));

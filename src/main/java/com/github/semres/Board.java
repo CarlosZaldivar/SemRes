@@ -326,15 +326,18 @@ public class Board {
             return new SynsetUpdate(originalSynset, null, null);
         }
 
+        SynsetUpdate synsetUpdate;
         if (!originalSynset.isDownloadedWithEdges()) {
-            SynsetUpdate synsetUpdate = new SynsetUpdate(originalSynset, updatedSynset, new HashMap<>());
-            return synsetUpdate.isSynsetUpdated() ? synsetUpdate : null;
+            synsetUpdate = new SynsetUpdate(originalSynset, updatedSynset, new HashMap<>());
+        } else {
+            updatedSynset = updatedSynset.loadEdgesFromBabelNet();
+            synsetUpdate = new SynsetUpdate(originalSynset, updatedSynset, getRelatedSynsets(originalSynset, updatedSynset));
         }
+        return synsetUpdate.isSynsetUpdated() ? synsetUpdate : null;
+    }
 
-        updatedSynset = updatedSynset.loadEdgesFromBabelNet();
-
-        Map<String, BabelNetSynset> relatedSynsets = new HashMap<>();
-
+    private HashMap<String, BabelNetSynset> getRelatedSynsets(BabelNetSynset originalSynset, BabelNetSynset updatedSynset) throws IOException {
+        HashMap<String, BabelNetSynset> relatedSynsets = new HashMap<>();
         for (Edge edge : originalSynset.getOutgoingEdges().values().stream().filter((e) -> e instanceof BabelNetEdge).collect(Collectors.toList())) {
             relatedSynsets.put(edge.getPointedSynsetId(), (BabelNetSynset) loadSynset(edge.getPointedSynsetId()));
         }
@@ -346,9 +349,7 @@ public class Board {
                 relatedSynsets.put(edge.getPointedSynsetId(), babelNetManager.getSynset(edge.getPointedSynsetId()));
             }
         }
-
-        SynsetUpdate synsetUpdate = new SynsetUpdate(originalSynset, updatedSynset, relatedSynsets);
-        return synsetUpdate.isSynsetUpdated() ? synsetUpdate : null;
+        return relatedSynsets;
     }
 
     public void update(List<SynsetUpdate> updates) {

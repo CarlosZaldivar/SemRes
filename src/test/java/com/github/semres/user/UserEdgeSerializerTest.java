@@ -18,7 +18,7 @@ public class UserEdgeSerializerTest {
         String baseIri = "http://example.org/";
         Repository repo = createTestRepository(baseIri);
         ValueFactory factory = repo.getValueFactory();
-        EdgeSerializer edgeSerializer = new UserEdgeSerializer(repo, baseIri);
+        EdgeSerializer edgeSerializer = new UserEdgeSerializer(baseIri);
 
         Synset pointedSynset = new UserSynset("Foo1", "123");
         Synset originSynset = new UserSynset("Foo2", "124");
@@ -41,8 +41,8 @@ public class UserEdgeSerializerTest {
     public void rdfToEdge() throws Exception {
         String baseIri = "http://example.org/";
         Repository repo = createTestRepository(baseIri);
-        UserEdgeSerializer edgeSerializer = new UserEdgeSerializer(repo, baseIri);
-        UserSynsetSerializer synsetSerializer = new UserSynsetSerializer(repo, baseIri);
+        UserEdgeSerializer edgeSerializer = new UserEdgeSerializer(baseIri);
+        UserSynsetSerializer synsetSerializer = new UserSynsetSerializer(baseIri);
 
         UserSynset pointedSynset = new UserSynset("Foo1", "123");
         UserSynset originSynset = new UserSynset("Foo2", "124");
@@ -57,7 +57,7 @@ public class UserEdgeSerializerTest {
             connection.add(model);
         }
 
-        edge = edgeSerializer.rdfToEdge("124-123");
+        edge = edgeSerializer.rdfToEdge(edge.getId(), repo);
 
         assertTrue(edge.getId().equals("124-123"));
         assertTrue(edge.getOriginSynsetId().equals("124"));

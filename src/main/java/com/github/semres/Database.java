@@ -32,14 +32,14 @@ public class Database {
         this.baseIri = baseIri;
         List<SynsetSerializer> synsetSerializers = new ArrayList<>();
         for (Class<? extends SynsetSerializer> serializerClass: synsetSerializerClasses) {
-            SynsetSerializer loadedSynsetSerializer = serializerClass.getConstructor(Repository.class, String.class).newInstance(repository, baseIri);
+            SynsetSerializer loadedSynsetSerializer = serializerClass.getConstructor(String.class).newInstance(baseIri);
             synsetSerializers.add(loadedSynsetSerializer);
         }
         this.synsetSerializers = synsetSerializers;
 
         List<EdgeSerializer> edgeSerializers = new ArrayList<>();
         for (Class<? extends EdgeSerializer> serializerClass: edgeSerializerClasses) {
-            EdgeSerializer loadedEdgeSerializer = serializerClass.getConstructor(Repository.class, String.class).newInstance(repository, baseIri);
+            EdgeSerializer loadedEdgeSerializer = serializerClass.getConstructor(String.class).newInstance(baseIri);
             edgeSerializers.add(loadedEdgeSerializer);
         }
         this.edgeSerializers = edgeSerializers;
@@ -152,11 +152,11 @@ public class Database {
     }
 
     private Synset getSynset(IRI synsetIri, String type) {
-        return getSerializerForSynset(type).rdfToSynset(synsetIri);
+        return getSerializerForSynset(type).rdfToSynset(synsetIri, repository);
     }
 
     private Edge getEdge(IRI edgeIri, String type) {
-        return getSerializerForEdge(type).rdfToEdge(edgeIri);
+        return getSerializerForEdge(type).rdfToEdge(edgeIri, repository);
     }
 
     List<Synset> getSynsets() {

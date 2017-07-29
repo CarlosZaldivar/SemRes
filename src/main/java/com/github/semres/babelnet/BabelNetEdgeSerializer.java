@@ -4,6 +4,7 @@ import com.github.semres.EdgeSerializer;
 import com.github.semres.RelationType;
 import com.github.semres.SemRes;
 import org.eclipse.rdf4j.model.*;
+import org.eclipse.rdf4j.model.impl.SimpleValueFactory;
 import org.eclipse.rdf4j.model.vocabulary.RDFS;
 import org.eclipse.rdf4j.query.*;
 import org.eclipse.rdf4j.repository.Repository;
@@ -14,12 +15,12 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 public class BabelNetEdgeSerializer extends EdgeSerializer {
-    public BabelNetEdgeSerializer(Repository repository, String baseIri) {
-        super(repository, baseIri);
+    public BabelNetEdgeSerializer(String baseIri) {
+        super(baseIri);
     }
 
     @Override
-    public BabelNetEdge rdfToEdge(IRI edgeIri) {
+    public BabelNetEdge rdfToEdge(IRI edgeIri, Repository repository) {
         String queryString = String.format("SELECT ?originSynsetId ?pointedSynsetId ?weight ?relationTypeName ?relationTypeSource ?description ?lastEdited " +
                 "WHERE { ?originSynset <%1$s> ?pointedSynset . <%1$s> <%2$s> ?weight . " +
                 "?originSynset <%3$s> ?originSynsetId . ?pointedSynset <%3$s> ?pointedSynsetId . " +
@@ -62,9 +63,9 @@ public class BabelNetEdgeSerializer extends EdgeSerializer {
     }
 
     @Override
-    public BabelNetEdge rdfToEdge(String edgeId) {
-        ValueFactory factory = repository.getValueFactory();
-        return rdfToEdge(factory.createIRI(baseIri + "outgoingEdges/" + edgeId));
+    public BabelNetEdge rdfToEdge(String edgeId, Repository repository) {
+        ValueFactory factory = SimpleValueFactory.getInstance();
+        return rdfToEdge(factory.createIRI(baseIri + "outgoingEdges/" + edgeId), repository);
     }
 
     @Override

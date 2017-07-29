@@ -20,7 +20,7 @@ public class BabelNetEdgeSerializerTest {
         Repository repo = createTestRepository(baseIri);
         repo.initialize();
         ValueFactory factory = repo.getValueFactory();
-        EdgeSerializer edgeSerializer = new BabelNetEdgeSerializer(repo, baseIri);
+        EdgeSerializer edgeSerializer = new BabelNetEdgeSerializer(baseIri);
 
         Synset pointedSynset = new UserSynset("Foo1", "123");
         Synset originSynset = new UserSynset("Foo2", "124");
@@ -44,8 +44,8 @@ public class BabelNetEdgeSerializerTest {
     public void rdfToEdge() throws Exception {
         String baseIri = "http://example.org/";
         Repository repo = createTestRepository(baseIri);
-        BabelNetEdgeSerializer edgeSerializer = new BabelNetEdgeSerializer(repo, baseIri);
-        UserSynsetSerializer synsetSerializer = new UserSynsetSerializer(repo, baseIri);
+        BabelNetEdgeSerializer edgeSerializer = new BabelNetEdgeSerializer(baseIri);
+        UserSynsetSerializer synsetSerializer = new UserSynsetSerializer(baseIri);
 
         UserSynset pointedSynset = new UserSynset("Foo1", "123");
         UserSynset originSynset = new UserSynset("Foo2", "124");
@@ -61,7 +61,7 @@ public class BabelNetEdgeSerializerTest {
             connection.add(model);
         }
 
-        edge = edgeSerializer.rdfToEdge(edge.getId());
+        edge = edgeSerializer.rdfToEdge(edge.getId(), repo);
 
         assertTrue(edge.getId().equals("124-123"));
         assertTrue(edge.getOriginSynsetId().equals("124"));
