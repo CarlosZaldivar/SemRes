@@ -9,7 +9,10 @@ import org.eclipse.rdf4j.model.vocabulary.RDFS;
 import org.eclipse.rdf4j.query.*;
 import org.eclipse.rdf4j.repository.Repository;
 import org.eclipse.rdf4j.repository.RepositoryConnection;
+import org.eclipse.rdf4j.rio.RDFFormat;
+import org.eclipse.rdf4j.rio.Rio;
 
+import java.io.StringWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.math.BigInteger;
 import java.time.LocalDateTime;
@@ -206,13 +209,6 @@ public class Database {
         return synsets;
     }
 
-    Model getAllStatements() {
-        try (RepositoryConnection conn = repository.getConnection()) {
-            GraphQueryResult graphResult = conn.prepareGraphQuery("CONSTRUCT { ?s ?p ?o } WHERE {?s ?p ?o }").evaluate();
-            return QueryResults.asModel(graphResult);
-        }
-    }
-
     List<Edge> getOutgoingEdges(Synset originSynset) {
         ValueFactory factory = repository.getValueFactory();
         String queryString = String.format("SELECT ?edgeType ?edge" +
@@ -356,7 +352,7 @@ public class Database {
      * Generate unique synset id.
      * @return Unique synset id.
      */
-    public String generateNewSynsetId() {
+    String generateNewSynsetId() {
         Random random = new Random();
         String id;
         while (true) {
@@ -366,5 +362,19 @@ public class Database {
             }
         }
         return id;
+    }
+
+    String export(RDFFormat format) {
+        Model model = getAllStatements();
+        StringWriter buffer = new StringWriter();
+        Rio.write(model, buffer, format);
+        return buffer.toString();
+    }
+
+    Model getAllStatements() {
+        try (RepositoryConnection conn = repository.getConnection()) {
+            GraphQueryResult graphResult = conn.prepareGraphQuery("CONSTRUCT { ?s ?p ?o } WHERE {?s ?p ?o }").evaluate();
+            return QueryResults.asModel(graphResult);
+        }
     }
 }

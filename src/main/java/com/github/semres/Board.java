@@ -7,12 +7,9 @@ import com.github.semres.babelnet.CommonIRI;
 import com.github.semres.gui.IDAlreadyTakenException;
 import com.github.semres.user.UserEdge;
 import com.github.semres.user.UserSynset;
-import org.eclipse.rdf4j.model.Model;
 import org.eclipse.rdf4j.rio.RDFFormat;
-import org.eclipse.rdf4j.rio.Rio;
 
 import java.io.IOException;
-import java.io.StringWriter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -399,10 +396,7 @@ public class Board {
     }
 
     public String export(RDFFormat format) {
-        Model model = attachedDatabase.getAllStatements();
-        StringWriter buffer = new StringWriter();
-        Rio.write(model, buffer, format);
-        return buffer.toString();
+        return attachedDatabase.export(format);
     }
 
     public boolean isIdAlreadyTaken(String id) {
