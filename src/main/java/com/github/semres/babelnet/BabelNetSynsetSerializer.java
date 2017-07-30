@@ -41,10 +41,11 @@ public class BabelNetSynsetSerializer extends SynsetSerializer {
 
         IRI synsetIri = factory.createIRI(baseIri + "synsets/" + synset.getId());
 
-        if (synset.getRepresentation() != null) {
-            Literal representation = factory.createLiteral(synset.getRepresentation());
-            model.add(factory.createStatement(synsetIri, RDFS.LABEL, representation));
-        }
+        model.add(synsetIri, RDF.TYPE, getSynsetClassIri());
+        Literal id = factory.createLiteral(synset.getId());
+        model.add(synsetIri, SemRes.ID, id);
+        Literal representation = factory.createLiteral(synset.getRepresentation());
+        model.add(factory.createStatement(synsetIri, RDFS.LABEL, representation));
 
         if (synset.getDescription() != null) {
             Literal description = factory.createLiteral(synset.getDescription());
@@ -55,9 +56,6 @@ public class BabelNetSynsetSerializer extends SynsetSerializer {
             model.add(synsetIri, SemRes.LAST_EDITED, factory.createLiteral(Date.from(synset.getLastEditedTime().atZone(ZoneId.systemDefault()).toInstant())));
         }
 
-        model.add(synsetIri, RDF.TYPE, getSynsetClassIri());
-        model.add(synsetIri, SemRes.ID, factory.createLiteral(synset.getId()));
-
         for (String removedRelation : ((BabelNetSynset) synset).getRemovedRelations()) {
             IRI removedRelationIRI = factory.createIRI(baseIri + "synsets/" + synset.getId() + "/removedRelations/" + removedRelation);
             model.add(factory.createStatement(removedRelationIRI, SemRes.ID, factory.createLiteral(removedRelation)));
@@ -66,7 +64,6 @@ public class BabelNetSynsetSerializer extends SynsetSerializer {
 
         // Add information if BabelNet edges has been downloaded.
         model.add(synsetIri, CommonIRI.EDGES_DOWNLOADED, factory.createLiteral(((BabelNetSynset) synset).isDownloadedWithEdges()));
-
         return model;
     }
 
