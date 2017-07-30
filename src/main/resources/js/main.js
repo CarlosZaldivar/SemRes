@@ -60,67 +60,67 @@ var menus = cy.contextMenus({
     menuItems: [
         {
             id: 'removeSynset',
-            title: 'Remove',
+            content: 'Remove',
             selector: 'node',
             onClickFunction: removeSynset
         },
         {
             id: 'removeEdge',
-            title: 'Remove',
+            content: 'Remove',
             selector: 'edge',
             onClickFunction: removeEdge
         },
         {
             id: 'add-node',
-            title: 'Add node',
+            content: 'Add node',
             coreAsWell: true,
             onClickFunction: startSynsetAddition
         },
         {
             id: 'add-edge',
-            title: 'Add edge',
+            content: 'Add edge',
             selector: 'node[?expanded]',
             onClickFunction: startEdgeAddition
         },
         {
             id: 'sendExpandRequest',
-            title: 'Expand',
+            content: 'Expand',
             selector: 'node[!expanded]',
             onClickFunction: sendExpandRequest
         },
         {
             id: 'collapse',
-            title: 'Collapse',
+            content: 'Collapse',
             selector: 'node[?expanded]',
-            onClickFunction: function (event) { collapse(event.cyTarget, []); }
+            onClickFunction: function (event) { collapse(event.target, []); }
         },
         {
             id: 'loadEdgesFromBabelNet',
-            title: 'Load edges from BabelNet',
+            content: 'Load edges from BabelNet',
             selector: 'node[!downloadedWithEdges][class="com.github.semres.babelnet.BabelNetSynset"]',
             onClickFunction: downloadEdgesFromBabelNet
         },
         {
             id: 'checkForUpdates',
-            title: 'Check for updates',
+            content: 'Check for updates',
             selector: 'node[class="com.github.semres.babelnet.BabelNetSynset"]',
             onClickFunction: checkForUpdates
         },
         {
             id: 'synsetDetails',
-            title: 'Details',
+            content: 'Details',
             selector: 'node',
             onClickFunction: openSynsetDetailsWindow
         },
         {
             id: 'edgeDetails',
-            title: 'Details',
+            content: 'Details',
             selector: 'edge',
             onClickFunction: openEdgeDetailsWindow
         },
         {
             id: 'select-all-nodes',
-            title: 'Select all nodes',
+            content: 'Select all nodes',
             coreAsWell: true,
             onClickFunction: function() {
                 cy.elements().unselect();
@@ -129,7 +129,7 @@ var menus = cy.contextMenus({
         },
         {
             id: 'fit',
-            title: 'Fit',
+            content: 'Fit',
             coreAsWell: true,
             onClickFunction: function () {
                 cy.fit();
@@ -145,7 +145,7 @@ cy.edgehandles({
 cy.edgehandles('disable');
 
 function startEdgeAddition(event) {
-    cy.edgehandles('start', escapeColon(event.cyTarget.id()));
+    cy.edgehandles('start', escapeColon(event.target.id()));
 }
 
 function startSynsetAddition() {
@@ -165,11 +165,11 @@ function setEdgeDetails(sourceNode, targetNode, addedEntities) {
 }
 
 function openSynsetDetailsWindow(event) {
-    javaApp.openSynsetDetailsWindow(event.cyTarget.data().id);
+    javaApp.openSynsetDetailsWindow(event.target.data().id);
 }
 
 function openEdgeDetailsWindow(event) {
-    javaApp.openEdgeDetailsWindow(event.cyTarget.data().id);
+    javaApp.openEdgeDetailsWindow(event.target.data().id);
 }
 
 function addSynset(synset, pointedSynsets, edges) {
@@ -180,7 +180,7 @@ function addSynset(synset, pointedSynsets, edges) {
     edges.forEach(function (edge) {
         addEdgeToCytoscape(edge);
     });
-    cy.layout({name: 'cola', fit: false});
+    cy.layout({name: 'cola', fit: false}).run();
 }
 
 function addSynsetToCytoscape(synset) {
@@ -221,18 +221,18 @@ function addEdgeToCytoscape(edge) {
 }
 
 function sendExpandRequest(event) {
-    var synset = event.cyTarget.data();
+    var synset = event.target.data();
     if (synset.expanded === false) {
         javaApp.loadEdges(synset.id);
         synset.expanded = true;
     }
 }
 
-function collapse(cyTarget, synsetsToCollapse) {
-    var synset = cyTarget.data();
+function collapse(target, synsetsToCollapse) {
+    var synset = target.data();
     if (synset.expanded === true) {
-        cyTarget.connectedEdges().forEach(function (edge) {
-            if (edge.source().data().id === cyTarget.data().id) {
+        target.connectedEdges().forEach(function (edge) {
+            if (edge.source().data().id === target.data().id) {
                 var target = edge.target();
 
                 if (synsetsToCollapse.indexOf(target.data().id) > -1) {
@@ -267,21 +267,21 @@ function collapse(cyTarget, synsetsToCollapse) {
 }
 
 function downloadEdgesFromBabelNet(event) {
-    javaApp.downloadEdgesFromBabelNet(event.cyTarget.id());
+    javaApp.downloadEdgesFromBabelNet(event.target.id());
 }
 
 function checkForUpdates(event) {
-    javaApp.checkForUpdates(event.cyTarget.id());
+    javaApp.checkForUpdates(event.target.id());
 }
 
 function removeSynset(event) {
-    javaApp.removeSynset(event.cyTarget.id());
-    cy.remove(event.cyTarget);
+    javaApp.removeSynset(event.target.id());
+    cy.remove(event.target);
 }
 
 function removeEdge(event) {
-    javaApp.removeEdge(event.cyTarget.id());
-    cy.remove(event.cyTarget);
+    javaApp.removeEdge(event.target.id());
+    cy.remove(event.target);
 }
 
 function clear() {
@@ -305,7 +305,7 @@ function expandSynset(synsetId, pointedSynsets, edges) {
     edges.forEach(function (edge) {
         addEdgeToCytoscape(edge);
     });
-    cy.layout({name: 'cola', fit: false});
+    cy.layout({name: 'cola', fit: false}).run();
 }
 
 function addBabelNetEdges(synsetId, pointedSynsets, edges) {
@@ -319,7 +319,7 @@ function addBabelNetEdges(synsetId, pointedSynsets, edges) {
     edges.forEach(function (edge) {
         addEdgeToCytoscape(edge);
     });
-    cy.layout({name: 'cola', fit: false});
+    cy.layout({name: 'cola', fit: false}).run();
 }
 
 function updateSynset(editedSynset) {

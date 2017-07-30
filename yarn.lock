@@ -16,16 +16,16 @@ cytoscape-context-menus@^3.0.2:
   version "3.0.2"
   resolved "https://registry.yarnpkg.com/cytoscape-context-menus/-/cytoscape-context-menus-3.0.2.tgz#2ad58ce807444923f11c0f73791f912f6bf0c0d9"
 
-cytoscape-edgehandles@^2.13.1:
-  version "2.13.1"
-  resolved "https://registry.yarnpkg.com/cytoscape-edgehandles/-/cytoscape-edgehandles-2.13.1.tgz#77913b4860b1e52fa7ca3d3c4a0246ac623b5dfa"
+cytoscape-edgehandles@^2.13.2:
+  version "2.13.2"
+  resolved "https://registry.yarnpkg.com/cytoscape-edgehandles/-/cytoscape-edgehandles-2.13.2.tgz#0d159e22c395ff80e965de9a722c8f4d2ff97813"
   dependencies:
     lodash.debounce "^4.0.8"
     lodash.throttle "^4.1.1"
 
-cytoscape@^3.1.3:
-  version "3.1.3"
-  resolved "https://registry.yarnpkg.com/cytoscape/-/cytoscape-3.1.3.tgz#95e43812ceee05ab281ca85a93cde44992bf037d"
+cytoscape@^3.1.4:
+  version "3.1.4"
+  resolved "https://registry.yarnpkg.com/cytoscape/-/cytoscape-3.1.4.tgz#f9bc078f7892bc66fc489cfae0f269693ed63665"
 
 fullscreen@^1.1.0:
   version "1.1.0"
