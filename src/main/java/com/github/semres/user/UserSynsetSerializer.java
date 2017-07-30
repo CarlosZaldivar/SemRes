@@ -32,9 +32,6 @@ public class UserSynsetSerializer extends SynsetSerializer {
         Model model = new LinkedHashModel();
         ValueFactory factory = SimpleValueFactory.getInstance();
 
-        model.add(getSynsetClassIri(), RDF.TYPE, RDFS.CLASS);
-        model.add(getSynsetClassIri(), RDFS.SUBCLASSOF, SemRes.SYNSET);
-
         IRI synsetIri = factory.createIRI(baseIri + "synsets/" + synset.getId());
 
         if (synset.getRepresentation() != null) {
