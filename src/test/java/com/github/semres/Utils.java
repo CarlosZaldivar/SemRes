@@ -33,7 +33,7 @@ public class Utils {
         edgeSerializers.add(UserEdgeSerializer.class);
         edgeSerializers.add(BabelNetEdgeSerializer.class);
 
-        return new Database(baseIri, synsetSerializers, edgeSerializers, repo);
+        return new Database(synsetSerializers, edgeSerializers, repo);
     }
 
     public static Repository createTestRepository(String baseIri) {
@@ -45,13 +45,16 @@ public class Utils {
             conn.add(new UserManager().getMetadataStatements());
             Model model = new LinkedHashModel();
 
+            ValueFactory factory = SimpleValueFactory.getInstance();
             for (RelationType relationType : new BabelNetManager().getRelationTypes()) {
-                ValueFactory factory = SimpleValueFactory.getInstance();
                 IRI relationTypeIri = factory.createIRI(baseIri + "relationTypes/" + relationType.getType());
                 model.add(relationTypeIri, RDF.TYPE, SemRes.RELATION_TYPE_CLASS);
                 model.add(relationTypeIri, RDFS.LABEL, factory.createLiteral(relationType.getType()));
                 model.add(relationTypeIri, SemRes.SOURCE, factory.createLiteral(relationType.getSource()));
             }
+
+            // Add base IRI
+            model.add(factory.createIRI(baseIri), RDF.TYPE, SemRes.BASE_IRI);
 
             conn.add(model);
         }

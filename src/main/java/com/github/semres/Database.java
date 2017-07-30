@@ -27,9 +27,13 @@ public class Database {
     private final Repository repository;
     private final String baseIri;
 
-    Database(String baseIri, List<Class<? extends SynsetSerializer>> synsetSerializerClasses, List<Class<? extends EdgeSerializer>> edgeSerializerClasses,
+    Database(List<Class<? extends SynsetSerializer>> synsetSerializerClasses, List<Class<? extends EdgeSerializer>> edgeSerializerClasses,
              Repository repository) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
-        this.baseIri = baseIri;
+        this.repository = repository;
+        this.repository.initialize();
+
+        this.baseIri = getBaseIri();
+
         List<SynsetSerializer> synsetSerializers = new ArrayList<>();
         for (Class<? extends SynsetSerializer> serializerClass: synsetSerializerClasses) {
             SynsetSerializer loadedSynsetSerializer = serializerClass.getConstructor(String.class).newInstance(baseIri);
@@ -43,9 +47,22 @@ public class Database {
             edgeSerializers.add(loadedEdgeSerializer);
         }
         this.edgeSerializers = edgeSerializers;
+    }
 
-        this.repository = repository;
-        this.repository.initialize();
+    private String getBaseIri() {
+        try (RepositoryConnection conn = repository.getConnection()) {
+            String queryString = String.format("SELECT ?baseIri WHERE { ?baseIri <%s> <%s> }", RDF.TYPE, SemRes.BASE_IRI);
+
+            TupleQuery tupleQuery = conn.prepareTupleQuery(QueryLanguage.SPARQL, queryString);
+            try (TupleQueryResult result = tupleQuery.evaluate()) {
+                if (result.hasNext()) {
+                    BindingSet bindingSet = result.next();
+                    return bindingSet.getValue("baseIri").stringValue();
+                } else {
+                    throw new RuntimeException("No base IRI in repository.");
+                }
+            }
+        }
     }
 
     public void addSynset(Synset synset) {

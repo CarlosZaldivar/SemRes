@@ -16,6 +16,9 @@ public class SemRes {
     public static final IRI EDGE;
     public static final IRI RELATION_TYPE_CLASS;
 
+    // Database base IRI
+    public static final IRI BASE_IRI;
+
     // Properties
     public static final IRI ID;
     public static final IRI RELATION_TYPE_PROPERTY;
@@ -25,6 +28,8 @@ public class SemRes {
 
     static {
         SimpleValueFactory factory = SimpleValueFactory.getInstance();
+        BASE_IRI = factory.createIRI(baseIri + "classes/BaseIri");
+
         SYNSET = factory.createIRI(baseIri + "classes/Synset");
         EDGE = factory.createIRI(baseIri + "classes/Edge");
         RELATION_TYPE_CLASS = factory.createIRI(baseIri + "classes/RelationType");

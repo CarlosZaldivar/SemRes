@@ -42,8 +42,8 @@ public class DatabasesController extends ChildController {
         databasesStage.show();
     }
 
-    void addDatabase(String name) {
-        mainController.getDatabasesManager().addRepository(name);
+    void addDatabase(String name, String baseIri) {
+        mainController.getDatabasesManager().addRepository(name, baseIri);
         observableList.add(name);
     }
 

@@ -25,7 +25,6 @@ public class DatabasesManager {
     private final List<Class<? extends SynsetSerializer>> synsetSerializerClasses = new ArrayList<>();
     private final List<Class<? extends EdgeSerializer>> edgeSerializerClasses = new ArrayList<>();
     private final Collection<RelationType> relationTypes;
-    private final String baseIri = "http://example.org/";
     private final Model metadataStatements;
     private final LocalRepositoryManager repositoryManager;
 
@@ -52,11 +51,11 @@ public class DatabasesManager {
 
     public Board getBoard(String repositoryId) throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
         Repository repository = repositoryManager.getRepository(repositoryId);
-        Database database = new Database(baseIri, synsetSerializerClasses, edgeSerializerClasses, repository);
+        Database database = new Database(synsetSerializerClasses, edgeSerializerClasses, repository);
         return new Board(database);
     }
 
-    public void addRepository(String repositoryId) {
+    public void addRepository(String repositoryId, String baseIri) {
         if (repositoryId == null) {
             throw new IllegalArgumentException();
         }
@@ -67,7 +66,7 @@ public class DatabasesManager {
 
         repositoryManager.addRepositoryConfig(new RepositoryConfig(repositoryId, new SailRepositoryConfig(new MemoryStoreConfig(true))));
         // Add some initial statements to new repository.
-        initializeRepository(repositoryManager.getRepository(repositoryId));
+        initializeRepository(repositoryManager.getRepository(repositoryId), baseIri);
     }
 
     public void deleteRepository(String repositoryId) {
@@ -86,19 +85,23 @@ public class DatabasesManager {
         repositoryManager.shutDown();
     }
 
-    private void initializeRepository(Repository repository) {
+    private void initializeRepository(Repository repository, String baseIri) {
         try (RepositoryConnection conn = repository.getConnection()) {
             conn.add(metadataStatements);
 
             // Add relation types
             Model model = new LinkedHashModel();
+            ValueFactory factory = SimpleValueFactory.getInstance();
             for (RelationType relationType : relationTypes) {
-                ValueFactory factory = SimpleValueFactory.getInstance();
                 IRI relationTypeIri = factory.createIRI(baseIri + "relationTypes/" + relationType.getType());
                 model.add(relationTypeIri, RDF.TYPE, SemRes.RELATION_TYPE_CLASS);
                 model.add(relationTypeIri, RDFS.LABEL, factory.createLiteral(relationType.getType()));
                 model.add(relationTypeIri, SemRes.SOURCE, factory.createLiteral(relationType.getSource()));
             }
+
+            // Add base IRI
+            model.add(factory.createIRI(baseIri), RDF.TYPE, SemRes.BASE_IRI);
+
             conn.add(model);
         }
     }

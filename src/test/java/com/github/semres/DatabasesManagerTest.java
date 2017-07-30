@@ -17,7 +17,7 @@ public class DatabasesManagerTest {
             DatabasesManager databasesManager = new DatabasesManager(settings);
             assertTrue(databasesManager.getRepositoryIDs().size() == 1);
 
-            databasesManager.addRepository("new-repo");
+            databasesManager.addRepository("new-repo", "http://example.org");
             assertTrue(databasesManager.getRepositoryIDs().size() == 2);
         } finally {
             FileUtils.deleteDirectory(new File("/tmp/semres-tests"));
