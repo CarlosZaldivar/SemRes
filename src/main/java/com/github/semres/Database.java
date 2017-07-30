@@ -276,8 +276,8 @@ public class Database {
         }
     }
 
-    Collection<RelationType> getRelationTypes() {
-        Collection<RelationType> relationTypes = new ArrayList<>();
+    List<RelationType> getRelationTypes() {
+        List<RelationType> relationTypes = new ArrayList<>();
         try (RepositoryConnection conn = repository.getConnection()) {
             String queryString = String.format("SELECT ?relationTypeName ?relationTypeSource" +
                     " WHERE { ?relationType <%s> <%s> . ?relationType <%s> ?relationTypeName . ?relationType <%s> ?relationTypeSource }",
