@@ -232,31 +232,31 @@ function collapse(target, synsetsToCollapse) {
     var synset = target.data();
     if (synset.expanded === true) {
         target.connectedEdges().forEach(function (edge) {
-            if (edge.source().data().id === target.data().id) {
-                var target = edge.target();
+            if (edge.source().data().id === synset.id) {
+                var edgeTarget = edge.target();
 
-                if (synsetsToCollapse.indexOf(target.data().id) > -1) {
+                if (synsetsToCollapse.indexOf(edgeTarget.data().id) > -1) {
                     return;
                 }
 
-                var targetConnectedEdges = target.connectedEdges();
+                var targetConnectedEdges = edgeTarget.connectedEdges();
                 var shouldBeRemoved = true;
 
                 for (var i = 0; i < targetConnectedEdges.length; ++i) {
                     var edgeSource = targetConnectedEdges[i].source();
-                    if (edgeSource.data().id !== target.data().id && edgeSource.data().id !== synset.id) {
+                    if (edgeSource.data().id !== edgeTarget.data().id && edgeSource.data().id !== synset.id) {
                         shouldBeRemoved = false;
                         break;
                     }
                 }
 
                 if (shouldBeRemoved) {
-                    if (target.data().expanded === true) {
+                    if (edgeTarget.data().expanded === true) {
                         var newSynsetsToCollapse = synsetsToCollapse.slice();
                         newSynsetsToCollapse.push(synset.id);
-                        collapse(target, newSynsetsToCollapse);
+                        collapse(edgeTarget, newSynsetsToCollapse);
                     }
-                    cy.remove(target);
+                    cy.remove(edgeTarget);
                 } else {
                     cy.remove(edge);
                 }
