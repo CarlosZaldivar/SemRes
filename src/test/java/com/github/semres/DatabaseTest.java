@@ -41,7 +41,7 @@ public class DatabaseTest {
         database.addSynset(synset1);
         database.addSynset(synset2);
 
-        List<Synset> synsets = database.getSynsets();
+        List<Synset> synsets = database.searchSynsets("");
 
         assertTrue(synsets.size() == 2);
 
@@ -86,9 +86,9 @@ public class DatabaseTest {
         UserSynset synset = new UserSynset("Foo", "123");
 
         database.addSynset(synset);
-        assertTrue(database.getSynsets().size() == 1);
+        assertTrue(database.searchSynsets("").size() == 1);
         database.removeSynset(synset);
-        assertTrue(database.getSynsets().size() == 0);
+        assertTrue(database.searchSynsets("").size() == 0);
     }
 
     @Test

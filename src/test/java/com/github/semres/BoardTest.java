@@ -277,7 +277,6 @@ public class BoardTest {
         String originSynsetId = "bn:00024922n";
         String pointedSynsetId = "bn:00024923n";
         BabelNetSynset originSynset = new BabelNetSynset("Foo", originSynsetId, null, true);
-        BabelNetSynset pointedSynset = new BabelNetSynset("Bar", pointedSynsetId);
 
         BabelNetSynset updatedOriginSynset = getMockOriginBabelNetSynset(originSynsetId, pointedSynsetId);
         BabelNetSynset updatedPointedSynset = getMockPointedBabelNetSynset(pointedSynsetId);
@@ -291,13 +290,13 @@ public class BoardTest {
 
         board.addSynset(originSynset);
         board.save();
-        assertTrue(database.getSynsets().size() == 1);
+        assertTrue(database.searchSynsets("").size() == 1);
 
         board.update(board.checkForUpdates());
 
         assertTrue(board.getSynset(originSynsetId).getOutgoingEdges().size() == 1);
         board.save();
-        assertTrue(database.getSynsets().size() == 2);
+        assertTrue(database.searchSynsets("").size() == 2);
     }
 
     @Test

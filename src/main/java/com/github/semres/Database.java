@@ -176,11 +176,6 @@ public class Database {
         return getSerializerForEdge(type).rdfToEdge(edgeIri, repository);
     }
 
-    List<Synset> getSynsets() {
-        String queryString = String.format("SELECT ?type ?synset WHERE { ?synset <%s> ?type . ?type <%s> <%s> }", RDF.TYPE, RDFS.SUBCLASSOF, SemRes.SYNSET);
-        return getSynsets(queryString);
-    }
-
     List<Synset> getSynsets(IRI typeIri) {
         String queryString = String.format("SELECT ?synset WHERE { ?synset <%s> <%s> }", RDF.TYPE, typeIri.stringValue());
         List<Synset> synsets = new ArrayList<>();
