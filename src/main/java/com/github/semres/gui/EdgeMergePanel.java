@@ -74,15 +74,14 @@ public class EdgeMergePanel extends TitledPane {
         if (!original.equals(edited)) {
             originalDescriptionLabel.setText(original);
             finalDescriptionLabel.setText(edited);
+
+            if (original.equals("No description")) {
+                mergeDescriptionButton.setVisible(false);
+                mergeDescriptionButton.setManaged(false);
+            }
         } else {
             removeDescriptionRow();
         }
-
-//        this.prefWidthProperty().bind(Bindings.createDoubleBinding(
-//                () -> cancelButton.getScene().getWindow().getWidth() / 2,
-//                cancelButton.sceneProperty().wi));
-
-
     }
 
     public EdgeEdit getEdgeEdit() {
