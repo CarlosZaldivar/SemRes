@@ -112,7 +112,7 @@ public class SearchBabelNetController extends ChildController implements Initial
 
             if (mainController.synsetExists(clickedSynset.getId())) {
                 BabelNetSynset loaded = (BabelNetSynset) mainController.loadSynset(clickedSynset.getId());
-                if (!loaded.isExpanded()) {
+                if (!loaded.hasDatabaseEdgesLoaded()) {
                     mainController.loadEdges(clickedSynset.getId());
                 }
                 if (!loaded.isDownloadedWithEdges()) {

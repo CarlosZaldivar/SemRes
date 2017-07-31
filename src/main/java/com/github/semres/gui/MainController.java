@@ -182,11 +182,6 @@ public class MainController extends Controller implements Initializable {
         addSynsetToView(synset);
     }
 
-    void addSynset(BabelNetSynset synset) {
-        addSynsetToBoard(synset);
-        addSynsetToView(synset);
-    }
-
     void addSynsetToBoard(BabelNetSynset synset) {
         board.addSynset(synset);
     }
@@ -229,8 +224,8 @@ public class MainController extends Controller implements Initializable {
         return board.loadSynset(id);
     }
 
-    Collection<Edge> loadEdges(String synsetId) {
-        return board.loadEdges(synsetId);
+    void loadEdges(String synsetId) {
+        board.loadEdges(synsetId);
     }
 
     Collection<Edge> downloadBabelNetEdges(String synsetId) throws IOException {
@@ -521,10 +516,11 @@ public class MainController extends Controller implements Initializable {
         public void loadEdges(String synsetId) {
             Synset synset = board.getSynset(synsetId);
             Collection<Edge> edges;
-            if (synset.isExpanded()) {
+            if (synset.hasDatabaseEdgesLoaded()) {
                 edges = synset.getOutgoingEdges().values();
             } else {
-                edges = MainController.this.loadEdges(synsetId);
+                MainController.this.loadEdges(synsetId);
+                edges = board.getSynset(synsetId).getOutgoingEdges().values();
             }
             List<Synset> pointedSynsets = new ArrayList<>();
             for (Edge edge : edges) {

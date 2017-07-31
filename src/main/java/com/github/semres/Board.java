@@ -61,32 +61,24 @@ public class Board {
         }
     }
 
-    public List<Edge> loadEdges(String synsetId) {
+    public void loadEdges(String synsetId) {
         Synset synset = synsets.get(synsetId);
 
         if (synset == null) {
             throw new RuntimeException("No synset with specified ID");
         }
-        if (synset.isExpanded()) {
+        if (synset.hasDatabaseEdgesLoaded()) {
             throw new RuntimeException("Edges already loaded");
         }
 
-        List<Edge> edges = attachedDatabase.getOutgoingEdges(synset);
-        List<Edge> filteredEdges = new ArrayList<>();
-        for (Edge edge : edges) {
-            if (isEdgeRemoved(edge)) {
-                continue;
-            }
+        attachedDatabase.loadEdges(synset);
 
+        for (Edge edge : synset.getOutgoingEdges().values()) {
             if (!synsets.containsKey(edge.getPointedSynsetId())) {
                 Synset pointedSynset = attachedDatabase.getSynset(edge.getPointedSynsetId());
                 synsets.put(pointedSynset.getId(), pointedSynset);
             }
-
-            filteredEdges.add(edge);
         }
-        synset.setOutgoingEdges(filteredEdges);
-        return filteredEdges;
     }
 
     public List<Edge> downloadBabelNetEdges(String synsetId) throws IOException {
@@ -122,17 +114,6 @@ public class Board {
             }
         }
         return edges;
-    }
-
-    private boolean isEdgeRemoved(Edge edge) {
-        String originSynsetId = edge.getOriginSynsetId();
-        if (!synsetEdits.containsKey(originSynsetId)) {
-            return false;
-        }
-        if (!synsetEdits.get(originSynsetId).getRemovedEdges().containsKey(edge.getId())) {
-            return false;
-        }
-        return true;
     }
 
     public UserSynset createSynset(String representation) {
@@ -173,11 +154,6 @@ public class Board {
 
         Synset originalSynset = synsets.get(originSynsetId);
         Synset editedSynset = originalSynset.addOutgoingEdge(newEdge);
-
-        // Return if no edition was made.
-        if (editedSynset == null) {
-            return;
-        }
 
         synsets.put(originSynsetId, editedSynset);
 
@@ -224,10 +200,10 @@ public class Board {
         }
 
         synsetEdit.editEdge(oldEdge, editedEdge);
-        Synset synset  =synsets.get(originSynsetId);
-        Map<String, Edge> outgoingEdges = synset.getOutgoingEdges();
-        outgoingEdges.put(oldEdge.getId(), editedEdge);
-        synset.setOutgoingEdges(outgoingEdges);
+
+        Synset synset = synsets.get(originSynsetId);
+        synset = synset.changeOutgoingEdge(editedEdge);
+        synsets.put(originSynsetId, synset);
     }
 
     public void removeSynset(String id) {
@@ -318,7 +294,10 @@ public class Board {
     }
 
     private SynsetUpdate parseUpdates(BabelNetSynset originalSynset) throws IOException {
-        originalSynset.setOutgoingEdges(attachedDatabase.getOutgoingEdges(originalSynset));
+        if (!originalSynset.hasDatabaseEdgesLoaded()) {
+            attachedDatabase.loadEdges(originalSynset);
+        }
+
         BabelNetSynset updatedSynset = babelNetManager.getSynset(originalSynset.getId());
 
         // If synset is not found in BabelNet, remove it.

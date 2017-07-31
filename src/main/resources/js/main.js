@@ -79,14 +79,14 @@ var menus = cy.contextMenus({
         {
             id: 'add-edge',
             content: 'Add edge',
-            selector: 'node[?expanded]',
+            selector: 'node',
             onClickFunction: startEdgeAddition
         },
         {
-            id: 'sendExpandRequest',
-            content: 'Expand',
-            selector: 'node[!expanded]',
-            onClickFunction: sendExpandRequest
+            id: 'sendLoadRequest',
+            content: 'Load edges',
+            selector: 'node[?expandable]',
+            onClickFunction: sendLoadRequest
         },
         {
             id: 'collapse',
@@ -175,7 +175,7 @@ function openEdgeDetailsWindow(event) {
 function addSynset(synset, pointedSynsets, edges) {
     addSynsetToCytoscape(synset);
     pointedSynsets.forEach(function (synset) {
-       addSynsetToCytoscape(synset);
+        addSynsetToCytoscape(synset);
     });
     edges.forEach(function (edge) {
         addEdgeToCytoscape(edge);
@@ -187,6 +187,8 @@ function addSynsetToCytoscape(synset) {
     if (elementExists(synset)) {
         return;
     }
+    synset.expandable = !synset.hasDatabaseEdgesLoaded;
+    synset.expanded = synset.hasDatabaseEdgesLoaded;
     cy.add({
         data: synset,
         style: [{
@@ -208,6 +210,9 @@ function addEdgeToCytoscape(edge) {
         return;
     }
 
+    var synset = cy.elements('#' + escapeColon(edge.sourceSynset.id)).data();
+    synset.expanded = true;
+
     edge.target = edge.targetSynset.id;
     edge.source = edge.sourceSynset.id;
 
@@ -220,11 +225,10 @@ function addEdgeToCytoscape(edge) {
     });
 }
 
-function sendExpandRequest(event) {
+function sendLoadRequest(event) {
     var synset = event.target.data();
-    if (synset.expanded === false) {
+    if (synset.expandable === true) {
         javaApp.loadEdges(synset.id);
-        synset.expanded = true;
     }
 }
 
@@ -263,6 +267,7 @@ function collapse(target, synsetsToCollapse) {
             }
         });
         synset.expanded = false;
+        synset.expandable = true;
     }
 }
 
@@ -295,10 +300,12 @@ function clear() {
 function expandSynset(synsetId, pointedSynsets, edges) {
     var originSynset = cy.getElementById(synsetId).data();
     originSynset.expanded = true;
+    originSynset.expandable = false;
 
     pointedSynsets.forEach(function (synset) {
-        if (!elementExists(synset) && synset.expanded === true) {
+        if (!elementExists(synset)) {
             synset.expanded = false;
+            synset.expandable = true;
         }
         addSynsetToCytoscape(synset);
     });

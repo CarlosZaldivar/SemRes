@@ -80,7 +80,7 @@ public class BoardTest {
         board.save();
 
         Synset loadedSynset = database.searchSynsets("Foo").get(0);
-        loadedSynset.setOutgoingEdges(database.getOutgoingEdges(loadedSynset));
+        database.loadEdges(loadedSynset);
 
         assertTrue(loadedSynset.getOutgoingEdges().size() == 0);
     }
@@ -102,11 +102,14 @@ public class BoardTest {
         board.removeEdge("bn:00024922n-bn:00024923n");
         board.save();
         // Add removed edge again
-        board.addEdge(edge);
+        try {
+            board.addEdge(edge);
+            throw new RuntimeException();
+        } catch (RuntimeException e) {}
         board.save();
 
         Synset loadedSynset = database.searchSynsets("Foo").get(0);
-        loadedSynset.setOutgoingEdges(database.getOutgoingEdges(loadedSynset));
+        database.loadEdges(loadedSynset);
 
         assertTrue(loadedSynset.getOutgoingEdges().size() == 0);
     }

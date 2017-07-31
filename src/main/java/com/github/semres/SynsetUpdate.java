@@ -29,7 +29,7 @@ public class SynsetUpdate {
 
         isSynsetDataUpdated = synsetsAreDifferent(originalSynset, updatedSynset);
 
-        if (originalSynset.isExpanded() && updatedSynset.isExpanded()) {
+        if (originalSynset.hasDatabaseEdgesLoaded() && updatedSynset.isDownloadedWithEdges()) {
             Map<String, Edge> originalEdges = originalSynset.getOutgoingEdges();
             Map<String, Edge> updatedEdges = updatedSynset.getOutgoingEdges();
 
@@ -65,8 +65,6 @@ public class SynsetUpdate {
                     addedEdges.put(edge.getId(), edge);
                 }
             }
-        } else if (originalSynset.isExpanded() && !updatedSynset.isExpanded()) {
-            updatedSynset.setOutgoingEdges(originalSynset.getOutgoingEdges());
         }
         this.updatedSynset = updatedSynset;
     }
@@ -138,9 +136,7 @@ public class SynsetUpdate {
     }
 
     private void replaceEdgeInUpdatedSynset(Edge edge) {
-        Map<String, Edge> edges = updatedSynset.getOutgoingEdges();
-        edges.put(edge.getId(), edge);
-        updatedSynset.setOutgoingEdges(edges);
+        updatedSynset = updatedSynset.changeOutgoingEdge(edge);
     }
 
     public void cancelEdgeWeightChange(String edgeId) {

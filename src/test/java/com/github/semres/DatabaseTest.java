@@ -164,7 +164,7 @@ public class DatabaseTest {
         database.addEdge(edge);
 
         originSynset = (BabelNetSynset) database.searchSynsets("Foo").get(0);
-        originSynset.setOutgoingEdges(database.getOutgoingEdges(originSynset));
+        database.loadEdges(originSynset);
 
         assertTrue(database.getOutgoingEdges(originSynset).size() == 1);
         assertTrue(originSynset.getRemovedRelations().size() == 0);
@@ -295,7 +295,7 @@ public class DatabaseTest {
         assertTrue(relationTypes.stream().map(RelationType::getType).anyMatch("RelationX"::equals));
     }
 
-    @Test(expected = RelationTypeAlreadyExists.class)
+    @Test(expected = RelationTypeAlreadyExistsException.class)
     public void addRelationTypesWithSameName() throws Exception {
         Database database = createTestDatabase();
         RelationType relationType = new RelationType("RelationX", "User");

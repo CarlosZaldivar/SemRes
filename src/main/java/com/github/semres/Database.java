@@ -17,8 +17,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 public class Database {
@@ -230,6 +230,21 @@ public class Database {
         return getEdges(queryString);
     }
 
+    void loadEdges(Synset synset) {
+        if (synset.hasDatabaseEdgesLoaded()) {
+            throw new RuntimeException("Edges already loaded.");
+        }
+
+        Map<String, Edge> currentEdges = synset.getOutgoingEdges();
+        List<Edge> loadedEdges = getOutgoingEdges(synset);
+
+        for (Edge edge : loadedEdges) {
+            currentEdges.put(edge.getId(), edge);
+        }
+        synset.setOutgoingEdges(currentEdges);
+        synset.hasDatabaseEdgesLoaded = true;
+    }
+
     List<Edge> getPointingEdges(Synset pointedSynset) {
         ValueFactory factory = repository.getValueFactory();
         String queryString = String.format("SELECT ?edgeType ?edge" +
@@ -246,7 +261,7 @@ public class Database {
             String queryString = String.format("ASK { ?relationType <%s> <%s> . ?relationType <%s> %s }",
                     RDF.TYPE, SemRes.RELATION_TYPE_CLASS, RDFS.LABEL, factory.createLiteral(relationType.getType()));
             if (conn.prepareBooleanQuery(queryString).evaluate()) {
-                throw new RelationTypeAlreadyExists();
+                throw new RelationTypeAlreadyExistsException();
             }
             conn.add(relationTypeToRdf(relationType));
         }

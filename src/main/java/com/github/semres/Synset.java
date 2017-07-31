@@ -4,13 +4,12 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 public abstract class Synset {
+    private final String id;
     protected Map<String, Edge> outgoingEdges = new HashMap<>();
     protected String representation;
     protected String description;
-    protected boolean isExpanded;
+    protected boolean hasDatabaseEdgesLoaded;
     protected LocalDateTime lastEditedTime;
-    private final String id;
-
     protected Synset(String representation, String id) {
         this.representation = representation;
         this.id = id;
@@ -28,7 +27,11 @@ public abstract class Synset {
         this.description = copiedSynset.description;
         this.id = copiedSynset.id;
         this.outgoingEdges = new HashMap<>(copiedSynset.outgoingEdges);
-        this.isExpanded = copiedSynset.isExpanded;
+        this.hasDatabaseEdgesLoaded = copiedSynset.hasDatabaseEdgesLoaded;
+    }
+
+    public boolean hasDatabaseEdgesLoaded() {
+        return hasDatabaseEdgesLoaded;
     }
 
     public LocalDateTime getLastEditedTime() {
@@ -37,10 +40,6 @@ public abstract class Synset {
 
     void setLastEditedTime(LocalDateTime lastEditedTime) {
         this.lastEditedTime = lastEditedTime;
-    }
-
-    public boolean isExpanded() {
-        return isExpanded;
     }
 
     public String getRepresentation() {
@@ -60,24 +59,14 @@ public abstract class Synset {
     }
 
     protected void setOutgoingEdges(Map<String, Edge> newEdges) {
-        if (newEdges == null) {
-            outgoingEdges.clear();
-        } else {
-            setOutgoingEdges(newEdges.values());
-        }
-    }
-
-    protected void setOutgoingEdges(Collection<Edge> newEdges) {
-        outgoingEdges.clear();
-        for (Edge edge : newEdges) {
-            outgoingEdges.put(edge.getId(), edge);
-        }
-        isExpanded = true;
+        outgoingEdges = new HashMap<>(newEdges);
     }
 
     abstract public Synset addOutgoingEdge(Edge edge);
 
     abstract public Synset removeOutgoingEdge(String id);
+
+    public abstract Synset changeOutgoingEdge(Edge edge);
 
     @Override
     public String toString() {

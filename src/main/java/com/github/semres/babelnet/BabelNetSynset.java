@@ -94,7 +94,7 @@ public class BabelNetSynset extends Synset {
     @Override
     public BabelNetSynset addOutgoingEdge(Edge edge) {
         if (edge instanceof BabelNetEdge && removedRelations.contains(edge.getPointedSynsetId())) {
-            return null;
+            throw new RuntimeException("Trying to add removed relation.");
         }
         BabelNetSynset newSynset = new BabelNetSynset(this);
         newSynset.outgoingEdges.put(edge.getId(), edge);
@@ -126,7 +126,6 @@ public class BabelNetSynset extends Synset {
                 break;
             }
         }
-        newSynset.isExpanded = true;
         newSynset.downloadedWithEdges = true;
         return newSynset;
     }
@@ -143,6 +142,17 @@ public class BabelNetSynset extends Synset {
 
     private boolean edgeIsRelevant(BabelSynsetIDRelation edge) {
         return !removedRelations.contains(edge.getBabelSynsetIDTarget().getID());
+    }
+
+    @Override
+    public BabelNetSynset changeOutgoingEdge(Edge edge) {
+        if (!outgoingEdges.containsKey(edge.getId())) {
+            throw new RuntimeException("No edge with specified ID.");
+        }
+
+        BabelNetSynset newSynset = new BabelNetSynset(this);
+        newSynset.outgoingEdges.put(edge.getId(), edge);
+        return newSynset;
     }
 
     public boolean isDownloadedWithEdges() {

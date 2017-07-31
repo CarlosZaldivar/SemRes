@@ -48,4 +48,15 @@ public class UserSynset extends Synset {
         newSynset.description = description;
         return newSynset;
     }
+
+    @Override
+    public UserSynset changeOutgoingEdge(Edge edge) {
+        if (!outgoingEdges.containsKey(edge.getId())) {
+            throw new RuntimeException("No edge with specified ID.");
+        }
+
+        UserSynset newSynset = new UserSynset(this);
+        newSynset.outgoingEdges.put(edge.getId(), edge);
+        return newSynset;
+    }
 }
