@@ -55,7 +55,7 @@ public class Settings {
         this.databasesDirectory = databasesDirectory;
     }
 
-    List<Source> getSources() {
+    public List<Source> getSources() {
         return new ArrayList<>(sources);
     }
 }

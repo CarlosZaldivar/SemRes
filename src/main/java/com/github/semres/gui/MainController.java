@@ -261,7 +261,7 @@ public class MainController extends Controller implements Initializable {
     }
 
     List<BabelNetSynset> searchBabelNet(String searchPhrase) throws IOException {
-        return babelNetManager.getSynsets(searchPhrase);
+        return babelNetManager.searchSynsets(searchPhrase);
     }
 
     public void openDatabasesWindow() throws IOException {

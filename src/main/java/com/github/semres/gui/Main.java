@@ -33,7 +33,9 @@ public class Main extends Application {
         }
 
         databasesManager = new DatabasesManager(settings);
-        babelNetManager = new BabelNetManager();
+        babelNetManager = (BabelNetManager) settings.getSources().stream()
+                .filter((source) -> source instanceof BabelNetManager)
+                .findFirst().orElseThrow(RuntimeException::new);
 
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/main.fxml"));
         Parent root = fxmlLoader.load();

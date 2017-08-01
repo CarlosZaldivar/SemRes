@@ -21,8 +21,9 @@ class SourcesInitializer {
                 if (language == null) {
                     throw new YamlException();
                 }
-                BabelNetManager.setLanguage(language);
-                return new BabelNetManager();
+                BabelNetManager babelNetManager = new BabelNetManager();
+                babelNetManager.setLanguage(language);
+                return babelNetManager;
             }
         }
         return null;
