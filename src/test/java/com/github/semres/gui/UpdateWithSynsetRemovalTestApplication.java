@@ -5,17 +5,15 @@ import com.github.semres.babelnet.BabelNetEdge;
 import com.github.semres.babelnet.BabelNetManager;
 import com.github.semres.babelnet.BabelNetSynset;
 import it.uniroma1.lcl.babelnet.*;
-import it.uniroma1.lcl.jlt.util.Language;
 import javafx.stage.Stage;
 import org.mockito.Mockito;
 
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
-import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.when;
 
 public class UpdateWithSynsetRemovalTestApplication extends Main  {
@@ -47,9 +45,17 @@ public class UpdateWithSynsetRemovalTestApplication extends Main  {
     private BabelNetManager createMockBabelNetManager() throws IOException, InvalidBabelSynsetIDException {
         BabelNetManager mockManager = Mockito.mock(BabelNetManager.class);
 
-        BabelNetSynset originBabelNetSynset = getOriginBabelNetSynset();
-        when(mockManager.getSynset(originSynsetId)).thenReturn(originBabelNetSynset);
+        BabelNetSynset originSynset = new BabelNetSynset("Origin", originSynsetId);
+        when(mockManager.getSynset(originSynsetId)).thenReturn(originSynset);
         when(mockManager.getSynset(pointedSynsetId)).thenReturn(null);
+
+        doAnswer(invocation -> {
+            Field downloadedWithEdges = originSynset.getClass().getDeclaredField("downloadedWithEdges");
+            downloadedWithEdges.setAccessible(true);
+            downloadedWithEdges.set(originSynset, true);
+            return null;
+        }).when(mockManager).loadEdges(originSynset);
+
         return mockManager;
     }
 
@@ -66,22 +72,5 @@ public class UpdateWithSynsetRemovalTestApplication extends Main  {
         database.addEdge(edge);
 
         return database;
-    }
-
-    private BabelNetSynset getOriginBabelNetSynset() throws InvalidBabelSynsetIDException {
-        BabelSense mockOriginBabelSense = getMockOriginBabelSense();
-
-        BabelSynset mockBabelSynset = Mockito.mock(BabelSynset.class);
-        when(mockBabelSynset.getMainSense(any(Language.class))).thenReturn(mockOriginBabelSense);
-        when(mockBabelSynset.getId()).thenReturn(new BabelSynsetID(originSynsetId));
-        when(mockBabelSynset.getEdges()).thenReturn(new ArrayList<>());
-
-        return new BabelNetSynset(mockBabelSynset);
-    }
-
-    private BabelSense getMockOriginBabelSense() {
-        BabelSense babelSense = Mockito.mock(BabelSense.class);
-        when(babelSense.getSenseString()).thenReturn("Origin");
-        return babelSense;
     }
 }

@@ -1,7 +1,9 @@
 package com.github.semres.babelnet;
 
 import com.github.semres.*;
+import com.github.semres.gui.EdgesAlreadyLoadedException;
 import it.uniroma1.lcl.babelnet.*;
+import it.uniroma1.lcl.babelnet.data.BabelPointer;
 import it.uniroma1.lcl.jlt.Configuration;
 import it.uniroma1.lcl.jlt.util.Language;
 import org.eclipse.rdf4j.model.Model;
@@ -10,9 +12,7 @@ import org.eclipse.rdf4j.model.vocabulary.RDF;
 import org.eclipse.rdf4j.model.vocabulary.RDFS;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 
 public class BabelNetManager extends Source {
     private static Language language = Language.EN;
@@ -63,24 +63,12 @@ public class BabelNetManager extends Source {
         return apiKey;
     }
 
-    public BabelSynset getBabelSynset(String id) throws IOException {
-        try {
-            return getBabelSynset(new BabelSynsetID(id));
-        } catch (InvalidBabelSynsetIDException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private BabelSynset getBabelSynset(BabelSynsetID id) throws IOException {
-        return BabelNet.getInstance().getSynset(id);
-    }
-
     public List<BabelNetSynset> getSynsets(String word) throws IOException {
         List<BabelSynset> babelSynsets = BabelNet.getInstance().getSynsets(word, language);
         List<BabelNetSynset> returnedSynsets = new ArrayList<>();
 
         for (BabelSynset babelSynset: babelSynsets) {
-            returnedSynsets.add(new BabelNetSynset(babelSynset));
+            returnedSynsets.add(createBabelNetSynset(babelSynset));
         }
 
         return returnedSynsets;
@@ -88,10 +76,71 @@ public class BabelNetManager extends Source {
 
     public BabelNetSynset getSynset(String id) throws IOException {
         try {
-            return new BabelNetSynset(BabelNet.getInstance().getSynset(new BabelSynsetID(id)));
+            return createBabelNetSynset(BabelNet.getInstance().getSynset(new BabelSynsetID(id)));
         } catch (InvalidBabelSynsetIDException e) {
-            throw new Error(e.getMessage());
+            throw new Error(e);
         }
+    }
+
+    private BabelNetSynset createBabelNetSynset(BabelSynset babelSynset) throws IOException {
+        String id = babelSynset.getId().getID();
+        String representation = babelSynset.getMainSense(getJltLanguage()).getSenseString();
+
+        String description;
+        try {
+            description = babelSynset.getMainGloss(BabelNetManager.getJltLanguage()).getGloss();
+        } catch (NullPointerException e) {
+            description = null;
+        }
+
+        return new BabelNetSynset(representation, id, description);
+    }
+
+
+    public void loadEdges(BabelNetSynset synset) throws IOException {
+        if (synset.isDownloadedWithEdges()) {
+            throw new EdgesAlreadyLoadedException();
+        }
+
+        BabelSynset babelSynset;
+        try {
+            babelSynset = BabelNet.getInstance().getSynset(new BabelSynsetID(synset.getId()));
+        } catch (InvalidBabelSynsetIDException e) {
+            throw new Error(e);
+        }
+
+        List<BabelSynsetIDRelation> babelEdges = babelSynset.getEdges();
+        babelEdges.sort(Comparator.comparing(BabelSynsetIDRelation::getWeight).reversed());
+
+        // Download all edges with weight > 0 and if there's less than 10 of them, download edges with weight = 0 too.
+        List<Edge> loadedEdges = new ArrayList<>();
+        int counter = 10;
+        for (BabelSynsetIDRelation edge: babelEdges) {
+            if (edgeIsRelevant(synset, edge)) {
+                loadedEdges.add(createBabelNetEdge(synset, edge));
+                --counter;
+            }
+            if (counter <= 0 && edge.getWeight() == 0) {
+                break;
+            }
+        }
+
+        Map<String, Edge> currentEdges = synset.getOutgoingEdges();
+        for (Edge edge : loadedEdges) {
+            currentEdges.put(edge.getId(), edge);
+        }
+        synset.setOutgoingEdges(currentEdges);
+        synset.downloadedWithEdges = true;
+    }
+
+    private BabelNetEdge createBabelNetEdge(BabelNetSynset synset, BabelSynsetIDRelation edge) {
+        BabelPointer babelPointer = edge.getPointer();
+        RelationType relationType = new RelationType(babelPointer.getRelationGroup().toString(), "BabelNet");
+        return new BabelNetEdge(edge.getBabelSynsetIDTarget().getID(), synset.getId(), babelPointer.getName(), relationType, edge.getWeight());
+    }
+
+    private boolean edgeIsRelevant(BabelNetSynset synset, BabelSynsetIDRelation edge) {
+        return !synset.getRemovedRelations().contains(edge.getBabelSynsetIDTarget().getID());
     }
 
     @Override

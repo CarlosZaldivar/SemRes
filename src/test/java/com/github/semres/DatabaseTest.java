@@ -3,13 +3,8 @@ package com.github.semres;
 import com.github.semres.babelnet.*;
 import com.github.semres.user.*;
 import com.github.semres.user.CommonIRI;
-import it.uniroma1.lcl.babelnet.BabelSense;
-import it.uniroma1.lcl.babelnet.BabelSynset;
-import it.uniroma1.lcl.babelnet.BabelSynsetID;
-import it.uniroma1.lcl.jlt.util.Language;
 import org.eclipse.rdf4j.model.Model;
 import org.junit.Test;
-import org.mockito.Mockito;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -17,8 +12,6 @@ import java.util.List;
 
 import static com.github.semres.Utils.createTestDatabase;
 import static org.junit.Assert.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
 
 public class DatabaseTest {
 
@@ -231,20 +224,8 @@ public class DatabaseTest {
 
     @Test
     public void saveBabelNetSynsetWithDownloadedEdges() throws Exception {
-        // BabelSynset objects are used internally to download edges from BabelNet. We use mocking framework
-        // to avoid making API calls during tests.
-        BabelSynset mockBabelSynset = Mockito.mock(BabelSynset.class);
-
-        BabelSense mockBabelSense = Mockito.mock(BabelSense.class);
-        when(mockBabelSense.getSenseString()).thenReturn("Foo");
-
-        when(mockBabelSynset.getMainSense(any(Language.class))).thenReturn(mockBabelSense);
-        when(mockBabelSynset.getId()).thenReturn(new BabelSynsetID("bn:00024922n"));
-        when(mockBabelSynset.getEdges()).thenReturn(new ArrayList<>());
-
-        BabelNetSynset synset = new BabelNetSynset(mockBabelSynset);
-        synset = synset.loadEdgesFromBabelNet();
-        assertTrue(synset.isDownloadedWithEdges());
+        String synsetId = "bn:00024922n";
+        BabelNetSynset synset = new BabelNetSynset("Foo", synsetId, true);
 
         Database database = createTestDatabase();
         database.addSynset(synset);

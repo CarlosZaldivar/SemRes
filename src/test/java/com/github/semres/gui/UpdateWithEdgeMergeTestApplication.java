@@ -1,29 +1,29 @@
 package com.github.semres.gui;
 
-import com.github.semres.Board;
-import com.github.semres.Database;
-import com.github.semres.DatabasesManager;
-import com.github.semres.RelationType;
+import com.github.semres.*;
+import com.github.semres.babelnet.BabelNetEdge;
 import com.github.semres.babelnet.BabelNetManager;
 import com.github.semres.babelnet.BabelNetSynset;
 import com.github.semres.user.UserEdge;
 import it.uniroma1.lcl.babelnet.*;
-import it.uniroma1.lcl.babelnet.data.BabelPointer;
-import it.uniroma1.lcl.jlt.util.Language;
 import javafx.stage.Stage;
 import org.mockito.Mockito;
 
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
-import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.when;
 
 public class UpdateWithEdgeMergeTestApplication extends Main {
     private String originSynsetId = "bn:00024922n";
     private String firstPointedSynsetId = "bn:00024923n";
     private String secondPointedSynsetId = "bn:00024924n";
+
+    private RelationType holonym = new BabelNetManager().getRelationTypes().get(0);
+    private RelationType hypernym = new BabelNetManager().getRelationTypes().get(1);
 
     @Override
     public void start(Stage primaryStage) throws IOException {
@@ -35,8 +35,6 @@ public class UpdateWithEdgeMergeTestApplication extends Main {
             throw new RuntimeException(e);
         }
     }
-
-
 
     private DatabasesManager createMockDatabasesManager() throws NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
         DatabasesManager mockManager = Mockito.mock(DatabasesManager.class);
@@ -52,12 +50,31 @@ public class UpdateWithEdgeMergeTestApplication extends Main {
     private BabelNetManager createMockBabelNetManager() throws IOException, InvalidBabelSynsetIDException {
         BabelNetManager mockManager = Mockito.mock(BabelNetManager.class);
 
-        BabelNetSynset originSynset = getOriginBabelNetSynset();
-        BabelNetSynset firstPointedSynset = getFirstPointedSynset();
-        BabelNetSynset secondPointedSynset = getSecondPointedSynset();
+        BabelNetSynset originSynset = new BabelNetSynset("Origin", originSynsetId);
+        BabelNetSynset firstPointedSynset = new BabelNetSynset("First pointed", firstPointedSynsetId);
+        BabelNetSynset secondPointedSynset = new BabelNetSynset("Second pointed", secondPointedSynsetId);
+
         when(mockManager.getSynset(originSynsetId)).thenReturn(originSynset);
         when(mockManager.getSynset(firstPointedSynsetId)).thenReturn(firstPointedSynset);
         when(mockManager.getSynset(secondPointedSynsetId)).thenReturn(secondPointedSynset);
+
+        doAnswer(invocation -> {
+            BabelNetEdge firstEdge = new BabelNetEdge(firstPointedSynsetId, originSynsetId, "BabelNet description", hypernym, 1);
+            BabelNetEdge secondEdge = new BabelNetEdge(secondPointedSynsetId, originSynsetId, "BabelNet description", hypernym, 1);
+            Map<String, Edge> edges = new HashMap<>();
+            edges.put(firstEdge.getId(), firstEdge);
+            edges.put(secondEdge.getId(), secondEdge);
+
+            // Use reflection to add edges. It's necessary because method setOutgoingEdges i package-private.
+            Field outgoingEdges = originSynset.getClass().getSuperclass().getDeclaredField("outgoingEdges");
+            outgoingEdges.setAccessible(true);
+            outgoingEdges.set(originSynset, edges);
+            Field downloadedWithEdges = originSynset.getClass().getDeclaredField("downloadedWithEdges");
+            downloadedWithEdges.setAccessible(true);
+            downloadedWithEdges.set(originSynset, true);
+            return null;
+        }).when(mockManager).loadEdges(originSynset);
+
         return mockManager;
     }
 
@@ -72,7 +89,7 @@ public class UpdateWithEdgeMergeTestApplication extends Main {
         database.addRelationType(userRelationType);
 
         UserEdge firstUserEdge = new UserEdge(firstPointedSynsetId, originSynsetId, "User description", userRelationType, 1);
-        UserEdge secondUserEdge = new UserEdge(secondPointedSynsetId, originSynsetId, new BabelNetManager().getRelationTypes().get(1), 0);
+        UserEdge secondUserEdge = new UserEdge(secondPointedSynsetId, originSynsetId, holonym, 0);
 
         database.addSynset(originSynset);
         database.addSynset(firstPointedSynset);
@@ -81,67 +98,5 @@ public class UpdateWithEdgeMergeTestApplication extends Main {
         database.addEdge(secondUserEdge);
 
         return database;
-    }
-
-    private BabelNetSynset getOriginBabelNetSynset() throws InvalidBabelSynsetIDException {
-        BabelSense mockOriginBabelSense = getMockOriginBabelSense();
-
-        BabelPointer mockFirstAddedPointer = Mockito.mock(BabelPointer.class);
-        when(mockFirstAddedPointer.getName()).thenReturn("BabelNet description");
-        when(mockFirstAddedPointer.getRelationGroup()).thenReturn(BabelPointer.RelationGroup.OTHER);
-        BabelSynsetIDRelation firstAddedRelation = new BabelSynsetIDRelation(null, mockFirstAddedPointer, firstPointedSynsetId);
-
-        BabelPointer mockSecondAddedPointer = Mockito.mock(BabelPointer.class);
-        when(mockSecondAddedPointer.getName()).thenReturn("BabelNet description");
-        when(mockSecondAddedPointer.getRelationGroup()).thenReturn(BabelPointer.RelationGroup.OTHER);
-        BabelSynsetIDRelation secondAddedRelation = new BabelSynsetIDRelation(null, mockSecondAddedPointer, secondPointedSynsetId);
-
-
-        BabelSynset mockBabelSynset = Mockito.mock(BabelSynset.class);
-        when(mockBabelSynset.getMainSense(any(Language.class))).thenReturn(mockOriginBabelSense);
-        when(mockBabelSynset.getId()).thenReturn(new BabelSynsetID(originSynsetId));
-        when(mockBabelSynset.getEdges()).thenReturn(Arrays.asList(firstAddedRelation, secondAddedRelation));
-
-        return new BabelNetSynset(mockBabelSynset);
-    }
-
-    private BabelNetSynset getFirstPointedSynset() throws InvalidBabelSynsetIDException {
-        BabelSense mockPointedBabelSense = getMockFirstPointedBabelSense();
-
-        BabelSynset mockBabelSynset = Mockito.mock(BabelSynset.class);
-        when(mockBabelSynset.getMainSense(any(Language.class))).thenReturn(mockPointedBabelSense);
-        when(mockBabelSynset.getId()).thenReturn(new BabelSynsetID(firstPointedSynsetId));
-        when(mockBabelSynset.getEdges()).thenReturn(new ArrayList<>());
-
-        return new BabelNetSynset(mockBabelSynset);
-    }
-
-    private BabelNetSynset getSecondPointedSynset() throws InvalidBabelSynsetIDException {
-        BabelSense mockPointedBabelSense = getMockSecondPointedBabelSense();
-
-        BabelSynset mockBabelSynset = Mockito.mock(BabelSynset.class);
-        when(mockBabelSynset.getMainSense(any(Language.class))).thenReturn(mockPointedBabelSense);
-        when(mockBabelSynset.getId()).thenReturn(new BabelSynsetID(secondPointedSynsetId));
-        when(mockBabelSynset.getEdges()).thenReturn(new ArrayList<>());
-
-        return new BabelNetSynset(mockBabelSynset);
-    }
-
-    private BabelSense getMockFirstPointedBabelSense() {
-        BabelSense babelSense = Mockito.mock(BabelSense.class);
-        when(babelSense.getSenseString()).thenReturn("First pointed");
-        return babelSense;
-    }
-
-    private BabelSense getMockSecondPointedBabelSense() {
-        BabelSense babelSense = Mockito.mock(BabelSense.class);
-        when(babelSense.getSenseString()).thenReturn("Second pointed");
-        return babelSense;
-    }
-
-    private BabelSense getMockOriginBabelSense() {
-        BabelSense babelSense = Mockito.mock(BabelSense.class);
-        when(babelSense.getSenseString()).thenReturn("Origin");
-        return babelSense;
     }
 }
