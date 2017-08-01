@@ -96,7 +96,7 @@ var menus = cy.contextMenus({
         },
         {
             id: 'loadEdgesFromBabelNet',
-            content: 'Load edges from BabelNet',
+            content: 'Download edges from BabelNet',
             selector: 'node[!downloadedWithEdges][class="com.github.semres.babelnet.BabelNetSynset"]',
             onClickFunction: downloadEdgesFromBabelNet
         },
