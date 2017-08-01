@@ -237,9 +237,6 @@ public class Board {
     public void save() {
         for (Synset synset : newSynsets.values()) {
             attachedDatabase.addSynset(synset);
-            for (Edge edge : synset.getOutgoingEdges().values()) {
-                attachedDatabase.addEdge(edge);
-            }
         }
         newSynsets.clear();
 
