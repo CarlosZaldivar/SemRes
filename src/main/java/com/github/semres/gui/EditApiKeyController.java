@@ -4,6 +4,7 @@ import com.github.semres.babelnet.BabelNetManager;
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
@@ -14,10 +15,10 @@ import java.net.URL;
 import java.util.ResourceBundle;
 
 public class EditApiKeyController extends ChildController implements Initializable {
-    public TextField apiKeyTF;
-    public Button editButton;
-    public Button cancelButton;
-    public Button okButton;
+    @FXML private TextField apiKeyTF;
+    @FXML private Button editButton;
+    @FXML private Button cancelButton;
+    @FXML private Button okButton;
 
     private BooleanProperty editing = new SimpleBooleanProperty(false);
     private MainController mainController;
