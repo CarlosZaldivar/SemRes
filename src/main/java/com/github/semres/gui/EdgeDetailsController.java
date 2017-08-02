@@ -79,7 +79,8 @@ public class EdgeDetailsController extends EdgeController implements Initializab
         editedEdge = editedEdge.changeWeight(Double.parseDouble(weightTF.getText()));
         editedEdge = editedEdge.changeRelationType(relationTypeCB.getSelectionModel().getSelectedItem());
 
-        mainController.editEdge(originalEdge, editedEdge);
+        mainController.getBoard().editEdge(originalEdge, editedEdge);
+        mainController.getBrowserController().updateEdge(editedEdge);
         editing.set(false);
     }
 

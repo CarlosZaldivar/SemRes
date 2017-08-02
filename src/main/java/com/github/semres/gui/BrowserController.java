@@ -99,7 +99,7 @@ class BrowserController extends Controller {
         Collection<Edge> edges = synset.getOutgoingEdges().values();
         List<Synset> pointedSynsets = new ArrayList<>();
         for (Edge edge : edges) {
-            pointedSynsets.add(mainController.getSynset(edge.getPointedSynsetId()));
+            pointedSynsets.add(mainController.getBoard().getSynset(edge.getPointedSynsetId()));
         }
         browser.executeJavaScript(String.format("addSynset(%s, %s, %s)", synsetToJson(synset), synsetsToJson(pointedSynsets), edgesToJson(edges)));
     }
@@ -118,7 +118,7 @@ class BrowserController extends Controller {
         JSArray synsetIds =  browser.executeJavaScriptAndReturnValue("clear()").asArray();
         for (int i = 0; i < synsetIds.length(); ++i) {
             String id = synsetIds.get(i).getStringValue();
-            Synset synset = mainController.getSynset(id);
+            Synset synset = mainController.getBoard().getSynset(id);
             if (synset != null) {
                 addSynsetToView(synset);
             }
@@ -128,7 +128,7 @@ class BrowserController extends Controller {
     void dispose() {
         browser.dispose();
     }
-    
+
     private Map<String, Object> synsetToMap(Synset synset) {
         Map<String, Object> synsetMap;
         try {
@@ -170,8 +170,8 @@ class BrowserController extends Controller {
         edgeMap.put("description", edge.getDescription());
         edgeMap.put("weight", edge.getWeight());
         edgeMap.put("relationType", edge.getRelationType().toString().toLowerCase());
-        edgeMap.put("targetSynset", synsetToMap(mainController.getSynset(edge.getPointedSynsetId())));
-        edgeMap.put("sourceSynset", synsetToMap(mainController.getSynset(edge.getOriginSynsetId())));
+        edgeMap.put("targetSynset", synsetToMap(mainController.getBoard().getSynset(edge.getPointedSynsetId())));
+        edgeMap.put("sourceSynset", synsetToMap(mainController.getBoard().getSynset(edge.getOriginSynsetId())));
         edgeMap.put("lastEditedTime", edge.getLastEditedTime());
         edgeMap.put("class", edge.getClass().getCanonicalName());
         return edgeMap;
@@ -253,25 +253,25 @@ class BrowserController extends Controller {
         }
 
         public void removeSynset(String synsetId) {
-            mainController.removeSynset(synsetId);
+            mainController.getBoard().removeSynset(synsetId);
         }
 
         public void removeEdge(String edgeId) {
-            mainController.removeEdge(edgeId);
+            mainController.getBoard().removeEdge(edgeId);
         }
 
         public void loadEdges(String synsetId) {
-            Synset synset = mainController.getSynset(synsetId);
+            Synset synset = mainController.getBoard().getSynset(synsetId);
             Collection<Edge> edges;
             if (synset.hasDatabaseEdgesLoaded()) {
                 edges = synset.getOutgoingEdges().values();
             } else {
-                mainController.loadEdges(synsetId);
+                mainController.getBoard().loadEdges(synsetId);
                 edges = synset.getOutgoingEdges().values();
             }
             List<Synset> pointedSynsets = new ArrayList<>();
             for (Edge edge : edges) {
-                pointedSynsets.add(mainController.getSynset(edge.getPointedSynsetId()));
+                pointedSynsets.add(mainController.getBoard().getSynset(edge.getPointedSynsetId()));
             }
 
             browser.executeJavaScript(String.format("expandSynset(\"%s\", %s, %s);", synsetId, synsetsToJson(pointedSynsets), edgesToJson(edges)));
@@ -280,14 +280,14 @@ class BrowserController extends Controller {
         public void downloadEdgesFromBabelNet(String synsetId) {
             Collection<Edge> edges;
             try {
-                edges = mainController.downloadBabelNetEdges(synsetId);
+                edges = mainController.getBoard().downloadBabelNetEdges(synsetId);
             } catch (IOException e) {
                 Utils.showError(e.getMessage());
                 return;
             }
             List<Synset> pointedSynsets = new ArrayList<>();
             for (Edge edge : edges) {
-                pointedSynsets.add(mainController.getSynset(edge.getPointedSynsetId()));
+                pointedSynsets.add(mainController.getBoard().getSynset(edge.getPointedSynsetId()));
             }
 
             browser.executeJavaScript(String.format("addBabelNetEdges(\"%s\", %s, %s);", synsetId, synsetsToJson(pointedSynsets), edgesToJson(edges)));

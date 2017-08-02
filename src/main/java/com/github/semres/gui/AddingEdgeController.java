@@ -49,7 +49,8 @@ public class AddingEdgeController extends EdgeController implements Initializabl
         RelationType relationType = relationTypeCB.getSelectionModel().getSelectedItem();
         UserEdge newEdge = new UserEdge(destinationSynset.getId(), originSynset.getId(), descriptionTA.getText(), relationType, weight);
 
-        mainController.addEdge(newEdge);
+        mainController.getBoard().addEdge(newEdge);
+        mainController.getBrowserController().addEdgeToView(newEdge);
 
         Stage stage = (Stage) addButton.getScene().getWindow();
         stage.close();

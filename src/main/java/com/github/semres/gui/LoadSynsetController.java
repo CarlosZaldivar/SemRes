@@ -58,7 +58,7 @@ public class LoadSynsetController extends ChildController implements Initializab
             return;
         }
 
-        Collection<Synset> synsetsFound = mainController.loadSynsets(searchPhrase);
+        Collection<Synset> synsetsFound = mainController.getBoard().loadSynsets(searchPhrase);
 
         for (Synset synset : synsetsFound) {
             synsetsObservableList.add(new SynsetMedia(synset));

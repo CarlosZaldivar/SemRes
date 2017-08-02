@@ -1,5 +1,6 @@
 package com.github.semres.gui;
 
+import com.github.semres.Synset;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
@@ -20,7 +21,8 @@ public class AddingSynsetController extends ChildController implements Initializ
         String representation = representationTF.getText();
         String description = descriptionTA.getText();
 
-        mainController.createSynset(representation, description);
+        Synset newSynset = mainController.getBoard().createSynset(representation, description);
+        mainController.getBrowserController().addSynsetToView(newSynset);
         Stage stage = (Stage) addButton.getScene().getWindow();
         stage.close();
     }

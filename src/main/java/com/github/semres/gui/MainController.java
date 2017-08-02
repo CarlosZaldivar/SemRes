@@ -137,91 +137,6 @@ public class MainController extends Controller implements Initializable {
         newApiKey = key;
     }
 
-    void createSynset(String representation, String description) {
-        Synset synset = board.createSynset(representation, description);
-        browserController.addSynsetToView(synset);
-    }
-
-    void addSynsetToBoard(BabelNetSynset synset) {
-        board.addSynset(synset);
-    }
-
-    void addEdge(Edge edge) {
-        board.addEdge(edge);
-        browserController.addEdgeToView(edge);
-    }
-
-    void editSynset(UserSynset oldSynset, UserSynset editedSynset) {
-        board.editSynset(oldSynset, editedSynset);
-        browserController.updateSynset(editedSynset);
-    }
-
-    public void editEdge(UserEdge oldEdge, UserEdge editedEdge) {
-        board.editEdge(oldEdge, editedEdge);
-        browserController.updateEdge(editedEdge);
-    }
-
-    public void removeSynset(String synsetId) {
-        board.removeSynset(synsetId);
-    }
-
-    public void removeEdge(String edgeId) {
-        board.removeEdge(edgeId);
-    }
-
-    public Collection<RelationType> getRelationTypes() {
-        return board.getRelationTypes();
-    }
-
-    public void addRelationType(RelationType relationType) {
-        board.addRelationType(relationType);
-    }
-
-    public void removeRelationType(RelationType relationType) {
-        board.removeRelationType(relationType);
-    }
-
-    Synset getSynset(String id) {
-        return board.getSynset(id);
-    }
-
-    Collection<Synset> loadSynsets(String searchPhrase) {
-        return board.loadSynsets(searchPhrase);
-    }
-
-    Synset loadSynset(String id) {
-        return board.loadSynset(id);
-    }
-
-    Collection<Edge> loadEdges(String synsetId) {
-        return board.loadEdges(synsetId);
-    }
-
-    Collection<Edge> downloadBabelNetEdges(String synsetId) throws IOException {
-        return board.downloadBabelNetEdges(synsetId);
-    }
-
-    List<SynsetUpdate> checkForUpdates() throws IOException {
-        return board.checkForUpdates();
-    }
-
-    public SynsetUpdate checkForUpdates(String checkedSynsetId) throws IOException {
-        return board.checkForUpdates(checkedSynsetId);
-    }
-
-    public void update(List<SynsetUpdate> updates) {
-        board.update(updates);
-        browserController.redrawNodes();
-    }
-
-    boolean synsetExists(String id) {
-        return board.synsetExists(id);
-    }
-
-    List<BabelNetSynset> searchBabelNet(String searchPhrase) throws IOException {
-        return babelNetManager.searchSynsets(searchPhrase);
-    }
-
     public void openDatabasesWindow() throws IOException {
         openNewWindow("/fxml/databases-list.fxml", "Databases");
     }
@@ -324,6 +239,10 @@ public class MainController extends Controller implements Initializable {
 
     public BrowserController getBrowserController() {
         return browserController;
+    }
+
+    public Board getBoard() {
+        return board;
     }
 
     public void dispose() {

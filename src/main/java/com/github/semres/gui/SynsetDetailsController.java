@@ -77,7 +77,8 @@ public class SynsetDetailsController extends ChildController implements Initiali
         UserSynset originalSynset = (UserSynset) synset;
         UserSynset editedSynset = originalSynset.changeRepresentation(representationTF.getText());
         editedSynset = editedSynset.changeDescription(descriptionTA.getText());
-        mainController.editSynset(originalSynset, editedSynset);
+        mainController.getBoard().editSynset(originalSynset, editedSynset);
+        mainController.getBrowserController().updateSynset(editedSynset);
         editing.set(false);
     }
 }

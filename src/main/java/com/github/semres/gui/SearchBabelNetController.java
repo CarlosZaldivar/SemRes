@@ -46,7 +46,7 @@ public class SearchBabelNetController extends ChildController implements Initial
                 return new Task<List<BabelNetSynset>>() {
                     @Override
                     protected List<BabelNetSynset> call() throws Exception {
-                        return mainController.searchBabelNet(searchBox.getText());
+                        return mainController.getBabelNetManager().searchSynsets(searchBox.getText());
                     }
                 };
             }
@@ -61,7 +61,7 @@ public class SearchBabelNetController extends ChildController implements Initial
                 return new Task<Collection<Edge>>() {
                     @Override
                     protected Collection<Edge> call() throws Exception {
-                        return mainController.downloadBabelNetEdges(clickedSynset.getId());
+                        return mainController.getBoard().downloadBabelNetEdges(clickedSynset.getId());
                     }
                 };
             }
@@ -101,7 +101,7 @@ public class SearchBabelNetController extends ChildController implements Initial
 
 
     private void addSynsetToView() {
-        mainController.getBrowserController().addSynsetToView(mainController.getSynset(clickedSynset.getId()));
+        mainController.getBrowserController().addSynsetToView(mainController.getBoard().getSynset(clickedSynset.getId()));
         Stage stage = (Stage) synsetsListView.getScene().getWindow();
         stage.close();
     }
@@ -110,10 +110,10 @@ public class SearchBabelNetController extends ChildController implements Initial
         if (click.getClickCount() == 2 && synsetsListView.getSelectionModel().getSelectedItem() != null) {
             clickedSynset = (BabelNetSynset) synsetsListView.getSelectionModel().getSelectedItem().getSynset();
 
-            if (mainController.synsetExists(clickedSynset.getId())) {
-                BabelNetSynset loaded = (BabelNetSynset) mainController.loadSynset(clickedSynset.getId());
+            if (mainController.getBoard().synsetExists(clickedSynset.getId())) {
+                BabelNetSynset loaded = (BabelNetSynset) mainController.getBoard().loadSynset(clickedSynset.getId());
                 if (!loaded.hasDatabaseEdgesLoaded()) {
-                    mainController.loadEdges(clickedSynset.getId());
+                    mainController.getBoard().loadEdges(clickedSynset.getId());
                 }
                 if (!loaded.isDownloadedWithEdges()) {
                     downloadEdgesService.restart();
@@ -121,7 +121,7 @@ public class SearchBabelNetController extends ChildController implements Initial
                     addSynsetToView();
                 }
             } else {
-                mainController.addSynsetToBoard(clickedSynset);
+                mainController.getBoard().addSynset(clickedSynset);
                 downloadEdgesService.restart();
             }
         }

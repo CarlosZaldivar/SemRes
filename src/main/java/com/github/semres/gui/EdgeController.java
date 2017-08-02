@@ -22,7 +22,7 @@ public class EdgeController extends ChildController {
     @Override
     public void setParent(Controller parent) {
         mainController = (MainController) parent;
-        relationTypes.addAll(mainController.getRelationTypes());
+        relationTypes.addAll(mainController.getBoard().getRelationTypes());
     }
 
     public Collection<RelationType> getRelationTypes() {
@@ -30,12 +30,12 @@ public class EdgeController extends ChildController {
     }
 
     public void addRelationType(RelationType relationType) {
-        mainController.addRelationType(relationType);
+        mainController.getBoard().addRelationType(relationType);
         relationTypes.add(relationType);
     }
 
     public void removeRelationType(RelationType relationType) {
-        mainController.removeRelationType(relationType);
+        mainController.getBoard().removeRelationType(relationType);
         relationTypes.remove(relationType);
     }
 

@@ -93,10 +93,10 @@ public class UpdatesListController extends ChildController implements Initializa
             @Override
             protected List<SynsetUpdate> call() throws IOException, InterruptedException {
                 if (checkSingleSynset) {
-                    SynsetUpdate update = mainController.checkForUpdates(checkedSynsetId);
+                    SynsetUpdate update = mainController.getBoard().checkForUpdates(checkedSynsetId);
                     return update != null ? Arrays.asList(update) : new ArrayList<>();
                 } else {
-                    return mainController.checkForUpdates();
+                    return mainController.getBoard().checkForUpdates();
                 }
             }
         };
@@ -145,7 +145,8 @@ public class UpdatesListController extends ChildController implements Initializa
     }
 
     public void applyUpdates() {
-        mainController.update(updates);
+        mainController.getBoard().update(updates);
+        mainController.getBrowserController().redrawNodes();
         Stage stage = (Stage) applyButton.getScene().getWindow();
         stage.close();
     }
