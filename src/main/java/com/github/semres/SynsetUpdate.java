@@ -17,7 +17,7 @@ public class SynsetUpdate {
     private final Map<String, EdgeEdit> edgeEdits = new HashMap<>();
     private final Map<String, EdgeEdit> edgesToMerge = new HashMap<>();
     private final Map<String, BabelNetSynset> relatedSynsets;
-    private boolean isSynsetDataUpdated = false;
+    private boolean areSynsetPropertiesUpdated = false;
 
     public SynsetUpdate(BabelNetSynset originalSynset, BabelNetSynset updatedSynset, Map<String, BabelNetSynset> relatedSynsets) {
         this.originalSynset = originalSynset;
@@ -27,7 +27,7 @@ public class SynsetUpdate {
             return;
         }
 
-        isSynsetDataUpdated = synsetsAreDifferent(originalSynset, updatedSynset);
+        areSynsetPropertiesUpdated = synsetsAreDifferent(originalSynset, updatedSynset);
 
         if (originalSynset.hasDatabaseEdgesLoaded() && updatedSynset.isDownloadedWithEdges()) {
             Map<String, Edge> originalEdges = originalSynset.getOutgoingEdges();
@@ -67,6 +67,10 @@ public class SynsetUpdate {
             }
         }
         this.updatedSynset = updatedSynset;
+
+        if (!isSynsetUpdated()) {
+            throw new SynsetNotUpdatedException();
+        }
     }
 
     private boolean synsetsAreDifferent(BabelNetSynset originalSynset, BabelNetSynset updatedSynset) {
@@ -79,6 +83,10 @@ public class SynsetUpdate {
                !Objects.equals(originalEdge.getDescription(), updatedEdge.getDescription());
     }
 
+    private boolean isSynsetUpdated() {
+        return areSynsetPropertiesUpdated || !addedEdges.isEmpty() || !removedEdges.isEmpty() || !edgeEdits.isEmpty() || !edgesToMerge.isEmpty();
+    }
+
     public BabelNetSynset getOriginalSynset() {
         return originalSynset;
     }
@@ -87,12 +95,8 @@ public class SynsetUpdate {
         return updatedSynset;
     }
 
-    public boolean isSynsetDataUpdated() {
-        return isSynsetDataUpdated;
-    }
-
-    public boolean isSynsetUpdated() {
-        return isSynsetDataUpdated || !addedEdges.isEmpty() || !removedEdges.isEmpty() || !edgeEdits.isEmpty() || !edgesToMerge.isEmpty();
+    public boolean areSynsetPropertiesUpdated() {
+        return areSynsetPropertiesUpdated;
     }
 
     public Map<String, Edge> getAddedEdges() {
@@ -123,7 +127,7 @@ public class SynsetUpdate {
     public void cancelEdgeAddition(String id) {
         updatedSynset = updatedSynset.removeOutgoingEdge(id);
         // Since removing edge updates removedRelations set, we also want to update the synset itself
-        isSynsetDataUpdated = true;
+        areSynsetPropertiesUpdated = true;
         addedEdges.remove(id);
     }
 
@@ -169,8 +173,8 @@ public class SynsetUpdate {
         replaceEdgeInUpdatedSynset(originalSynset.getOutgoingEdges().get(id));
     }
 
-    public void cancelSynsetEdition() {
-        isSynsetDataUpdated = false;
+    public void cancelSynsetPropertiesEdition() {
+        areSynsetPropertiesUpdated = false;
     }
 
     public String getId() {

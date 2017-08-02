@@ -301,13 +301,17 @@ public class Board {
         }
 
         SynsetUpdate synsetUpdate;
-        if (!originalSynset.isDownloadedWithEdges()) {
-            synsetUpdate = new SynsetUpdate(originalSynset, updatedSynset, new HashMap<>());
-        } else {
-            babelNetManager.loadEdges(updatedSynset);
-            synsetUpdate = new SynsetUpdate(originalSynset, updatedSynset, getRelatedSynsets(originalSynset, updatedSynset));
+        try {
+            if (!originalSynset.isDownloadedWithEdges()) {
+                synsetUpdate = new SynsetUpdate(originalSynset, updatedSynset, new HashMap<>());
+            } else {
+                babelNetManager.loadEdges(updatedSynset);
+                synsetUpdate = new SynsetUpdate(originalSynset, updatedSynset, getRelatedSynsets(originalSynset, updatedSynset));
+            }
+        } catch (SynsetNotUpdatedException e) {
+            return null;
         }
-        return synsetUpdate.isSynsetUpdated() ? synsetUpdate : null;
+        return synsetUpdate;
     }
 
     private HashMap<String, BabelNetSynset> getRelatedSynsets(BabelNetSynset originalSynset, BabelNetSynset updatedSynset) throws IOException {
@@ -338,7 +342,7 @@ public class Board {
                 continue;
             }
 
-            if (update.isSynsetDataUpdated()) {
+            if (update.areSynsetPropertiesUpdated()) {
                 attachedDatabase.editSynset(update.getUpdatedSynset(), update.getOriginalSynset());
             }
 

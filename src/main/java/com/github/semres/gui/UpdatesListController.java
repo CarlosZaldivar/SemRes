@@ -158,7 +158,7 @@ public class UpdatesListController extends ChildController implements Initializa
                 continue;
             }
 
-            if (update.isSynsetDataUpdated()) {
+            if (update.areSynsetPropertiesUpdated()) {
                 editedSynsets.add(update.getOriginalSynset());
             }
 
