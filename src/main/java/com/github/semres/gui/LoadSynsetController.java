@@ -45,7 +45,7 @@ public class LoadSynsetController extends ChildController implements Initializab
     void addSynsetToView(MouseEvent click) {
         if (click.getClickCount() == 2 && synsetsListView.getSelectionModel().getSelectedItem() != null) {
             Synset synset = synsetsListView.getSelectionModel().getSelectedItem().getSynset();
-            mainController.addSynsetToView(synset);
+            mainController.getBrowserController().addSynsetToView(synset);
             Stage stage = (Stage) synsetsListView.getScene().getWindow();
             stage.close();
         }
