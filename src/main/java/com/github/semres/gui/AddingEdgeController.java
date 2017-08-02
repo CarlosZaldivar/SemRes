@@ -50,7 +50,7 @@ public class AddingEdgeController extends EdgeController implements Initializabl
         UserEdge newEdge = new UserEdge(destinationSynset.getId(), originSynset.getId(), descriptionTA.getText(), relationType, weight);
 
         mainController.getBoard().addEdge(newEdge);
-        mainController.getBrowserController().addEdgeToView(newEdge);
+        mainController.getBrowserController().addEdge(newEdge);
 
         Stage stage = (Stage) addButton.getScene().getWindow();
         stage.close();

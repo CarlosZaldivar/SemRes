@@ -22,7 +22,7 @@ public class AddingSynsetController extends ChildController implements Initializ
         String description = descriptionTA.getText();
 
         Synset newSynset = mainController.getBoard().createSynset(representation, description);
-        mainController.getBrowserController().addSynsetToView(newSynset);
+        mainController.getBrowserController().addSynset(newSynset);
         Stage stage = (Stage) addButton.getScene().getWindow();
         stage.close();
     }

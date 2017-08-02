@@ -95,7 +95,7 @@ class BrowserController extends Controller {
         );
     }
 
-    void addSynsetToView(Synset synset) {
+    void addSynset(Synset synset) {
         Collection<Edge> edges = synset.getOutgoingEdges().values();
         List<Synset> pointedSynsets = new ArrayList<>();
         for (Edge edge : edges) {
@@ -104,7 +104,7 @@ class BrowserController extends Controller {
         browser.executeJavaScript(String.format("addSynset(%s, %s, %s)", synsetToJson(synset), synsetsToJson(pointedSynsets), edgesToJson(edges)));
     }
 
-    void addEdgeToView(Edge edge) { browser.executeJavaScript("addEdge(" + edgeToJson(edge) + ");"); }
+    void addEdge(Edge edge) { browser.executeJavaScript("addEdge(" + edgeToJson(edge) + ");"); }
 
     void updateSynset(UserSynset editedSynset) {
         browser.executeJavaScript("updateSynset(" + synsetToJson(editedSynset) + ");");
@@ -120,7 +120,7 @@ class BrowserController extends Controller {
             String id = synsetIds.get(i).getStringValue();
             Synset synset = mainController.getBoard().getSynset(id);
             if (synset != null) {
-                addSynsetToView(synset);
+                addSynset(synset);
             }
         }
     }

@@ -101,7 +101,7 @@ public class SearchBabelNetController extends ChildController implements Initial
 
 
     private void addSynsetToView() {
-        mainController.getBrowserController().addSynsetToView(mainController.getBoard().getSynset(clickedSynset.getId()));
+        mainController.getBrowserController().addSynset(mainController.getBoard().getSynset(clickedSynset.getId()));
         Stage stage = (Stage) synsetsListView.getScene().getWindow();
         stage.close();
     }
