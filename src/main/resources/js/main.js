@@ -342,8 +342,9 @@ function updateEdge(editedEdge) {
     oldEdge.data('weight', editedEdge.weight);
 }
 
-function disableUpdates() {
+function disableBabelNetOptions() {
     menus.disableMenuItem("checkForUpdates");
+    menus.disableMenuItem("loadEdgesFromBabelNet");
 }
 
 function updateStartTime() {

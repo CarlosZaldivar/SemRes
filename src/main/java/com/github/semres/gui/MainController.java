@@ -106,13 +106,13 @@ public class MainController extends Controller implements Initializable {
         board.setBabelNetManager(babelNetManager);
         browser.loadURL(getClass().getResource("/html/board.html").toExternalForm());
 
-        // Disable option to update synsets if there's no api key.
+        // Disable options concerning BabelNet if there's no api key.
         if (StringUtils.isEmpty(BabelNetManager.getApiKey())) {
             browser.addLoadListener(new LoadAdapter() {
                 @Override
                 public void onFinishLoadingFrame(FinishLoadingEvent event) {
                     if (event.isMainFrame()) {
-                        browser.executeJavaScript("disableUpdates()");
+                        browser.executeJavaScript("disableBabelNetOptions()");
                     }
                 }
             });
