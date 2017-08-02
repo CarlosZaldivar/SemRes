@@ -279,18 +279,13 @@ public class Board {
         return updates;
     }
 
-    public List<SynsetUpdate> checkForUpdates(String checkedSynsetId) throws IOException {
+    public SynsetUpdate checkForUpdates(String checkedSynsetId) throws IOException {
         if (isBoardEdited()) {
             throw new RuntimeException("Cannot check for updates with unsaved changes.");
         }
 
         Synset synset = attachedDatabase.getSynset(checkedSynsetId);
-        SynsetUpdate synsetUpdate = parseUpdates((BabelNetSynset) synset);
-        if (synsetUpdate != null) {
-            return Arrays.asList(synsetUpdate);
-        } else {
-            return new ArrayList<>();
-        }
+        return parseUpdates((BabelNetSynset) synset);
     }
 
     private SynsetUpdate parseUpdates(BabelNetSynset originalSynset) throws IOException {

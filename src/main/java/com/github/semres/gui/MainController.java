@@ -237,7 +237,7 @@ public class MainController extends Controller implements Initializable {
         return board.checkForUpdates();
     }
 
-    public List<SynsetUpdate> checkForUpdates(String checkedSynsetId) throws IOException {
+    public SynsetUpdate checkForUpdates(String checkedSynsetId) throws IOException {
         return board.checkForUpdates(checkedSynsetId);
     }
 
@@ -549,6 +549,10 @@ public class MainController extends Controller implements Initializable {
 
         public void checkForUpdates(String synsetId) {
             Platform.runLater(() -> {
+                if (board.isBoardEdited()) {
+                    Utils.showError("Cannot check for updates with unsaved changes.");
+                    return;
+                }
                 try {
                     openUpdatesWindow(synsetId);
                 } catch (IOException e) {

@@ -21,6 +21,8 @@ import javafx.util.Callback;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.ResourceBundle;
 
@@ -91,7 +93,8 @@ public class UpdatesListController extends ChildController implements Initializa
             @Override
             protected List<SynsetUpdate> call() throws IOException, InterruptedException {
                 if (checkSingleSynset) {
-                    return mainController.checkForUpdates(checkedSynsetId);
+                    SynsetUpdate update = mainController.checkForUpdates(checkedSynsetId);
+                    return update != null ? Arrays.asList(update) : new ArrayList<>();
                 } else {
                     return mainController.checkForUpdates();
                 }
