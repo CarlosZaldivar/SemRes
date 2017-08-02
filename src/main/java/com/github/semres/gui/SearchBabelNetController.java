@@ -66,7 +66,7 @@ public class SearchBabelNetController extends ChildController implements Initial
                 };
             }
         };
-        downloadEdgesService.setOnSucceeded(workerStateEvent -> addDownloadedEdges());
+        downloadEdgesService.setOnSucceeded(workerStateEvent -> addSynsetToView());
         setServiceErrorHandling(downloadEdgesService);
 
         synsetsListView.visibleProperty().bind(searchService.runningProperty().not());
@@ -100,7 +100,7 @@ public class SearchBabelNetController extends ChildController implements Initial
     }
 
 
-    private void addDownloadedEdges() {
+    private void addSynsetToView() {
         mainController.addSynsetToView(mainController.getSynset(clickedSynset.getId()));
         Stage stage = (Stage) synsetsListView.getScene().getWindow();
         stage.close();
@@ -118,9 +118,7 @@ public class SearchBabelNetController extends ChildController implements Initial
                 if (!loaded.isDownloadedWithEdges()) {
                     downloadEdgesService.restart();
                 } else {
-                    mainController.addSynsetToView(mainController.getSynset(clickedSynset.getId()));
-                    Stage stage = (Stage) synsetsListView.getScene().getWindow();
-                    stage.close();
+                    addSynsetToView();
                 }
             } else {
                 mainController.addSynsetToBoard(clickedSynset);

@@ -7,6 +7,7 @@ import com.github.semres.*;
 import com.github.semres.babelnet.BabelNetManager;
 import com.github.semres.babelnet.BabelNetSynset;
 import com.github.semres.user.UserEdge;
+import com.github.semres.user.UserSynset;
 import com.teamdev.jxbrowser.chromium.*;
 import com.teamdev.jxbrowser.chromium.events.FinishLoadingEvent;
 import com.teamdev.jxbrowser.chromium.events.LoadAdapter;
@@ -202,7 +203,7 @@ public class MainController extends Controller implements Initializable {
 
     void addEdgeToView(Edge edge) { browser.executeJavaScript("addEdge(" + edgeToJson(edge) + ");"); }
 
-    void editSynset(Synset oldSynset, Synset editedSynset) {
+    void editSynset(UserSynset oldSynset, UserSynset editedSynset) {
         board.editSynset(oldSynset, editedSynset);
         browser.executeJavaScript("updateSynset(" + synsetToJson(editedSynset) + ");");
     }
@@ -224,8 +225,8 @@ public class MainController extends Controller implements Initializable {
         return board.loadSynset(id);
     }
 
-    void loadEdges(String synsetId) {
-        board.loadEdges(synsetId);
+    Collection<Edge> loadEdges(String synsetId) {
+        return board.loadEdges(synsetId);
     }
 
     Collection<Edge> downloadBabelNetEdges(String synsetId) throws IOException {
@@ -257,7 +258,7 @@ public class MainController extends Controller implements Initializable {
     }
 
     boolean synsetExists(String id) {
-        return board.isIdAlreadyTaken(id);
+        return board.synsetExists(id);
     }
 
     List<BabelNetSynset> searchBabelNet(String searchPhrase) throws IOException {
@@ -520,7 +521,7 @@ public class MainController extends Controller implements Initializable {
                 edges = synset.getOutgoingEdges().values();
             } else {
                 MainController.this.loadEdges(synsetId);
-                edges = board.getSynset(synsetId).getOutgoingEdges().values();
+                edges = synset.getOutgoingEdges().values();
             }
             List<Synset> pointedSynsets = new ArrayList<>();
             for (Edge edge : edges) {

@@ -7,6 +7,7 @@ import com.github.semres.babelnet.CommonIRI;
 import com.github.semres.gui.IDAlreadyTakenException;
 import com.github.semres.user.UserEdge;
 import com.github.semres.user.UserSynset;
+import org.apache.commons.collections4.CollectionUtils;
 import org.eclipse.rdf4j.rio.RDFFormat;
 
 import java.io.IOException;
@@ -61,7 +62,7 @@ public class Board {
         }
     }
 
-    public void loadEdges(String synsetId) {
+    public List<Edge> loadEdges(String synsetId) {
         Synset synset = synsets.get(synsetId);
 
         if (synset == null) {
@@ -71,6 +72,7 @@ public class Board {
             throw new RuntimeException("Edges already loaded");
         }
 
+        Collection<Edge> edgesAlreadyPresent = synset.getOutgoingEdges().values();
         attachedDatabase.loadEdges(synset);
 
         for (Edge edge : synset.getOutgoingEdges().values()) {
@@ -79,6 +81,8 @@ public class Board {
                 synsets.put(pointedSynset.getId(), pointedSynset);
             }
         }
+
+        return new ArrayList<>(CollectionUtils.disjunction(edgesAlreadyPresent, synset.getOutgoingEdges().values()));
     }
 
     public List<Edge> downloadBabelNetEdges(String synsetId) throws IOException {
@@ -128,7 +132,7 @@ public class Board {
     }
 
     public void addSynset(Synset newSynset) {
-        if (isIdAlreadyTaken(newSynset.getId())) {
+        if (synsetExists(newSynset.getId())) {
             throw new IDAlreadyTakenException();
         }
         synsets.put(newSynset.getId(), newSynset);
@@ -176,7 +180,7 @@ public class Board {
     }
 
     // Edit synset's representation or description.
-    public void editSynset(Synset originalSynset, Synset editedSynset) {
+    public void editSynset(UserSynset originalSynset, UserSynset editedSynset) {
         SynsetEdit synsetEdit;
         if (!synsetEdits.containsKey(originalSynset.getId())) {
             synsetEdit = new SynsetEdit(originalSynset, editedSynset);
@@ -318,7 +322,7 @@ public class Board {
         }
 
         for (Edge edge : updatedSynset.getOutgoingEdges().values()) {
-            if (isIdAlreadyTaken(edge.getPointedSynsetId())) {
+            if (synsetExists(edge.getPointedSynsetId())) {
                 relatedSynsets.put(edge.getPointedSynsetId(), (BabelNetSynset) loadSynset(edge.getPointedSynsetId()));
             } else {
                 relatedSynsets.put(edge.getPointedSynsetId(), babelNetManager.getSynset(edge.getPointedSynsetId()));
@@ -348,7 +352,7 @@ public class Board {
             }
 
             for (Edge edge : update.getAddedEdges().values()) {
-                if (!isIdAlreadyTaken(edge.getPointedSynsetId())) {
+                if (!synsetExists(edge.getPointedSynsetId())) {
                     Synset pointedSynset = update.getPointedSynset(edge);
                     attachedDatabase.addSynset(pointedSynset);
                     synsets.put(pointedSynset.getId(), pointedSynset);
@@ -375,7 +379,7 @@ public class Board {
         return attachedDatabase.export(format);
     }
 
-    public boolean isIdAlreadyTaken(String id) {
+    public boolean synsetExists(String id) {
         if (synsets.containsKey(id)) {
             return true;
         }
@@ -407,7 +411,7 @@ public class Board {
         return false;
     }
 
-    public Map<String,Synset> getSynsets() {
+    Map<String,Synset> getSynsets() {
         return synsets;
     }
 
