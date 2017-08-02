@@ -95,10 +95,10 @@ public class MainController extends Controller implements Initializable {
         // searchBabelNetMenuItem should be disabled if there's no api key
         babelNetMenu.setOnShowing(e -> {
             searchBabelNetMenuItem.setDisable(board == null || StringUtils.isEmpty(BabelNetManager.getApiKey()));
-            updateMenuItem.setDisable(board == null || board.isBoardEdited() || StringUtils.isEmpty(BabelNetManager.getApiKey()));
+            updateMenuItem.setDisable(board == null || board.isEdited() || StringUtils.isEmpty(BabelNetManager.getApiKey()));
         });
 
-        fileMenu.setOnShowing(e -> saveMenuItem.setDisable(board == null || !board.isBoardEdited()));
+        fileMenu.setOnShowing(e -> saveMenuItem.setDisable(board == null || !board.isEdited()));
     }
 
     void setBoard(Board board) {
@@ -549,7 +549,7 @@ public class MainController extends Controller implements Initializable {
 
         public void checkForUpdates(String synsetId) {
             Platform.runLater(() -> {
-                if (board.isBoardEdited()) {
+                if (board.isEdited()) {
                     Utils.showError("Cannot check for updates with unsaved changes.");
                     return;
                 }

@@ -264,7 +264,7 @@ public class Board {
     }
 
     public List<SynsetUpdate> checkForUpdates() throws IOException {
-        if (isBoardEdited()) {
+        if (isEdited()) {
             throw new RuntimeException("Cannot check for updates with unsaved changes.");
         }
 
@@ -280,7 +280,7 @@ public class Board {
     }
 
     public SynsetUpdate checkForUpdates(String checkedSynsetId) throws IOException {
-        if (isBoardEdited()) {
+        if (isEdited()) {
             throw new RuntimeException("Cannot check for updates with unsaved changes.");
         }
 
@@ -327,7 +327,7 @@ public class Board {
     }
 
     public void update(List<SynsetUpdate> updates) {
-        if (isBoardEdited()) {
+        if (isEdited()) {
             throw new RuntimeException("Cannot update with unsaved changes.");
         }
 
@@ -384,7 +384,7 @@ public class Board {
         return false;
     }
 
-    public boolean isBoardEdited() {
+    public boolean isEdited() {
         return !removedSynsets.isEmpty() || !newSynsets.isEmpty() || !synsetEdits.isEmpty();
     }
 
@@ -410,7 +410,7 @@ public class Board {
         return synsets;
     }
 
-    public Collection<RelationType> getRelationTypes() {
+    public List<RelationType> getRelationTypes() {
         return attachedDatabase.getRelationTypes();
     }
 
