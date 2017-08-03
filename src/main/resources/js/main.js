@@ -149,12 +149,7 @@ function startEdgeAddition(event) {
 }
 
 function startSynsetAddition() {
-    try {
-        javaApp.openNewSynsetWindow();
-    }
-    catch(err) {
-        console.log(err);
-    }
+    javaApp.openNewSynsetWindow();
 }
 
 function setEdgeDetails(sourceNode, targetNode, addedEntities) {
