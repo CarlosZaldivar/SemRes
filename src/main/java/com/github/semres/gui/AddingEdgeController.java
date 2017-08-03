@@ -33,7 +33,7 @@ public class AddingEdgeController extends EdgeController implements Initializabl
     }
 
     @Override
-    public void setParent(Controller parent) {
+    public void setParent(JavaFXController parent) {
         super.setParent(parent);
         relationTypeCB.setItems((relationTypes));
         relationTypeCB.getSelectionModel().select(0);

@@ -87,7 +87,7 @@ public class SearchBabelNetController extends ChildController implements Initial
     }
 
     @Override
-    public void setParent(Controller parent) {
+    public void setParent(JavaFXController parent) {
         mainController = (MainController) parent;
     }
 

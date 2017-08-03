@@ -32,7 +32,7 @@ public class AddingDatabaseController extends ChildController implements Initial
     }
 
     @Override
-    public void setParent(Controller parent) {
+    public void setParent(JavaFXController parent) {
         databasesController = (DatabasesController) parent;
     }
 

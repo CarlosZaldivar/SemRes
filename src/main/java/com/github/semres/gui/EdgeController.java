@@ -15,12 +15,12 @@ import javafx.stage.Stage;
 import java.io.IOException;
 import java.util.Collection;
 
-public class EdgeController extends ChildController {
+public abstract class EdgeController extends ChildController {
     protected MainController mainController;
     protected ObservableList<RelationType> relationTypes = FXCollections.observableArrayList();
 
     @Override
-    public void setParent(Controller parent) {
+    public void setParent(JavaFXController parent) {
         mainController = (MainController) parent;
         relationTypes.addAll(mainController.getBoard().getRelationTypes());
     }

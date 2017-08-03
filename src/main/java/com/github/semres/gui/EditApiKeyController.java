@@ -53,7 +53,7 @@ public class EditApiKeyController extends ChildController implements Initializab
     }
 
     @Override
-    public void setParent(Controller parent) {
+    public void setParent(JavaFXController parent) {
         mainController = (MainController) parent;
         if (mainController.getNewApiKey() == null) {
             apiKeyTF.setText(BabelNetManager.getApiKey());

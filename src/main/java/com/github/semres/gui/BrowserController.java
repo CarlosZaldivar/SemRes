@@ -25,7 +25,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.stream.Collectors;
 
-class BrowserController extends Controller {
+class BrowserController {
     static Logger log = Logger.getRootLogger();
 
     private MainController mainController;
@@ -104,7 +104,9 @@ class BrowserController extends Controller {
         browser.executeJavaScript(String.format("addSynset(%s, %s, %s)", synsetToJson(synset), synsetsToJson(pointedSynsets), edgesToJson(edges)));
     }
 
-    void addEdge(Edge edge) { browser.executeJavaScript("addEdge(" + edgeToJson(edge) + ");"); }
+    void addEdge(Edge edge) {
+        browser.executeJavaScript("addEdge(" + edgeToJson(edge) + ");");
+    }
 
     void updateSynset(UserSynset editedSynset) {
         browser.executeJavaScript("updateSynset(" + synsetToJson(editedSynset) + ");");

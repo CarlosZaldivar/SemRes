@@ -2,9 +2,6 @@ package com.github.semres.gui;
 
 import com.github.semres.*;
 import com.github.semres.babelnet.BabelNetManager;
-import com.github.semres.babelnet.BabelNetSynset;
-import com.github.semres.user.UserEdge;
-import com.github.semres.user.UserSynset;
 import com.teamdev.jxbrowser.chromium.*;
 import com.teamdev.jxbrowser.chromium.javafx.BrowserView;
 import javafx.event.ActionEvent;
@@ -29,7 +26,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.*;
 
-public class MainController extends Controller implements Initializable {
+public class MainController extends JavaFXController implements Initializable {
     @FXML private MenuBar menuBar;
     @FXML private MenuItem turtleMenuItem;
     @FXML private MenuItem nTriplesMenuItem;
@@ -203,7 +200,7 @@ public class MainController extends Controller implements Initializable {
         childController.setEdge(board.getEdge(edgeId));
     }
 
-    private Controller openNewWindow(String fxmlPath, String title) throws IOException {
+    private JavaFXController openNewWindow(String fxmlPath, String title) throws IOException {
         FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
         Parent root = loader.load();
         Stage newStage = new Stage();

@@ -28,7 +28,7 @@ public class AddingSynsetController extends ChildController implements Initializ
     }
     
     @Override
-    public void setParent(Controller parent) {
+    public void setParent(JavaFXController parent) {
         mainController = (MainController) parent;
     }
 

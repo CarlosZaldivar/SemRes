@@ -28,7 +28,7 @@ public class EdgeDetailsController extends EdgeController implements Initializab
     private Edge edge;
 
     @Override
-    public void setParent(Controller parent) {
+    public void setParent(JavaFXController parent) {
         super.setParent(parent);
         relationTypeCB.setItems(relationTypes);
     }

@@ -23,7 +23,7 @@ public class AddingRelationTypeController extends ChildController {
     }
 
     @Override
-    public void setParent(Controller parent) {
+    public void setParent(JavaFXController parent) {
         relationTypesController = (RelationTypesController) parent;
         Collection<RelationType> currentRelationTypes = ((RelationTypesController) parent).getRelationTypes();
         BooleanBinding nameValid = Bindings.createBooleanBinding(() -> {

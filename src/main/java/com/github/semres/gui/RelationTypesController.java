@@ -28,7 +28,7 @@ public class RelationTypesController extends ChildController {
     private EdgeController addingEdgeController;
 
     @Override
-    public void setParent(Controller parent) {
+    public void setParent(JavaFXController parent) {
         addingEdgeController = (EdgeController) parent;
 
         observableList.setAll(addingEdgeController.getRelationTypes());

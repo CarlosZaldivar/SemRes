@@ -73,7 +73,7 @@ public class UpdatesListController extends ChildController implements Initializa
     private String checkedSynsetId;
 
     @Override
-    public void setParent(Controller parent) {
+    public void setParent(JavaFXController parent) {
         mainController = (MainController) parent;
 
         // Update task should be run only when MainController is set up.

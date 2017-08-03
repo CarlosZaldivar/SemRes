@@ -38,7 +38,7 @@ public class LoadSynsetController extends ChildController implements Initializab
     }
 
     @Override
-    public void setParent(Controller parent) {
+    public void setParent(JavaFXController parent) {
         mainController = (MainController) parent;
     }
 

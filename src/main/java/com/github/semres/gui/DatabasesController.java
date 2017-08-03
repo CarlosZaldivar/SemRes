@@ -66,7 +66,7 @@ public class DatabasesController extends ChildController {
     }
 
     @Override
-    public void setParent(Controller parent) {
+    public void setParent(JavaFXController parent) {
         mainController = (MainController) parent;
         Set<String> databasesNames = mainController.getDatabasesManager().getRepositoryIDs();
         databasesNames.remove("SYSTEM");
