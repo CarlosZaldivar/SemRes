@@ -58,14 +58,14 @@ public class UpdatesListController extends ChildController implements Initializa
     @FXML private TableColumn<Synset, String> removedSynsetDescriptionColumn;
     @FXML private TableColumn<Synset, String> removedSynsetCancelColumn;
     @FXML private ListView<Synset> editedSynsetsLV;
-    @FXML private ListView<Edge> editedEdgesLV;
+    @FXML private ListView<EdgeData> editedEdgesLV;
 
     private List<SynsetUpdate> updates;
     private ObservableList<EdgeData> addedEdges;
     private ObservableList<EdgeData> removedEdges;
     private ObservableList<Synset> removedSynsets;
     private ObservableList<Synset> editedSynsets;
-    private ObservableList<Edge> editedEdges;
+    private ObservableList<EdgeData> editedEdges;
     private Task<List<SynsetUpdate>> updateTask;
 
     private MainController mainController;
@@ -177,7 +177,7 @@ public class UpdatesListController extends ChildController implements Initializa
             }
 
             for (EdgeEdit edgeEdit : update.getEdgeEdits().values()) {
-                editedEdges.add(edgeEdit.getOriginal());
+                addEdgeToObservableList(edgeEdit.getOriginal(), update, editedEdges);
             }
         }
 
@@ -387,6 +387,11 @@ public class UpdatesListController extends ChildController implements Initializa
 
         public String getType() {
             return type.get();
+        }
+
+        @Override
+        public String toString() {
+            return getFrom() + " → " + getTo();
         }
     }
 }
