@@ -113,10 +113,10 @@ public class BabelNetManager extends Source {
         List<Edge> loadedEdges = new ArrayList<>();
         int counter = 10;
         for (BabelSynsetIDRelation edge: babelEdges) {
-            if (edgeIsRelevant(synset, edge)) {
+            if (edgeNotRemoved(synset, edge)) {
                 loadedEdges.add(createBabelNetEdge(synset, edge));
-                --counter;
             }
+            --counter;
             if (counter <= 0 && edge.getWeight() == 0) {
                 break;
             }
@@ -140,7 +140,7 @@ public class BabelNetManager extends Source {
         return Arrays.asList(language);
     }
 
-    private boolean edgeIsRelevant(BabelNetSynset synset, BabelSynsetIDRelation edge) {
+    private boolean edgeNotRemoved(BabelNetSynset synset, BabelSynsetIDRelation edge) {
         return !synset.getRemovedRelations().contains(edge.getBabelSynsetIDTarget().getID());
     }
 
